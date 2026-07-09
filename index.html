@@ -39,6 +39,15 @@
   --track-langdock:#4a5bd4;
   --track-code:#262626;
   --track-design:#a8436f;
+  /* Kategorie-Farben — gedämpft, damit sie neben dem pilot-Gelb bestehen.
+     Nie alleiniger Bedeutungsträger: jede Kategorie hat zusätzlich Symbol + Name. */
+  --cat-zeit:#b8541b;
+  --cat-wissen:#2f5fa8;
+  --cat-qualitaet:#2e7d4f;
+  --cat-formate:#6b4ca8;
+  --cat-team:#12706f;
+  --cat-pitch:#a8436f;
+  --cat-offen:#6f6e66;
 }
 @media(max-width:1023px){:root{--header-h:6.8rem}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -214,8 +223,12 @@ select.sort{border:1px solid var(--c-line);background:var(--c-white);border-radi
 .chip .n{font-family:var(--mono);font-size:1.2rem;opacity:.55}
 .chip.-mine[aria-pressed="true"]{background:var(--c-yellow);color:var(--c-black);border-color:var(--c-yellow)}
 .tb-meta{display:flex;align-items:center;gap:1.6rem;margin-left:auto;font-size:1.4rem;color:var(--c-gray-m)}
-.tb-meta button{background:none;border:none;color:var(--c-gray-m);text-decoration:underline;cursor:pointer;font-size:1.4rem;padding:.4rem}
+.tb-meta button{
+  background:none;border:none;color:var(--c-gray-m);text-decoration:underline;cursor:pointer;
+  font-size:1.4rem;padding:1rem .6rem;min-height:4.4rem;display:inline-flex;align-items:center;
+}
 .tb-meta button:hover{color:var(--c-black)}
+.tb-meta #open-print{font-weight:500;color:var(--c-black)}
 @media(max-width:900px){.tb-meta{width:100%;margin-left:0;margin-top:1.2rem;justify-content:space-between}}
 
 /* ===== IDEA CARDS ===== */
@@ -239,6 +252,12 @@ select.sort{border:1px solid var(--c-line);background:var(--c-white);border-radi
 .badge.-effort{background:var(--c-bg);color:var(--c-black);border:1px solid var(--c-line);font-family:var(--mono);text-transform:none;letter-spacing:0;cursor:help}
 .badge.-wild{background:var(--c-yellow);color:var(--c-black);cursor:help}
 .badge.-mine{background:var(--c-black);color:var(--c-yellow);text-transform:none;letter-spacing:0}
+.badge.-cat{
+  background:color-mix(in srgb, var(--cc) 12%, white);
+  color:var(--cc);border:1px solid color-mix(in srgb, var(--cc) 30%, white);
+  text-transform:none;letter-spacing:0;font-weight:600;display:inline-flex;align-items:center;gap:.5rem;
+}
+.badge.-cat .ico{font-size:1.3rem;line-height:1}
 
 .card h3{font-size:2.1rem;font-weight:500;letter-spacing:-.01em;line-height:1.25}
 /* Stretched-Link-Muster: ein einziger Button, der die ganze Karte klickbar macht,
@@ -295,6 +314,13 @@ select.sort{border:1px solid var(--c-line);background:var(--c-white);border-radi
 .spark-actions{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap}
 .zuender .cta.-outline{border-color:var(--c-white);color:var(--c-white)}
 .zuender .cta.-outline:hover{background:var(--c-white);color:var(--c-black)}
+.lostopf-note{
+  margin-top:3.2rem;display:flex;gap:2.4rem;align-items:center;flex-wrap:wrap;
+  border:1px dashed rgba(255,255,255,.28);border-radius:var(--r-card);padding:2.8rem 3.2rem;
+}
+.lostopf-note > div{flex:1 1 34rem}
+.lostopf-note h3{font-size:2rem;font-weight:500;color:var(--c-white)}
+.lostopf-note p{margin-top:.8rem;font-size:1.55rem;line-height:1.6;color:#d5d3c9;max-width:70ch}
 
 /* ===== ABLAUF ===== */
 .ablauf{background:var(--c-white);border-top:1px solid var(--c-line)}
@@ -424,7 +450,84 @@ footer .bot{border-top:1px solid #3a3a38;padding-top:2.4rem;display:flex;justify
 footer code{font-family:var(--mono);background:rgba(255,255,255,.08);padding:.3rem .8rem;border-radius:.4rem;color:var(--c-yellow);font-size:1.3rem}
 footer .cta.-ghost{border-color:#4a4a48;color:#d5d3c9}
 footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
-@media print{.hdr,.toolbar,.vote,.hero-actions,.reminder,footer .tools{display:none}}
+/* ============================================================
+   LOSE — Druckvorlage zum Ausschneiden
+   Kategorie ist über Farbe UND Symbol UND Name kodiert, damit
+   die Lose auch im Schwarzweiß-Druck unterscheidbar bleiben.
+   ============================================================ */
+.los{
+  --cc:var(--cat-offen);
+  position:relative;display:flex;flex-direction:column;
+  border:2px dashed var(--c-gray-l);border-radius:4mm;
+  background:#fff;overflow:hidden;
+  width:92mm;height:88mm;
+}
+.los-band{
+  background:var(--cc);color:#fff;padding:4mm 5mm;
+  display:flex;align-items:center;gap:2.5mm;flex-shrink:0;
+}
+.los-band .ico{font-size:5mm;line-height:1}
+.los-band .nm{font-size:3.4mm;font-weight:700;text-transform:uppercase;letter-spacing:.08em;flex:1}
+.los-band .nr{font-family:var(--mono);font-size:3.6mm;font-weight:700;opacity:.85}
+.los-body{padding:5mm 5mm 3mm;flex:1;min-height:0;display:flex;flex-direction:column;gap:2.5mm}
+.los-body h3{font-size:5mm;line-height:1.2;font-weight:600;letter-spacing:-.01em;color:#262626}
+.los-body p{font-size:3.5mm;line-height:1.45;color:#4a4a44;overflow:hidden}
+.los-foot{
+  padding:3mm 5mm 7mm;display:flex;gap:2mm;flex-wrap:wrap;align-items:center;
+  border-top:1px solid #e3e1d8;font-size:2.9mm;color:#5c5b54;flex-shrink:0;
+}
+.los-foot .pill{border:1px solid #d5d3c9;border-radius:10mm;padding:.8mm 2.4mm;white-space:nowrap}
+.los-foot .votes{margin-left:auto;font-family:var(--mono);font-weight:700;color:#262626;white-space:nowrap}
+.los.-wild{border:2mm solid var(--c-yellow);border-style:solid}
+/* Eigenes Band statt Eck-Flagge: überdeckt nichts und bleibt auch s/w lesbar */
+.los .wild-flag{
+  background:var(--c-yellow);color:#262626;flex-shrink:0;
+  font-size:2.9mm;font-weight:700;padding:1.6mm 5mm;letter-spacing:.06em;
+  display:flex;align-items:center;gap:1.5mm;
+}
+.los-hint{
+  position:absolute;bottom:1.8mm;left:0;right:0;text-align:center;
+  font-size:2.4mm;color:#9a9890;letter-spacing:.04em;
+}
+
+/* Vorschau im Modal */
+.los-preview{
+  display:grid;gap:1.6rem;grid-template-columns:1fr;justify-items:center;
+  max-height:52vh;overflow-y:auto;padding:1.6rem;background:#e8e6df;border-radius:.8rem;
+  border:1px solid var(--c-line);
+}
+@media(min-width:720px){.los-preview{grid-template-columns:repeat(2,1fr)}}
+.los-preview .los{box-shadow:0 .4rem 1.6rem rgba(0,0,0,.08)}
+.print-meta{
+  display:flex;gap:1.6rem;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  background:var(--c-white);border:1px solid var(--c-line);border-radius:.8rem;
+  padding:1.6rem 2rem;margin:2.4rem 0;font-size:1.5rem;
+}
+.print-meta b{font-family:var(--mono);font-size:1.8rem}
+.print-meta .warn{color:var(--c-warn);font-weight:500}
+
+/* Druck-Container: am Bildschirm unsichtbar */
+#print-area{display:none}
+
+@media print{
+  @page{size:A4;margin:10mm}
+  html{font-size:10px}
+  body{padding:0;background:#fff;color:#000}
+  body > *{display:none !important}
+  body > #print-area{display:block !important}
+  #print-area{width:100%}
+  .sheet{
+    display:grid;grid-template-columns:repeat(2,92mm);grid-auto-rows:88mm;
+    gap:6mm;justify-content:center;align-content:start;
+    break-after:page;page-break-after:always;
+  }
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+  .los{
+    break-inside:avoid;page-break-inside:avoid;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .los-band{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -525,13 +628,17 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
       </div>
 
       <div class="filters" id="filters">
+        <div class="chips" id="cat-filters" role="group" aria-label="Nach Kategorie filtern"></div>
         <div class="chips" id="track-filters" role="group" aria-label="Nach Track filtern"></div>
         <div class="chips" id="status-filters" role="group" aria-label="Nach Status filtern"></div>
       </div>
 
       <div class="tb-meta">
         <span id="count" role="status" aria-live="polite"></span>
-        <button type="button" id="reset-filters" hidden>Filter zurücksetzen</button>
+        <span style="display:flex;gap:1.6rem;align-items:center">
+          <button type="button" id="open-print">🎟 Lose drucken</button>
+          <button type="button" id="reset-filters" hidden>Filter zurücksetzen</button>
+        </span>
       </div>
     </div>
 
@@ -560,6 +667,18 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
         <button class="cta -yellow" id="roll">🎲 Idee würfeln</button>
         <button class="cta -outline" id="spark-take" disabled>Als Idee übernehmen</button>
       </div>
+    </div>
+
+    <div class="lostopf-note">
+      <div>
+        <h3>Und für den Hackathon selbst: der Lostopf</h3>
+        <p>
+          Am Tag des Hackathons hilft kein Bildschirm. Druck die Ideen als Lose aus,
+          wirf sie in einen Topf — wer ohne eigene Idee dasitzt, zieht eine und legt los.
+          Jede Kategorie hat ihre eigene Farbe und ihr eigenes Symbol.
+        </p>
+      </div>
+      <button class="cta -yellow" id="open-print-2">🎟 Lose drucken</button>
     </div>
   </div>
 </section>
@@ -675,6 +794,12 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
         </div>
 
         <div class="fld">
+          <span class="lg">Worum geht es im Kern?</span>
+          <p class="hint">Die Kategorie hilft anderen beim Suchen — und bestimmt, wie dein Los im Lostopf aussieht.</p>
+          <div class="chk-row" id="cat-chks" role="radiogroup" aria-label="Kategorie"></div>
+        </div>
+
+        <div class="fld">
           <span class="lg">Welcher Track?</span>
           <p class="hint">Nur eine Vermutung. Wenn du unsicher bist, nimm den ersten — beim Kickoff schauen wir gemeinsam drauf.</p>
           <div class="radios" id="track-radios"></div>
@@ -754,6 +879,50 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </div>
 
+<!-- DRUCK-MODAL -->
+<div class="ov" id="ov-print" role="dialog" aria-modal="true" aria-labelledby="print-title">
+  <div class="modal">
+    <div class="modal-hd">
+      <div><p class="ol">Für den Lostopf</p><h2 id="print-title">Ideen als Lose drucken</h2></div>
+      <button class="x" data-close aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-bd">
+      <p class="notice">
+        <b>Wofür ist das?</b> Beim Hackathon sitzt manchmal jemand da, ohne eigene Idee.
+        Statt ihn ratlos zu lassen, zieht er ein Los aus dem Topf und baut, was darauf steht.
+        Jedes Los trägt eine Idee aus diesem Board — mit Kategorie, Track und geschätztem Aufwand.
+      </p>
+
+      <div class="fld">
+        <span class="lg">Welche Ideen sollen in den Topf?</span>
+        <div class="radios" id="print-scope"></div>
+      </div>
+
+      <div class="print-meta" id="print-meta"></div>
+
+      <div class="fld">
+        <span class="lg">Vorschau</span>
+        <p class="hint">So sehen die Lose aus. Gedruckt wird auf A4, sechs Lose pro Seite.</p>
+        <div class="los-preview" id="print-preview"></div>
+      </div>
+
+      <p class="notice">
+        <b>Vor dem Drucken:</b> Aktiviere in den Druckeinstellungen deines Browsers
+        <em>„Hintergrundgrafiken drucken"</em> — sonst bleiben die farbigen Kategorie-Bänder weiß.
+        Die Lose funktionieren trotzdem: Jede Kategorie hat neben der Farbe auch ein Symbol
+        und ihren Namen. Ausschneiden entlang der gestrichelten Linie, einmal falten, in den Topf.
+      </p>
+    </div>
+    <div class="modal-ft">
+      <button type="button" class="cta -outline" data-close>Abbrechen</button>
+      <button type="button" class="cta -yellow" id="do-print">Druckdialog öffnen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wird nur beim Drucken sichtbar -->
+<div id="print-area" aria-hidden="true"></div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -817,6 +986,26 @@ const TRACK_GROUPS = [
   }
 ];
 
+/* Kategorien beschreiben, WAS eine Idee bewirkt — anders als der Track,
+   der beschreibt, WOMIT sie gebaut wird. Beides zusammen ergibt das Los-Design. */
+const CATEGORIES = {
+  'zeit':      {label:'Zeit zurückholen', icon:'⏱', color:'var(--cat-zeit)',
+                desc:'Wiederkehrende Handarbeit, die eine Maschine übernehmen könnte.'},
+  'wissen':    {label:'Wissen finden', icon:'🔎', color:'var(--cat-wissen)',
+                desc:'Informationen, die verstreut sind und jedes Mal neu gesucht werden.'},
+  'qualitaet': {label:'Fehler vermeiden', icon:'✓', color:'var(--cat-qualitaet)',
+                desc:'Prüfen, was sonst jemand übersieht — vor der Abgabe.'},
+  'formate':   {label:'Formate übersetzen', icon:'🔄', color:'var(--cat-formate)',
+                desc:'Excel zu Slides, Zahlen zu Klartext, Daten zu Text.'},
+  'team':      {label:'Zusammenarbeit', icon:'🤝', color:'var(--cat-team)',
+                desc:'Abstimmung, Übergaben, Onboarding, Wissen teilen.'},
+  'pitch':     {label:'Kunde & Pitch', icon:'🏆', color:'var(--cat-pitch)',
+                desc:'Neues Geschäft gewinnen, Kunden überzeugen.'},
+  'offen':     {label:'Noch offen', icon:'·', color:'var(--cat-offen)',
+                desc:'Noch keiner Kategorie zugeordnet.'}
+};
+const CAT_DEFAULT = 'offen';
+
 const DEPTS = ['Mediaplanung','Strategie','Kreation','Werbewirkungsforschung','Technologie','Account Management','New Business','HR & People','Controlling','Agenturweit'];
 
 const STATUSES = {
@@ -833,14 +1022,14 @@ const EFFORT_ORDER = {'S':1,'M':2,'L':3,'?':4};
 
 const SPARK_DEPTS = DEPTS.filter(d => d !== 'Agenturweit');
 const SPARK_PAINS = [
-  {t:'wiederkehrende Fleißarbeit', q:'was macht ihr jede Woche von Hand, obwohl es immer gleich abläuft?'},
-  {t:'Wissen wiederfinden',        q:'welches Wissen steckt in Köpfen oder alten Dateien und wird jedes Mal neu gesucht?'},
-  {t:'Qualitätssicherung',         q:'wo schaut jemand drüber und findet immer wieder dieselben Fehler?'},
-  {t:'Formate übersetzen',         q:'was wird bei euch ständig von einem Format ins andere übertragen?'},
-  {t:'Warten auf andere',          q:'worauf wartet ihr regelmäßig, obwohl ihr es selbst könntet?'},
-  {t:'Onboarding',                 q:'was muss jede neue Person mühsam lernen, weil es nirgends steht?'},
-  {t:'Zahlen erklären',            q:'welche Auswertung müsst ihr immer wieder für andere übersetzen?'},
-  {t:'Pitch-Vorbereitung',         q:'was frisst vor jedem Pitch Zeit, ohne dass es den Pitch besser macht?'}
+  {t:'wiederkehrende Fleißarbeit', q:'was macht ihr jede Woche von Hand, obwohl es immer gleich abläuft?', cat:'zeit'},
+  {t:'Wissen wiederfinden',        q:'welches Wissen steckt in Köpfen oder alten Dateien und wird jedes Mal neu gesucht?', cat:'wissen'},
+  {t:'Qualitätssicherung',         q:'wo schaut jemand drüber und findet immer wieder dieselben Fehler?', cat:'qualitaet'},
+  {t:'Formate übersetzen',         q:'was wird bei euch ständig von einem Format ins andere übertragen?', cat:'formate'},
+  {t:'Warten auf andere',          q:'worauf wartet ihr regelmäßig, obwohl ihr es selbst könntet?', cat:'team'},
+  {t:'Onboarding',                 q:'was muss jede neue Person mühsam lernen, weil es nirgends steht?', cat:'team'},
+  {t:'Zahlen erklären',            q:'welche Auswertung müsst ihr immer wieder für andere übersetzen?', cat:'formate'},
+  {t:'Pitch-Vorbereitung',         q:'was frisst vor jedem Pitch Zeit, ohne dass es den Pitch besser macht?', cat:'pitch'}
 ];
 const SPARK_TOOLS = Object.entries(TRACKS).map(([id,t]) => ({id, t:t.label}));
 
@@ -851,54 +1040,64 @@ const SEED = [
   {title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
    problem:'Kunden schicken überarbeitete Mediapläne als neue Excel. Wir vergleichen Zeile für Zeile von Hand und übersehen trotzdem Änderungen bei Budgets und Laufzeiten.',
    solution:'Zwei Dateien reinziehen, das Tool markiert farbig jede Abweichung bei Budget, Zeitraum, Kanal und Format — plus eine Zusammenfassung in Prosa für die Mail an den Kunden.',
+   category:'qualitaet',
    track:'claude-code-app', dept:'Mediaplanung', effort:'M', author:'Christopher Kipp',
    status:'crew-gesucht', wildcard:false, needs:['Fachwissen Media','Design-Blick'],
    votes:23, crew:[{name:'Christopher Kipp',role:'Bauen'}], days:14},
   {title:'Briefing-Wächter: prüft eingehende Kunden-Briefings auf Lücken',
    problem:'Briefings kommen unvollständig rein — kein Budget, keine KPIs, keine Zielgruppe. Das merken wir erst, wenn die Strategin schon zwei Stunden drin steckt.',
    solution:'Ein Langdock-Agent, dem man das Briefing gibt. Er prüft gegen unsere Checkliste, listet was fehlt und formuliert die Rückfrage-Mail an den Kunden gleich mit.',
+   category:'qualitaet',
    track:'langdock-agent', dept:'Strategie', effort:'S', author:'Erika Maier',
    status:'idee', wildcard:false, needs:['Fachwissen Media'], votes:31, crew:[], days:9},
   {title:'Wettbewerbs-Radar: was machen die Wettbewerber unserer Kunden gerade?',
    problem:'Vor jedem Jour Fixe googelt jemand händisch, was der Wettbewerb an Kampagnen gestartet hat. Dauert eine Stunde, ist am nächsten Tag veraltet.',
    solution:'Ein Workflow, der wöchentlich Quellen abklappert, Neues zusammenfasst und montags eine kurze Mail an das Kundenteam schickt. Ein Mensch gibt vor dem Versand frei.',
+   category:'wissen',
    track:'langdock-workflow', dept:'Account Management', effort:'M', author:'Jan Richter',
    status:'idee', wildcard:false, needs:['Daten-Zugang','Kunden-Sicht'], votes:19, crew:[], days:6},
   {title:'Pitch-Deck-Rohbau aus dem Briefing',
    problem:'Jeder Pitch fängt mit derselben leeren PowerPoint an. Struktur, Kapitel, pilot-Layout — jedes Mal von vorn, obwohl 60 % identisch sind.',
    solution:'Briefing rein, Claude Design baut den Rohbau im pilot-Design: Agenda, Marktkapitel, Zielgruppen-Slide, Media-Strategie, Wirkungsnachweis. Inhalte füllt der Mensch — die Struktur steht.',
+   category:'pitch',
    track:'claude-design', dept:'New Business', effort:'M', author:'Mia Hoffmann',
    status:'in-arbeit', wildcard:false, needs:[], votes:27,
    crew:[{name:'Mia Hoffmann',role:'Design'},{name:'Sophie Klein',role:'Idee & Fachwissen'},{name:'Jan Richter',role:'Bauen'}], days:21},
   {title:'Onboarding-Lotse für neue Piloten',
    problem:'Neue Kolleg:innen fragen in den ersten Wochen dieselben 40 Dinge — welches Tool wofür, wer entscheidet was, wo liegt die Vorlage. Immer bei den gleichen drei Leuten.',
    solution:'Ein Langdock-Agent mit Zugriff auf unser Confluence, der geduldig antwortet und ehrlich sagt, wenn er etwas nicht weiß — inklusive Hinweis, wen man dann fragt.',
+   category:'team',
    track:'langdock-agent', dept:'HR & People', effort:'S', author:'Sophie Klein',
    status:'crew-gesucht', wildcard:false, needs:['Fachwissen Kreation','Jemand der baut'],
    votes:16, crew:[{name:'Sophie Klein',role:'Idee & Fachwissen'}], days:11},
   {title:'Tonalitäts-Check gegen die Marken-Guidelines',
    problem:'Bei jedem Text stellt sich die Frage: klingt das nach der Marke? Die Guidelines liegen als 40-seitiges PDF herum und niemand liest sie beim Texten.',
    solution:'Ein Skill für Claude Code: Text rein, Bewertung raus — welche Stelle bricht mit welcher Guideline-Regel, mit Formulierungsvorschlag. Landet danach im Skill-Marktplatz.',
+   category:'qualitaet',
    track:'claude-code-skill', dept:'Kreation', effort:'M', author:'Christopher Kipp',
    status:'idee', wildcard:false, needs:['Fachwissen Kreation'], votes:14, crew:[], days:4},
   {title:'Kampagnen-Obduktion: was können wir aus abgeschlossenen Kampagnen lernen?',
    problem:'Nach dem Kampagnen-Ende wandert der Abschlussbericht ins Archiv. Beim nächsten ähnlichen Kunden erinnert sich niemand, was damals funktioniert hat.',
    solution:'Alle Abschlussberichte in eine durchsuchbare Wissensbasis. Frage: „Was hat bei FMCG-Kunden im Weihnachtsgeschäft funktioniert?“ — Antwort mit Quellenangabe auf die echten Berichte.',
+   category:'wissen',
    track:'langdock-agent', dept:'Werbewirkungsforschung', effort:'L', author:'Erika Maier',
    status:'idee', wildcard:false, needs:['Daten-Zugang','Fachwissen Media'], votes:22, crew:[], days:8},
   {title:'Der Zahlen-Übersetzer: Reportings, die man auch ohne Media-Studium versteht',
    problem:'Wir schicken Kunden Dashboards voller TKP, GRP und Viewability. Auf der anderen Seite sitzt oft eine Marketing-Managerin, die eigentlich nur wissen will, ob es funktioniert hat.',
    solution:'Eine Webapp: Reporting-Daten rein, verständliche Zusammenfassung raus — in drei Absätzen, ohne Fachjargon, mit einer klaren Empfehlung fürs nächste Quartal.',
+   category:'formate',
    track:'claude-code-app', dept:'Account Management', effort:'M', author:'Jan Richter',
    status:'idee', wildcard:false, needs:['Fachwissen Media','Kunden-Sicht'], votes:18, crew:[], days:5},
   {title:'Der Werbewirkungs-Simulator: Kampagne vorher durchspielen',
    problem:'Wir wissen erst nach der Kampagne, ob der Mediamix gepasst hat. Vorher ist alles Erfahrung und Bauchgefühl.',
    solution:'Ein Tool, das auf Basis unserer historischen Wirkungsdaten durchspielt, was passiert, wenn man Budget zwischen Kanälen verschiebt. Ehrlich gesagt: sportlich für zwei Tage. Aber selbst eine grobe Version wäre im Pitch Gold wert.',
+   category:'pitch',
    track:'claude-code-app', dept:'Werbewirkungsforschung', effort:'L', author:'Christopher Kipp',
    status:'idee', wildcard:true, needs:['Daten-Zugang','Jemand der baut','Fachwissen Media'], votes:29, crew:[], days:3},
   {title:'Meeting-Nachbereiter mit Aufgaben-Erkennung',
    problem:'Nach Kundenterminen tippt jemand Notizen ab und vergisst die Hälfte der Zusagen. Aufgaben landen nirgends.',
    solution:'Workflow: Transkript rein, strukturiertes Protokoll raus — plus eine Liste der Zusagen mit Verantwortlichen. Wer zugesagt hat, bekommt eine Teams-Nachricht.',
+   category:'zeit',
    track:'langdock-workflow', dept:'Agenturweit', effort:'S', author:'Mia Hoffmann',
    status:'gebaut', wildcard:false, needs:[], votes:34,
    crew:[{name:'Mia Hoffmann',role:'Bauen'},{name:'Christopher Kipp',role:'Testen'}], days:30}
@@ -909,7 +1108,7 @@ const SEED = [
    ============================================================ */
 let ideas = [];
 let me = localStorage.getItem(ME_KEY) || '';
-let filters = {q:'', tracks:new Set(), statuses:new Set(), mine:false, sort:'votes'};
+let filters = {q:'', tracks:new Set(), statuses:new Set(), cats:new Set(), mine:false, sort:'votes'};
 let spark = null;
 let lastFocus = null;
 
@@ -921,17 +1120,22 @@ const initials = n => n.trim().split(/\s+/).slice(0,2).map(w => w[0]||'').join('
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const daysAgo = n => new Date(Date.now() - n*864e5).toISOString();
 
+/* Ideen aus älteren Board-Ständen kennen noch keine Kategorie.
+   Sie landen sichtbar unter „Noch offen“, statt still einer falschen zugeordnet zu werden. */
+function migrate(list){
+  return list.map(i => ({...i, category: CATEGORIES[i.category] ? i.category : CAT_DEFAULT}));
+}
 function load(){
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw){
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)){ ideas = parsed; return; }
+      if (Array.isArray(parsed)){ ideas = migrate(parsed); return; }
     }
   } catch(e){ console.warn('Board nicht lesbar, nutze Seed:', e); }
   ideas = SEED.map(s => ({
     id:uid(), title:s.title, problem:s.problem, solution:s.solution||'',
-    track:s.track, dept:s.dept, effort:s.effort, author:s.author,
+    track:s.track, category:s.category||CAT_DEFAULT, dept:s.dept, effort:s.effort, author:s.author,
     status:s.status, wildcard:s.wildcard, needs:s.needs||[],
     votes:s.votes, voters:[], crew:s.crew||[], createdAt:daysAgo(s.days)
   }));
@@ -1138,6 +1342,16 @@ function renderTracks(){
    FILTER
    ============================================================ */
 function renderFilters(){
+  $('#cat-filters').innerHTML = Object.entries(CATEGORIES).map(([id,c]) => `
+    <button class="chip" aria-pressed="false" data-cat="${id}" style="--cd:${c.color}" title="${esc(c.desc)}">
+      <span aria-hidden="true">${c.icon}</span>${esc(c.label)}<span class="n" data-n="cat-${id}"></span>
+    </button>`).join('');
+
+  $('#cat-filters').addEventListener('click', e => {
+    const b = e.target.closest('[data-cat]'); if (!b) return;
+    toggle(filters.cats, b.dataset.cat, b); render();
+  });
+
   $('#track-filters').innerHTML =
     `<button class="chip -mine" data-mine aria-pressed="false">★ Von mir / meine Crew</button>` +
     Object.entries(TRACKS).map(([id,t]) => `
@@ -1179,10 +1393,10 @@ function toggle(set, val, btn){
   btn.setAttribute('aria-pressed', String(set.has(val)));
 }
 function activeFilterCount(){
-  return filters.tracks.size + filters.statuses.size + (filters.mine?1:0) + (filters.q?1:0);
+  return filters.tracks.size + filters.statuses.size + filters.cats.size + (filters.mine?1:0) + (filters.q?1:0);
 }
 function clearFilters(){
-  filters.tracks.clear(); filters.statuses.clear();
+  filters.tracks.clear(); filters.statuses.clear(); filters.cats.clear();
   filters.mine = false; filters.q = '';
   $('#q').value = '';
   $$('.chip[aria-pressed]').forEach(c => c.setAttribute('aria-pressed','false'));
@@ -1197,9 +1411,11 @@ function visible(){
   const out = ideas.filter(i => {
     if (filters.tracks.size && !filters.tracks.has(i.track)) return false;
     if (filters.statuses.size && !filters.statuses.has(i.status)) return false;
+    if (filters.cats.size && !filters.cats.has(i.category)) return false;
     if (filters.mine && !mineIdea(i)) return false;
     if (q){
-      const hay = [i.title,i.problem,i.solution,i.dept,i.author,...(i.needs||[])].join(' ').toLowerCase();
+      const cat = CATEGORIES[i.category]?.label || '';
+      const hay = [i.title,i.problem,i.solution,i.dept,i.author,cat,...(i.needs||[])].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -1236,9 +1452,13 @@ function render(){
   $('#count').textContent = n
     ? `${list.length} von ${ideas.length} Ideen — ${n} ${n===1?'Filter':'Filter'} aktiv`
     : `${ideas.length} Ideen im Hangar`;
-  $('#filter-n').textContent = filters.tracks.size + filters.statuses.size + (filters.mine?1:0);
+  $('#filter-n').textContent = filters.tracks.size + filters.statuses.size + filters.cats.size + (filters.mine?1:0);
   $('#reset-filters').hidden = n === 0;
 
+  Object.keys(CATEGORIES).forEach(id => {
+    const el = $(`.n[data-n="cat-${id}"]`, $('#cat-filters'));
+    if (el) el.textContent = ideas.filter(i => i.category===id).length || '';
+  });
   Object.keys(TRACKS).forEach(id => {
     const el = $(`.n[data-n="${id}"]`, $('#track-filters'));
     if (el) el.textContent = ideas.filter(i => i.track===id).length || '';
@@ -1258,12 +1478,16 @@ function render(){
 
 function cardHTML(i){
   const t = TRACKS[i.track] || {label:'—', color:'var(--c-gray-l)'};
+  const cat = CATEGORIES[i.category] || CATEGORIES[CAT_DEFAULT];
   const voted = me && i.voters.includes(me);
   const crew = i.crew.slice(0,3).map(c => `<span class="av" title="${esc(c.name)}">${esc(initials(c.name))}</span>`).join('');
   const more = i.crew.length > 3 ? `<span class="av -more">+${i.crew.length-3}</span>` : '';
   return `
   <article class="card" style="--tc:${t.color}" data-id="${i.id}">
     <div class="badges">
+      <span class="badge -cat" style="--cc:${cat.color}" title="${esc(cat.desc)}">
+        <span class="ico" aria-hidden="true">${cat.icon}</span>${esc(cat.label)}
+      </span>
       <span class="badge -track" style="--tc:${t.color}">${esc(t.label)}</span>
       ${i.wildcard ? '<span class="badge -wild" title="Mutige, ungewöhnliche Idee — zählt auf den Mut-Preis ein.">🎲 Wildcard</span>' : ''}
       ${mineIdea(i) ? '<span class="badge -mine">Von dir</span>' : ''}
@@ -1341,6 +1565,14 @@ function buildForm(){
       </span>
     </label>`).join('');
 
+  /* Kategorien als Radio-Chips — „Noch offen" ist der ehrliche Default:
+     niemand wird gezwungen, seine Idee in eine Schublade zu stecken. */
+  $('#cat-chks').innerHTML = Object.entries(CATEGORIES).map(([id,c]) => `
+    <label class="chk" title="${esc(c.desc)}">
+      <input type="radio" name="category" value="${id}" ${id===CAT_DEFAULT?'checked':''}>
+      <span aria-hidden="true" style="margin-right:.6rem">${c.icon}</span>${esc(c.label)}
+    </label>`).join('');
+
   $('#i-dept').innerHTML = DEPTS.map(d => `<option${d==='Agenturweit'?' selected':''}>${esc(d)}</option>`).join('');
   $('#needs-chks').innerHTML = NEEDS.map(n => `
     <label class="chk"><input type="checkbox" value="${esc(n)}">${esc(n)}</label>`).join('');
@@ -1408,6 +1640,7 @@ function openSubmit(prefill){
     if (prefill.problem) $('#i-problem').value = prefill.problem;
     if (prefill.dept)    $('#i-dept').value = prefill.dept;
     if (prefill.track){ const r = f.querySelector(`input[name=track][value="${prefill.track}"]`); if (r) r.checked = true; }
+    if (prefill.category){ const r = f.querySelector(`input[name=category][value="${prefill.category}"]`); if (r) r.checked = true; }
   }
   ['#i-title','#i-problem'].forEach(s => $(s).dispatchEvent(new Event('input')));
   openOv('#ov-submit', '#i-title');
@@ -1433,6 +1666,7 @@ $('#form-submit').addEventListener('submit', e => {
     problem:$('#i-problem').value.trim(),
     solution:$('#i-solution').value.trim(),
     track:$('#form-submit').querySelector('input[name=track]:checked').value,
+    category:($('#form-submit').querySelector('input[name=category]:checked')||{value:CAT_DEFAULT}).value,
     dept:$('#i-dept').value,
     effort:$('#i-effort').value,
     author,
@@ -1463,10 +1697,11 @@ $('#form-submit').addEventListener('submit', e => {
 function openDetail(id, keepOpen){
   const i = ideas.find(x => x.id === id); if (!i) return;
   const t = TRACKS[i.track];
+  const cat = CATEGORIES[i.category] || CATEGORIES[CAT_DEFAULT];
   const ov = $('#ov-detail');
   ov.dataset.id = id;
 
-  $('#detail-ol').textContent = `${t.label} · ${i.dept}${i.wildcard ? ' · 🎲 Wildcard' : ''}`;
+  $('#detail-ol').textContent = `${cat.icon} ${cat.label} · ${t.label} · ${i.dept}${i.wildcard ? ' · 🎲 Wildcard' : ''}`;
   $('#detail-title').textContent = i.title;
 
   const inCrew = me && i.crew.some(c => c.name === me);
@@ -1475,6 +1710,8 @@ function openDetail(id, keepOpen){
 
   $('#detail-body').innerHTML = `
     <div class="d-facts">
+      <div class="fact"><div class="k">Kategorie</div>
+        <div class="v" style="color:${cat.color}">${cat.icon} ${esc(cat.label)}</div></div>
       <div class="fact"><div class="k">Stimmen</div><div class="v">${i.votes}</div></div>
       <div class="fact"><div class="k">Status</div><div class="v">${esc(STATUSES[i.status].label)}</div></div>
       <div class="fact"><div class="k">Aufwand</div><div class="v">${i.effort === '?' ? 'offen' : `${esc(i.effort)} — ${esc(EFFORTS[i.effort])}`}</div></div>
@@ -1581,13 +1818,17 @@ function openDetail(id, keepOpen){
           <input type="text" id="e-title" maxlength="90" value="${esc(i.title)}"></div>
         <div class="fld"><label for="e-problem">Problem</label>
           <textarea id="e-problem" maxlength="400">${esc(i.problem)}</textarea></div>
-        <div class="fld" style="margin:0"><label for="e-solution">Lösungsidee</label>
-          <textarea id="e-solution" maxlength="400" style="min-height:7rem">${esc(i.solution)}</textarea></div>`,
+        <div class="fld"><label for="e-solution">Lösungsidee</label>
+          <textarea id="e-solution" maxlength="400" style="min-height:7rem">${esc(i.solution)}</textarea></div>
+        <div class="fld" style="margin:0"><label for="e-cat">Kategorie</label>
+          <p class="hint">Bestimmt, wie dein Los im Lostopf aussieht.</p>
+          <select id="e-cat">${Object.entries(CATEGORIES).map(([cid,c]) =>
+            `<option value="${cid}" ${cid===i.category?'selected':''}>${c.icon} ${esc(c.label)}</option>`).join('')}</select></div>`,
       ok:'Speichern', focus:'#e-title',
       read: body => {
         const t2 = $('#e-title',body).value.trim(), p = $('#e-problem',body).value.trim();
         if (!t2 || !p){ toast('Titel und Problem dürfen nicht leer sein.'); return undefined; }
-        return {title:t2, problem:p, solution:$('#e-solution',body).value.trim()};
+        return {title:t2, problem:p, solution:$('#e-solution',body).value.trim(), category:$('#e-cat',body).value};
       }
     });
     if (!vals) return;
@@ -1632,9 +1873,124 @@ $('#spark-take').addEventListener('click', () => {
   if (!spark) return;
   openSubmit({
     problem:`Aus dem Ideen-Zünder — Schmerzpunkt „${spark.pain.t}“ im Bereich ${spark.dept}: ${spark.pain.q}`,
-    dept:spark.dept, track:spark.tool.id
+    dept:spark.dept, track:spark.tool.id, category:spark.pain.cat
   });
 });
+
+/* ============================================================
+   LOSE — Druckvorlage für den Lostopf
+   ============================================================ */
+const LOSE_PRO_SEITE = 6;
+
+/* Problemtext auf Los-Länge bringen, ohne mitten im Wort zu kappen */
+function kurz(text, max){
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const at = cut.lastIndexOf(' ');
+  return (at > max * 0.6 ? cut.slice(0, at) : cut).replace(/[,;:.\s]+$/,'') + ' …';
+}
+
+function losHTML(i, nr){
+  const cat = CATEGORIES[i.category] || CATEGORIES[CAT_DEFAULT];
+  const t = TRACKS[i.track] || {label:'—'};
+  return `
+  <article class="los ${i.wildcard ? '-wild' : ''}" style="--cc:${cat.color}">
+    <div class="los-band">
+      <span class="ico" aria-hidden="true">${cat.icon}</span>
+      <span class="nm">${esc(cat.label)}</span>
+      <span class="nr">Nr. ${String(nr).padStart(2,'0')}</span>
+    </div>
+    ${i.wildcard ? '<div class="wild-flag"><span aria-hidden="true">🎲</span> WILDCARD — TRAU DICH</div>' : ''}
+    <div class="los-body">
+      <h3>${esc(kurz(i.title, 72))}</h3>
+      <p>${esc(kurz(i.problem, 180))}</p>
+    </div>
+    <div class="los-foot">
+      <span class="pill">${esc(t.label)}</span>
+      <span class="pill">${i.effort === '?' ? 'Aufwand offen' : 'Aufwand ' + esc(i.effort)}</span>
+      <span class="votes">▲ ${i.votes}</span>
+    </div>
+    <span class="los-hint">✂ ausschneiden · falten · in den Topf</span>
+  </article>`;
+}
+
+/* Welche Ideen eignen sich für den Lostopf? */
+function printScopes(){
+  const n = activeFilterCount();
+  return [
+    {id:'lostopf', label:'Gute Lostopf-Kandidaten',
+     desc:'Ideen, die noch niemand gebaut hat und die noch keine Crew haben. Genau das, was jemand ohne eigene Idee übernehmen kann.',
+     list: ideas.filter(i => i.status !== 'gebaut' && i.crew.length === 0)},
+    {id:'gefiltert', label:'Was gerade im Board steht',
+     desc: n
+       ? `Die aktuell gefilterte Auswahl (${n} ${n===1?'Filter':'Filter'} aktiv) — nützlich, wenn du nur eine Kategorie in den Topf werfen willst.`
+       : 'Du hast gerade keine Filter gesetzt, deshalb ist das dasselbe wie „Alle Ideen“. Filtere im Board z. B. nach einer Kategorie, dann wird diese Auswahl enger.',
+     list: visible()},
+    {id:'alle', label:'Alle Ideen',
+     desc:'Das komplette Board, inklusive der bereits gebauten — die kann niemand mehr ziehen.',
+     list: [...ideas]}
+  ];
+}
+let printScope = 'lostopf';
+
+function selectedLose(){
+  const s = printScopes().find(x => x.id === printScope);
+  return (s ? s.list : []).slice().sort((a,b) => b.votes - a.votes);
+}
+
+function renderPrintDialog(){
+  const scopes = printScopes();
+  $('#print-scope').innerHTML = scopes.map(s => `
+    <label class="radio">
+      <input type="radio" name="scope" value="${s.id}" ${s.id===printScope?'checked':''}>
+      <span>
+        <b>${esc(s.label)} — ${s.list.length} ${s.list.length===1?'Los':'Lose'}</b>
+        <small>${esc(s.desc)}</small>
+      </span>
+    </label>`).join('');
+
+  $$('#print-scope input').forEach(r => r.onchange = () => { printScope = r.value; renderPrintMeta(); });
+  renderPrintMeta();
+}
+
+function renderPrintMeta(){
+  const lose = selectedLose();
+  const seiten = Math.ceil(lose.length / LOSE_PRO_SEITE);
+  const catCount = new Set(lose.map(l => l.category)).size;
+
+  $('#print-meta').innerHTML = lose.length ? `
+    <span><b>${lose.length}</b> ${lose.length===1?'Los':'Lose'}</span>
+    <span><b>${seiten}</b> ${seiten===1?'Blatt':'Blätter'} A4</span>
+    <span><b>${catCount}</b> ${catCount===1?'Kategorie':'Kategorien'}</span>
+    ${lose.length < 3 ? '<span class="warn">Ein Lostopf mit so wenigen Losen macht wenig Spaß.</span>' : ''}`
+    : `<span class="warn">Keine Idee passt zu dieser Auswahl — es gäbe nichts zu drucken.</span>`;
+
+  $('#do-print').disabled = lose.length === 0;
+
+  /* Vorschau: die ersten vier Lose reichen, um den Eindruck zu vermitteln */
+  const preview = lose.slice(0,4);
+  $('#print-preview').innerHTML = preview.length
+    ? preview.map((l,n) => losHTML(l, n+1)).join('') +
+      (lose.length > 4 ? `<p style="grid-column:1/-1;text-align:center;color:var(--c-gray-m);font-size:1.45rem;padding:1.6rem">
+         … und ${lose.length - 4} weitere Lose.</p>` : '')
+    : `<p style="grid-column:1/-1;text-align:center;color:var(--c-gray-m);padding:3rem">Nichts ausgewählt.</p>`;
+}
+
+const openPrint = () => { renderPrintDialog(); openOv('#ov-print'); };
+$('#open-print').onclick = openPrint;
+$('#open-print-2').onclick = openPrint;
+
+$('#do-print').onclick = () => {
+  const lose = selectedLose();
+  if (!lose.length) return;
+  const seiten = [];
+  for (let n = 0; n < lose.length; n += LOSE_PRO_SEITE) seiten.push(lose.slice(n, n + LOSE_PRO_SEITE));
+  $('#print-area').innerHTML = seiten.map((seite, si) =>
+    `<div class="sheet">${seite.map((l,n) => losHTML(l, si*LOSE_PRO_SEITE + n + 1)).join('')}</div>`
+  ).join('');
+  closeOv($('#ov-print'));
+  setTimeout(() => window.print(), 120);
+};
 
 /* ============================================================
    TOOLBAR
@@ -1691,7 +2047,7 @@ $('#export-md').onclick = () => {
     `Stand: ${new Date().toLocaleDateString('de-DE')} · ${ideas.length} Ideen · ${ideas.reduce((a,i)=>a+i.votes,0)} Stimmen`, ``,
     ...byVotes.map(i => [
       `## ${i.votes} ▲ — ${i.title}${i.wildcard ? ' 🎲' : ''}`, ``,
-      `**Track:** ${TRACKS[i.track].label} · **Abteilung:** ${i.dept} · **Aufwand:** ${i.effort === '?' ? 'offen' : i.effort} · **Status:** ${STATUSES[i.status].label}`, ``,
+      `**Kategorie:** ${(CATEGORIES[i.category]||CATEGORIES[CAT_DEFAULT]).label} · **Track:** ${TRACKS[i.track].label} · **Abteilung:** ${i.dept} · **Aufwand:** ${i.effort === '?' ? 'offen' : i.effort} · **Status:** ${STATUSES[i.status].label}`, ``,
       `**Problem:** ${i.problem}`,
       i.solution ? `\n**Lösung:** ${i.solution}` : '',
       i.needs?.length ? `\n**Sucht:** ${i.needs.join(', ')}` : '',

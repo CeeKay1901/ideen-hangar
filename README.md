@@ -33,6 +33,45 @@ in eine vorausgefüllte Einreichung verwandelt.
 Wer eine Idee eingereicht hat, kann sie später **bearbeiten oder löschen**. Der Filter
 *„Von mir / meine Crew"* zeigt alles, woran man beteiligt ist.
 
+## Kategorien
+
+Jede Idee bekommt eine Kategorie. Sie beschreibt, **was die Idee bewirkt** — im Unterschied
+zum Track, der beschreibt, **womit sie gebaut wird**.
+
+| | Kategorie | Bedeutung |
+|---|---|---|
+| ⏱ | Zeit zurückholen | Wiederkehrende Handarbeit, die eine Maschine übernehmen könnte |
+| 🔎 | Wissen finden | Informationen, die verstreut sind und jedes Mal neu gesucht werden |
+| ✓ | Fehler vermeiden | Prüfen, was sonst jemand übersieht — vor der Abgabe |
+| 🔄 | Formate übersetzen | Excel zu Slides, Zahlen zu Klartext, Daten zu Text |
+| 🤝 | Zusammenarbeit | Abstimmung, Übergaben, Onboarding, Wissen teilen |
+| 🏆 | Kunde & Pitch | Neues Geschäft gewinnen, Kunden überzeugen |
+| · | Noch offen | Standard — niemand wird gezwungen, sich festzulegen |
+
+Ideen aus älteren Board-Ständen landen sichtbar unter *„Noch offen"*, statt still einer
+falschen Kategorie zugeordnet zu werden.
+
+## Der Lostopf
+
+Am Hackathon-Tag hilft kein Bildschirm. Über **„🎟 Lose drucken"** entsteht eine A4-Druckvorlage:
+sechs Lose pro Blatt, jedes zum Ausschneiden. Wer ohne eigene Idee dasitzt, zieht eines aus dem
+Topf und baut, was darauf steht.
+
+Jedes Los trägt Kategorie-Band, Titel, Problem, Track, geschätzten Aufwand und die Stimmenzahl.
+Wildcards bekommen ein gelbes Band und einen gelben Rahmen.
+
+Drei Auswahlmöglichkeiten:
+
+- **Gute Lostopf-Kandidaten** (Standard) — noch nicht gebaut, noch keine Crew. Genau das,
+  was jemand übernehmen kann.
+- **Was gerade im Board steht** — die aktuell gefilterte Auswahl, z. B. nur eine Kategorie.
+- **Alle Ideen** — inklusive der bereits gebauten.
+
+Der Dialog zeigt vorab, wie viele Lose, Blätter und Kategorien dabei herauskommen, und blendet
+eine Vorschau ein. **Hintergrundgrafiken müssen in den Druckeinstellungen aktiviert sein**,
+sonst bleiben die Kategorie-Bänder weiß — die Lose funktionieren dann trotzdem, weil jede
+Kategorie neben der Farbe auch ein Symbol und ihren Namen trägt.
+
 ## Für Nicht-Techniker gebaut
 
 Die Zielgruppe sind Mediaplaner:innen, Texter:innen und Strateg:innen — nicht Entwickler.
@@ -80,10 +119,12 @@ Alles steckt in `index.html`, keine Abhängigkeiten, kein Build.
 |---|---|
 | Hackathon-Datum (Countdown) | `HACKATHON_DATE` |
 | Tracks | `TRACKS`, `TRACK_GROUPS` |
+| Kategorien (Name, Symbol, Farbe) | `CATEGORIES` + `--cat-*` in den CSS-Tokens |
 | Abteilungen | `DEPTS` |
 | Status-Stufen | `STATUSES` |
 | Beispiel-Ideen | `SEED` |
 | Würfel des Ideen-Zünders | `SPARK_PAINS` |
+| Lose pro Druckseite | `LOSE_PRO_SEITE` |
 
 ## Verwandt
 
