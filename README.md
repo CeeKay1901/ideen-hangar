@@ -20,14 +20,39 @@ Jede Idee wird einem Werkzeug zugeordnet — als Vermutung, die beim Kickoff gem
 
 1. **Idee einreichen** — beschrieben wird zuerst das *Problem*, nicht die Lösung.
    Die Lösungsidee ist optional; wer sein Problem benennen kann, kann mitmachen.
+   Beim Tippen des Titels warnt der Hangar, wenn eine ähnliche Idee schon existiert.
 2. **Abstimmen** — eine Stimme pro Person und Idee.
 3. **Crew bilden** — per „Ich mach mit" tritt man einer Idee mit einer Rolle bei.
    Die Idee wechselt dann automatisch auf *Crew gesucht*.
-4. **Bauen** — beim Hackathon. Status wandert bis *Gebaut*.
+4. **Bauen** — beim Hackathon. Den Status darf nur die Crew der jeweiligen Idee ändern.
 
 Wer keine Idee hat, nutzt den **Ideen-Zünder**: drei Würfel für Abteilung,
 Schmerzpunkt und Werkzeug ergeben eine Frage zum Weiterdenken, die sich per Klick
 in eine vorausgefüllte Einreichung verwandelt.
+
+Wer eine Idee eingereicht hat, kann sie später **bearbeiten oder löschen**. Der Filter
+*„Von mir / meine Crew"* zeigt alles, woran man beteiligt ist.
+
+## Für Nicht-Techniker gebaut
+
+Die Zielgruppe sind Mediaplaner:innen, Texter:innen und Strateg:innen — nicht Entwickler.
+Entsprechend:
+
+- **Kein Fachjargon als Einstiegshürde.** Die Tracks tragen ein sichtbares
+  „✓ Ohne Programmieren"-Signal, wo es zutrifft (Langdock, Claude Design).
+- **Das Formular fragt nach dem Problem, nicht nach der Lösung.** Aufwand steht
+  standardmäßig auf „Keine Ahnung" — niemand muss schätzen, was er nicht schätzen kann.
+- **Keine nativen Browser-Dialoge.** Name, Rolle und Bestätigungen laufen über
+  gestaltete Dialoge im pilot-Design.
+- **Getippter Text geht nicht verloren.** Wer das Formular mit Inhalt schließt, wird gefragt.
+
+## Barrierefreiheit
+
+- Skip-Link zum Board, vollständige Tastatur-Bedienung, Fokusfalle in Dialogen.
+- Keine verschachtelten interaktiven Elemente (die Karte nutzt das Stretched-Link-Muster).
+- Trefferzahl der Filter wird als `aria-live`-Region angesagt.
+- Alle Touch-Ziele mindestens 44 × 44 px; `prefers-reduced-motion` wird respektiert.
+- Status und Track sind nie nur über Farbe kodiert, immer auch über Text.
 
 ## Datenhaltung
 
@@ -38,6 +63,9 @@ Geteilt wird über **JSON-Export/Import** im Fußbereich. Der Import überschrei
 sondern führt zusammen: Stimmen werden vereinigt (eine pro Person), Crew-Mitglieder ergänzt,
 ein fortgeschrittener Status gewinnt. So kann eine Person die Exporte aller Teilnehmenden
 einsammeln und hat den Gesamtstand.
+
+Damit niemand seine Arbeit verliert, blendet der Hangar ein **Export-Banner** ein, sobald
+man mit ungesicherten Änderungen aus einem anderen Tab zurückkommt.
 
 Für einen Hackathon mit vielen Einreichenden ist das die Krücke, nicht die Lösung.
 Der nächste Schritt ist eine kleine Datenbank hinter Coolify.

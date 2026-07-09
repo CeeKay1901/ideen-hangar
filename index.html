@@ -26,7 +26,8 @@
   --c-gray-d:#6f6e66;
   --c-line:#dedcd2;
   --c-ok:#2e7d4f;
-  --c-warn:#b26a00;
+  --c-warn:#8a5f00;
+  --c-err:#b3261e;
   --header-h:8.5rem;
   --max-w:144rem;
   --pad-d:8rem;
@@ -35,43 +36,66 @@
   --r-card:1.2rem;
   --trans:all .2s cubic-bezier(.17,.67,.83,.67);
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --track-langdock:#5b6ef5;
+  --track-langdock:#4a5bd4;
   --track-code:#262626;
-  --track-design:#c2568c;
+  --track-design:#a8436f;
 }
+@media(max-width:1023px){:root{--header-h:6.8rem}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:10px;scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 body{
   font-family:'Inter','Helvetica Neue',Arial,sans-serif;
   background:var(--c-bg);color:var(--c-black);
   padding-top:var(--header-h);min-height:100vh;
-  font-size:1.6rem;line-height:1.5;
-  -webkit-font-smoothing:antialiased;
+  font-size:1.6rem;line-height:1.5;-webkit-font-smoothing:antialiased;
 }
-img{max-width:100%;display:block}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:inherit}
-:focus-visible{outline:3px solid var(--c-yellow);outline-offset:2px;border-radius:4px}
+:focus-visible{outline:3px solid var(--c-black);outline-offset:2px;border-radius:4px}
+.hero :focus-visible,.zuender :focus-visible,.modal-hd :focus-visible{outline-color:var(--c-yellow)}
+/* Anker-Sprünge dürfen nicht unter dem fixierten Header landen */
+section[id],main[id]{scroll-margin-top:var(--header-h)}
 .wrap{max-width:var(--max-w);margin:0 auto;padding:0 var(--pad-m)}
 @media(min-width:1024px){.wrap{padding:0 var(--pad-d)}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* ===== HEADER ===== */
-.hdr{
-  position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);
-  background:var(--c-black);display:flex;align-items:center;
+/* Skip-Link */
+.skip{
+  position:absolute;left:50%;top:-10rem;transform:translateX(-50%);z-index:300;
+  background:var(--c-yellow);color:var(--c-black);padding:1.2rem 2.4rem;
+  border-radius:0 0 var(--r-card) var(--r-card);font-weight:500;text-decoration:none;transition:top .2s;
 }
-@media(max-width:1023px){.hdr{height:6.8rem}:root{--header-h:6.8rem}}
-.hdr .wrap{display:flex;align-items:center;justify-content:space-between;width:100%}
-.logo{display:flex;align-items:center;gap:1.2rem;text-decoration:none}
+.skip:focus{top:0}
+
+/* ===== HEADER ===== */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);background:var(--c-black);display:flex;align-items:center}
+.hdr .wrap{display:flex;align-items:center;justify-content:space-between;width:100%;gap:1.6rem}
+.logo{display:flex;align-items:center;gap:1.2rem;text-decoration:none;flex-shrink:0}
 .logo b{color:var(--c-white);font-size:2.4rem;font-weight:600;letter-spacing:-.02em}
 .logo .dot{width:1rem;height:1rem;border-radius:50%;background:var(--c-yellow);flex-shrink:0}
 .logo .sub{color:var(--c-gray-l);font-size:1.4rem;border-left:1px solid #4a4a48;padding-left:1.2rem}
 @media(max-width:640px){.logo .sub{display:none}}
 .hdr nav{display:flex;align-items:center;gap:2.4rem}
-.hdr nav a{color:var(--c-gray-l);text-decoration:none;font-size:1.4rem;transition:var(--trans)}
-.hdr nav a:hover{color:var(--c-yellow)}
-@media(max-width:900px){.hdr nav a:not(.cta){display:none}}
+.hdr nav a:not(.cta){color:var(--c-gray-l);text-decoration:none;font-size:1.4rem;transition:var(--trans)}
+.hdr nav a:not(.cta):hover{color:var(--c-yellow)}
+.burger{display:none;background:transparent;border:1px solid #4a4a48;color:var(--c-white);width:4.4rem;height:4.4rem;border-radius:.8rem;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+.burger svg{width:2rem;height:2rem;stroke:currentColor;stroke-width:2;fill:none}
+@media(max-width:900px){
+  .hdr nav{
+    position:fixed;top:var(--header-h);left:0;right:0;background:var(--c-black);
+    flex-direction:column;align-items:stretch;gap:0;padding:1rem 0 2rem;
+    border-top:1px solid #3a3a38;transform:translateY(-120%);transition:transform .25s ease;
+    max-height:calc(100vh - var(--header-h));overflow-y:auto;
+  }
+  .hdr nav[data-open="true"]{transform:none}
+  .hdr nav a:not(.cta){padding:1.6rem var(--pad-m);font-size:1.7rem;border-bottom:1px solid #333331}
+  .hdr nav .cta{margin:2rem var(--pad-m) 0;justify-content:center}
+  .burger{display:flex}
+}
 
 /* ===== BUTTONS ===== */
 .cta{
@@ -79,59 +103,55 @@ a{color:inherit}
   border:2px solid transparent;border-radius:var(--r-pill);
   padding:1.2rem 2.6rem;font-size:1.5rem;font-weight:500;
   cursor:pointer;transition:var(--trans);text-decoration:none;white-space:nowrap;
+  min-height:4.4rem;
 }
 .cta.-yellow{background:var(--c-yellow);color:var(--c-black);border-color:var(--c-yellow)}
 .cta.-yellow:hover{background:transparent;color:var(--c-yellow)}
+.tracks .cta.-yellow:hover,.board .cta.-yellow:hover,.modal .cta.-yellow:hover{color:var(--c-black);background:#ffcf1a}
 .cta.-black{background:var(--c-black);color:var(--c-white);border-color:var(--c-black)}
 .cta.-black:hover{background:transparent;color:var(--c-black)}
 .cta.-outline{background:transparent;color:var(--c-black);border-color:var(--c-black)}
 .cta.-outline:hover{background:var(--c-black);color:var(--c-white)}
 .cta.-ghost{background:transparent;color:var(--c-gray-m);border-color:var(--c-line);padding:.9rem 1.8rem;font-size:1.4rem}
 .cta.-ghost:hover{border-color:var(--c-black);color:var(--c-black)}
-.cta.-sm{padding:.8rem 1.8rem;font-size:1.4rem}
+.cta.-danger{background:transparent;color:var(--c-err);border-color:var(--c-err)}
+.cta.-danger:hover{background:var(--c-err);color:#fff}
+.cta.-sm{padding:.8rem 1.8rem;font-size:1.4rem;min-height:4.4rem}
 .cta:disabled{opacity:.45;cursor:not-allowed}
 
 /* ===== HERO ===== */
 .hero{background:var(--c-black);color:var(--c-white);padding:8rem 0 7rem;position:relative;overflow:hidden}
-.hero::after{
-  content:'';position:absolute;right:-14rem;top:-14rem;width:44rem;height:44rem;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,224,94,.16),transparent 62%);pointer-events:none;
-}
+.hero::after{content:'';position:absolute;right:-14rem;top:-14rem;width:44rem;height:44rem;border-radius:50%;background:radial-gradient(circle,rgba(255,224,94,.16),transparent 62%);pointer-events:none}
 .hero .wrap{position:relative;z-index:1}
-.overline{
-  font-size:1.4rem;text-transform:uppercase;letter-spacing:.14em;font-weight:500;
-  color:var(--c-yellow);margin-bottom:2.4rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
-}
+.overline{font-size:1.4rem;text-transform:uppercase;letter-spacing:.14em;font-weight:500;color:var(--c-yellow);margin-bottom:2.4rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
 .overline .pulse{width:.8rem;height:.8rem;border-radius:50%;background:var(--c-yellow);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.35)}}
 .hero h1{font-size:5.2rem;line-height:1.02;font-weight:300;letter-spacing:-.03em;max-width:18ch}
 .hero h1 em{font-style:normal;color:var(--c-yellow)}
 @media(min-width:1024px){.hero h1{font-size:8.8rem}}
-.hero p.lead{font-size:1.9rem;color:var(--c-gray-l);max-width:62ch;margin-top:2.8rem;line-height:1.6}
+.hero p.lead{font-size:1.9rem;color:#d5d3c9;max-width:62ch;margin-top:2.8rem;line-height:1.6}
 .hero-actions{display:flex;gap:1.4rem;margin-top:4rem;flex-wrap:wrap}
 .hero .cta.-outline{border-color:var(--c-white);color:var(--c-white)}
 .hero .cta.-outline:hover{background:var(--c-white);color:var(--c-black)}
+.reassure{margin-top:2.4rem;font-size:1.45rem;color:var(--c-gray-l);display:flex;align-items:center;gap:.8rem}
+.reassure svg{width:1.6rem;height:1.6rem;stroke:var(--c-yellow);fill:none;stroke-width:2;flex-shrink:0}
 
-/* Countdown */
 .countdown{display:flex;gap:1.2rem;margin-top:4.8rem;flex-wrap:wrap}
-.cd-box{
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  border-radius:var(--r-card);padding:1.6rem 2rem;min-width:9rem;text-align:center;
-}
+.cd-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-card);padding:1.6rem 2rem;min-width:9rem;text-align:center}
 .cd-box b{display:block;font-size:3.2rem;font-weight:600;font-family:var(--mono);color:var(--c-yellow);line-height:1}
 .cd-box span{font-size:1.2rem;text-transform:uppercase;letter-spacing:.1em;color:var(--c-gray-l);margin-top:.6rem;display:block}
 .cd-meta{align-self:center;font-size:1.5rem;color:var(--c-gray-l);max-width:24ch;line-height:1.5}
 .cd-meta b{color:var(--c-white);display:block;font-weight:600;font-size:1.6rem}
 
 /* ===== STATS ===== */
-.stats{background:var(--c-yellow);padding:0}
-.stats .wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+.stats{background:var(--c-yellow)}
+.stats .wrap{display:grid;grid-template-columns:repeat(2,1fr)}
 @media(min-width:768px){.stats .wrap{grid-template-columns:repeat(4,1fr)}}
 .stat{padding:3rem 1rem;text-align:center;border-right:1px solid rgba(38,38,38,.14);border-bottom:1px solid rgba(38,38,38,.14)}
 @media(min-width:768px){.stat{border-bottom:none}.stat:last-child{border-right:none}}
 @media(max-width:767px){.stat:nth-child(2n){border-right:none}.stat:nth-child(n+3){border-bottom:none}}
 .stat b{display:block;font-size:4rem;font-weight:600;font-family:var(--mono);line-height:1;letter-spacing:-.02em}
-.stat span{font-size:1.3rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(38,38,38,.72);margin-top:.8rem;display:block;font-weight:500}
+.stat span{font-size:1.3rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(38,38,38,.75);margin-top:.8rem;display:block;font-weight:500}
 
 /* ===== SECTIONS ===== */
 section{padding:8rem 0}
@@ -145,57 +165,58 @@ section{padding:8rem 0}
 .tracks{background:var(--c-white);border-top:1px solid var(--c-line);border-bottom:1px solid var(--c-line)}
 .track-grid{display:grid;gap:2.4rem;grid-template-columns:1fr}
 @media(min-width:900px){.track-grid{grid-template-columns:repeat(3,1fr)}}
-.track{
-  border:1px solid var(--c-line);border-radius:var(--r-card);padding:3.2rem;
-  background:var(--c-bg);display:flex;flex-direction:column;transition:var(--trans);
-  border-top:4px solid var(--tc);
-}
+.track{border:1px solid var(--c-line);border-radius:var(--r-card);padding:3.2rem;background:var(--c-bg);display:flex;flex-direction:column;transition:var(--trans);border-top:4px solid var(--tc)}
 .track:hover{transform:translateY(-4px);box-shadow:0 1.6rem 4rem rgba(38,38,38,.08)}
-.track .tag{
-  font-family:var(--mono);font-size:1.2rem;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--tc);font-weight:700;margin-bottom:1.6rem;
-}
+.track .tag{font-family:var(--mono);font-size:1.2rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tc);font-weight:700;margin-bottom:1.6rem}
 .track h3{font-size:2.6rem;font-weight:500;letter-spacing:-.01em}
 .track .sub{color:var(--c-gray-m);font-size:1.5rem;margin-top:.6rem}
-.track p{margin-top:1.8rem;color:var(--c-gray-m);font-size:1.6rem;line-height:1.6;flex-grow:1}
+.track .code-note{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.6rem;font-size:1.35rem;font-weight:500;background:var(--c-white);border:1px solid var(--c-line);border-radius:var(--r-pill);padding:.5rem 1.2rem}
+.track p.body{margin-top:1.8rem;color:var(--c-gray-m);font-size:1.6rem;line-height:1.6;flex-grow:1}
 .track ul{list-style:none;margin-top:2rem;display:flex;flex-direction:column;gap:.9rem}
-.track ul li{font-size:1.5rem;display:flex;gap:1rem;align-items:flex-start;color:var(--c-black)}
+.track ul li{font-size:1.5rem;display:flex;gap:1rem;align-items:flex-start}
 .track ul li::before{content:'→';color:var(--tc);font-weight:700;flex-shrink:0}
 .track .foot{margin-top:2.4rem;padding-top:2rem;border-top:1px solid var(--c-line);font-size:1.4rem;color:var(--c-gray-d)}
 .track .foot b{color:var(--c-black);font-weight:500}
 
 /* ===== BOARD TOOLBAR ===== */
 .board{background:var(--c-bg)}
-.toolbar{
-  position:sticky;top:var(--header-h);z-index:40;background:var(--c-bg);
-  padding:1.6rem 0 2rem;margin-bottom:3.2rem;border-bottom:1px solid var(--c-line);
-}
+.toolbar{position:sticky;top:var(--header-h);z-index:40;background:var(--c-bg);padding:1.6rem 0 2rem;margin-bottom:3.2rem;border-bottom:1px solid var(--c-line)}
 .tb-row{display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center}
 .tb-row + .tb-row{margin-top:1.4rem}
-.search{
-  flex:1 1 26rem;position:relative;
+.search{flex:1 1 26rem;position:relative}
+.search input{width:100%;padding:1.2rem 4.4rem 1.2rem 4.4rem;border:1px solid var(--c-line);border-radius:var(--r-pill);background:var(--c-white);font-size:1.5rem;transition:var(--trans);min-height:4.6rem}
+.search input:focus{border-color:var(--c-black);outline:none;box-shadow:0 0 0 3px rgba(255,224,94,.6)}
+.search .ico{position:absolute;left:1.6rem;top:50%;transform:translateY(-50%);width:1.8rem;height:1.8rem;stroke:var(--c-gray-d);fill:none;stroke-width:2;pointer-events:none}
+.search .clear{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);width:3.2rem;height:3.2rem;border:none;background:var(--c-bg);border-radius:50%;cursor:pointer;font-size:1.8rem;line-height:1;color:var(--c-gray-m);display:none}
+.search .clear:hover{background:var(--c-line);color:var(--c-black)}
+.search input:not(:placeholder-shown) ~ .clear{display:block}
+select.sort{border:1px solid var(--c-line);background:var(--c-white);border-radius:var(--r-pill);padding:1.2rem 1.6rem;font-size:1.4rem;cursor:pointer;min-height:4.6rem}
+
+/* Auf Desktop stehen die Filter immer offen — der Toggle ist nur mobil nötig.
+   Muss .chip überschreiben, daher doppelte Klasse. */
+.chip.filter-toggle{display:none}
+.filters{display:contents}
+@media(max-width:900px){
+  .filters{display:none;width:100%;margin-top:1.4rem;padding-top:1.4rem;border-top:1px solid var(--c-line)}
+  .filters[data-open="true"]{display:block}
+  .filters .chips + .chips{margin-top:1rem}
+  .chip.filter-toggle{display:inline-flex;flex:0 0 auto}
+  .filter-toggle .badge-n{background:var(--c-black);color:var(--c-yellow);border-radius:var(--r-pill);padding:.1rem .8rem;font-size:1.2rem;font-family:var(--mono)}
+  .filter-toggle[aria-expanded="true"]{background:var(--c-black);color:var(--c-white);border-color:var(--c-black)}
+  .filter-toggle[aria-expanded="true"] .badge-n{background:var(--c-yellow);color:var(--c-black)}
 }
-.search input{
-  width:100%;padding:1.2rem 1.6rem 1.2rem 4.4rem;border:1px solid var(--c-line);
-  border-radius:var(--r-pill);background:var(--c-white);font-size:1.5rem;transition:var(--trans);
-}
-.search input:focus{border-color:var(--c-black);outline:none;box-shadow:0 0 0 3px rgba(255,224,94,.5)}
-.search svg{position:absolute;left:1.6rem;top:50%;transform:translateY(-50%);width:1.8rem;height:1.8rem;stroke:var(--c-gray-d);fill:none;stroke-width:2}
 .chips{display:flex;gap:.8rem;flex-wrap:wrap}
-.chip{
-  border:1px solid var(--c-line);background:var(--c-white);border-radius:var(--r-pill);
-  padding:.8rem 1.6rem;font-size:1.4rem;cursor:pointer;transition:var(--trans);
-  display:inline-flex;align-items:center;gap:.7rem;
-}
+.chip{border:1px solid var(--c-line);background:var(--c-white);border-radius:var(--r-pill);padding:.9rem 1.6rem;font-size:1.4rem;cursor:pointer;transition:var(--trans);display:inline-flex;align-items:center;gap:.7rem;min-height:4.4rem}
 .chip:hover{border-color:var(--c-black)}
 .chip[aria-pressed="true"]{background:var(--c-black);color:var(--c-white);border-color:var(--c-black)}
-.chip .dot{width:.8rem;height:.8rem;border-radius:50%;background:var(--cd,var(--c-gray-l));flex-shrink:0}
-.chip .n{font-family:var(--mono);font-size:1.2rem;opacity:.6}
-select.sort{
-  border:1px solid var(--c-line);background:var(--c-white);border-radius:var(--r-pill);
-  padding:.9rem 1.6rem;font-size:1.4rem;cursor:pointer;
-}
-.tb-count{font-size:1.4rem;color:var(--c-gray-m);margin-left:auto}
+.chip[aria-pressed="true"] .n{opacity:.75}
+.chip .dot{width:.9rem;height:.9rem;border-radius:50%;background:var(--cd,var(--c-gray-l));flex-shrink:0}
+.chip .n{font-family:var(--mono);font-size:1.2rem;opacity:.55}
+.chip.-mine[aria-pressed="true"]{background:var(--c-yellow);color:var(--c-black);border-color:var(--c-yellow)}
+.tb-meta{display:flex;align-items:center;gap:1.6rem;margin-left:auto;font-size:1.4rem;color:var(--c-gray-m)}
+.tb-meta button{background:none;border:none;color:var(--c-gray-m);text-decoration:underline;cursor:pointer;font-size:1.4rem;padding:.4rem}
+.tb-meta button:hover{color:var(--c-black)}
+@media(max-width:900px){.tb-meta{width:100%;margin-left:0;margin-top:1.2rem;justify-content:space-between}}
 
 /* ===== IDEA CARDS ===== */
 .grid{display:grid;gap:2rem;grid-template-columns:1fr}
@@ -204,75 +225,72 @@ select.sort{
 .card{
   background:var(--c-white);border:1px solid var(--c-line);border-radius:var(--r-card);
   padding:2.4rem;display:flex;flex-direction:column;gap:1.4rem;transition:var(--trans);
-  cursor:pointer;border-left:4px solid var(--tc,var(--c-gray-l));position:relative;text-align:left;width:100%;
+  border-left:4px solid var(--tc,var(--c-gray-l));position:relative;
 }
 .card:hover{transform:translateY(-3px);box-shadow:0 1.2rem 3.2rem rgba(38,38,38,.09);border-color:var(--c-gray-l)}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1.2rem}
-.badges{display:flex;gap:.6rem;flex-wrap:wrap}
-.badge{
-  font-size:1.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
-  padding:.45rem 1rem;border-radius:var(--r-pill);white-space:nowrap;
-}
+.card:focus-within{box-shadow:0 0 0 3px var(--c-yellow)}
+.badges{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.badge{font-size:1.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.5rem 1rem;border-radius:var(--r-pill);white-space:nowrap}
 .badge.-track{background:var(--tc);color:#fff}
-.badge.-track[data-t="claude-code-app"],.badge.-track[data-t="claude-code-skill"]{color:var(--c-yellow)}
-.badge.-status{background:var(--c-bg);color:var(--c-gray-m);border:1px solid var(--c-line)}
-.badge.-status[data-s="crew-gesucht"]{background:#fff4d6;color:#8a5f00;border-color:#f0dda6}
+.badge.-status{background:var(--c-bg);color:var(--c-gray-m);border:1px solid var(--c-line);text-transform:none;letter-spacing:0;font-weight:500}
+.badge.-status[data-s="crew-gesucht"]{background:#fff4d6;color:var(--c-warn);border-color:#f0dda6}
 .badge.-status[data-s="in-arbeit"]{background:#e4ecff;color:#2f4bb5;border-color:#c7d5fb}
 .badge.-status[data-s="gebaut"]{background:#e2f3e9;color:var(--c-ok);border-color:#bfe3cd}
-.badge.-effort{background:var(--c-black);color:var(--c-white);font-family:var(--mono)}
-.badge.-wild{background:var(--c-yellow);color:var(--c-black)}
+.badge.-effort{background:var(--c-bg);color:var(--c-black);border:1px solid var(--c-line);font-family:var(--mono);text-transform:none;letter-spacing:0;cursor:help}
+.badge.-wild{background:var(--c-yellow);color:var(--c-black);cursor:help}
+.badge.-mine{background:var(--c-black);color:var(--c-yellow);text-transform:none;letter-spacing:0}
+
 .card h3{font-size:2.1rem;font-weight:500;letter-spacing:-.01em;line-height:1.25}
-.card .prob{font-size:1.5rem;color:var(--c-gray-m);line-height:1.6}
-.card .prob b{color:var(--c-black);font-weight:500}
-.card-meta{display:flex;gap:1.6rem;flex-wrap:wrap;font-size:1.3rem;color:var(--c-gray-d);margin-top:auto;padding-top:1.4rem;border-top:1px solid var(--c-line)}
-.card-meta span{display:inline-flex;align-items:center;gap:.5rem}
-.crew-strip{display:flex;align-items:center;gap:.5rem}
-.av{
-  width:2.6rem;height:2.6rem;border-radius:50%;background:var(--c-black);color:var(--c-yellow);
-  display:grid;place-items:center;font-size:1.1rem;font-weight:600;border:2px solid var(--c-white);
+/* Stretched-Link-Muster: ein einziger Button, der die ganze Karte klickbar macht,
+   ohne dass interaktive Elemente ineinander verschachtelt werden. */
+.card h3 .open{
+  background:none;border:none;padding:0;margin:0;text-align:left;font:inherit;color:inherit;
+  cursor:pointer;
 }
+.card h3 .open::after{content:'';position:absolute;inset:0;z-index:1;border-radius:var(--r-card)}
+.card h3 .open:focus-visible{outline:none}
+.card .prob{font-size:1.5rem;color:var(--c-gray-m);line-height:1.6}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:1.6rem;margin-top:auto;padding-top:1.6rem;border-top:1px solid var(--c-line)}
+.card-meta{display:flex;flex-direction:column;gap:.5rem;font-size:1.3rem;color:var(--c-gray-d);min-width:0}
+.card-meta .dept{font-weight:500;color:var(--c-black);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crew-strip{display:flex;align-items:center;gap:.6rem}
+.av{width:2.6rem;height:2.6rem;border-radius:50%;background:var(--c-black);color:var(--c-yellow);display:grid;place-items:center;font-size:1.1rem;font-weight:600;border:2px solid var(--c-white);flex-shrink:0}
 .av + .av{margin-left:-1rem}
 .av.-more{background:var(--c-gray-l);color:var(--c-black)}
+.no-crew{color:var(--c-warn);font-weight:500}
 
-/* Vote button */
+/* Vote — im normalen Fluss, kein Überlappen mehr */
 .vote{
-  position:absolute;top:2.4rem;right:2.4rem;
-  display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  position:relative;z-index:2;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:.1rem;
   border:1px solid var(--c-line);border-radius:1rem;background:var(--c-bg);
-  padding:.8rem 1rem;min-width:5rem;cursor:pointer;transition:var(--trans);
+  padding:.9rem 1.2rem;min-width:6.4rem;min-height:4.4rem;cursor:pointer;transition:var(--trans);
 }
 .vote:hover{border-color:var(--c-black);background:var(--c-white)}
 .vote[aria-pressed="true"]{background:var(--c-yellow);border-color:var(--c-yellow)}
-.vote svg{width:1.4rem;height:1.4rem;fill:currentColor}
-.vote b{font-family:var(--mono);font-size:1.7rem;font-weight:700;line-height:1}
+.vote svg{width:1.3rem;height:1.3rem;fill:currentColor}
+.vote b{font-family:var(--mono);font-size:1.7rem;font-weight:700;line-height:1.1}
 .vote small{font-size:1rem;text-transform:uppercase;letter-spacing:.06em;color:var(--c-gray-d)}
-.vote[aria-pressed="true"] small{color:rgba(38,38,38,.7)}
-.card h3{padding-right:6rem}
+.vote[aria-pressed="true"] small{color:rgba(38,38,38,.75)}
 
-.empty{
-  grid-column:1/-1;text-align:center;padding:8rem 2rem;border:2px dashed var(--c-line);
-  border-radius:var(--r-card);color:var(--c-gray-m);
-}
+.empty{grid-column:1/-1;text-align:center;padding:8rem 2rem;border:2px dashed var(--c-line);border-radius:var(--r-card);color:var(--c-gray-m)}
 .empty b{display:block;font-size:2.2rem;color:var(--c-black);font-weight:400;margin-bottom:1rem}
+.empty .cta{margin-top:2.4rem}
 
 /* ===== ZÜNDER ===== */
 .zuender{background:var(--c-black);color:var(--c-white)}
 .zuender .sec-head h2{color:var(--c-white)}
-.zuender .sec-head p{color:var(--c-gray-l)}
+.zuender .sec-head p{color:#d5d3c9}
 .zuender .sec-head .overline{color:var(--c-yellow)}
-.spark{
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
-  border-radius:var(--r-card);padding:4rem;text-align:center;
-}
+.spark{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-card);padding:4rem 2rem}
+@media(min-width:768px){.spark{padding:4rem}}
 .spark-slots{display:flex;gap:1.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:3.2rem}
 .slot{flex:1 1 22rem;max-width:30rem;background:var(--c-black);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-card);padding:2.4rem 1.6rem}
 .slot .lbl{font-size:1.15rem;text-transform:uppercase;letter-spacing:.12em;color:var(--c-yellow);font-weight:600}
 .slot .val{font-size:2rem;margin-top:1.2rem;font-weight:400;line-height:1.3;min-height:5.2rem;display:grid;place-items:center}
 .slot.spin .val{animation:flick .32s ease}
 @keyframes flick{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
-.spark-out{
-  font-size:1.9rem;line-height:1.6;color:var(--c-gray-l);max-width:70ch;margin:0 auto 3.2rem;min-height:6rem;
-}
+.spark-out{font-size:1.9rem;line-height:1.6;color:#d5d3c9;max-width:70ch;margin:0 auto 3.2rem;min-height:6rem;text-align:center}
 .spark-out b{color:var(--c-yellow);font-weight:500}
 .spark-actions{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap}
 .zuender .cta.-outline{border-color:var(--c-white);color:var(--c-white)}
@@ -280,97 +298,79 @@ select.sort{
 
 /* ===== ABLAUF ===== */
 .ablauf{background:var(--c-white);border-top:1px solid var(--c-line)}
-.timeline{display:grid;gap:0;grid-template-columns:1fr}
+.timeline{display:grid;grid-template-columns:1fr}
 @media(min-width:900px){.timeline{grid-template-columns:repeat(5,1fr)}}
 .tl{padding:2.8rem 2rem 2.8rem 0;position:relative;border-top:2px solid var(--c-line)}
 .tl:first-child{border-top-color:var(--c-yellow)}
 .tl::before{content:'';position:absolute;top:-.9rem;left:0;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--c-bg);border:2px solid var(--c-line)}
 .tl:first-child::before{background:var(--c-yellow);border-color:var(--c-yellow)}
 .tl .t{font-family:var(--mono);font-size:1.3rem;color:var(--c-gray-d);letter-spacing:.04em}
-.tl h4{font-size:1.9rem;font-weight:500;margin-top:1rem}
+.tl h3{font-size:1.9rem;font-weight:500;margin-top:1rem}
 .tl p{font-size:1.5rem;color:var(--c-gray-m);margin-top:.8rem;line-height:1.55}
-
 .jury{display:grid;gap:2rem;grid-template-columns:1fr;margin-top:6rem}
 @media(min-width:768px){.jury{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1200px){.jury{grid-template-columns:repeat(4,1fr)}}
 .crit{border:1px solid var(--c-line);border-radius:var(--r-card);padding:2.4rem;background:var(--c-bg)}
-.crit .pct{font-family:var(--mono);font-size:2.8rem;font-weight:700;color:var(--c-black)}
-.crit h4{font-size:1.8rem;font-weight:500;margin-top:.8rem}
+.crit .pct{font-family:var(--mono);font-size:2.8rem;font-weight:700}
+.crit h3{font-size:1.8rem;font-weight:500;margin-top:.8rem}
 .crit p{font-size:1.45rem;color:var(--c-gray-m);margin-top:.8rem;line-height:1.55}
 
 /* ===== MODAL ===== */
-.ov{
-  position:fixed;inset:0;background:rgba(38,38,38,.6);backdrop-filter:blur(4px);
-  z-index:200;display:none;align-items:flex-start;justify-content:center;
-  padding:2rem;overflow-y:auto;
-}
+.ov{position:fixed;inset:0;background:rgba(38,38,38,.6);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:2rem;overflow-y:auto}
 .ov.open{display:flex}
-.modal{
-  background:var(--c-bg);border-radius:var(--r-card);width:100%;max-width:78rem;
-  margin:auto;position:relative;animation:up .24s cubic-bezier(.17,.67,.4,1);
-}
+.ov.-mini{align-items:center}
+.modal{background:var(--c-bg);border-radius:var(--r-card);width:100%;max-width:78rem;margin:auto;position:relative;animation:up .24s cubic-bezier(.17,.67,.4,1)}
+.ov.-mini .modal{max-width:48rem}
 @keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
-.modal-hd{
-  position:sticky;top:0;background:var(--c-black);color:var(--c-white);
-  padding:2.4rem 3.2rem;border-radius:var(--r-card) var(--r-card) 0 0;
-  display:flex;justify-content:space-between;align-items:center;gap:2rem;z-index:2;
-}
+.modal-hd{position:sticky;top:0;background:var(--c-black);color:var(--c-white);padding:2.4rem 3.2rem;border-radius:var(--r-card) var(--r-card) 0 0;display:flex;justify-content:space-between;align-items:center;gap:2rem;z-index:2}
+.ov.-mini .modal-hd{position:static}
 .modal-hd h2{font-size:2.4rem;font-weight:400;letter-spacing:-.01em}
 .modal-hd .ol{font-size:1.2rem;text-transform:uppercase;letter-spacing:.12em;color:var(--c-yellow);margin-bottom:.6rem;font-weight:500}
-.x{
-  background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--c-white);
-  width:4rem;height:4rem;border-radius:50%;cursor:pointer;font-size:2rem;line-height:1;
-  display:grid;place-items:center;transition:var(--trans);flex-shrink:0;
-}
+.x{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--c-white);width:4.4rem;height:4.4rem;border-radius:50%;cursor:pointer;font-size:2rem;line-height:1;display:grid;place-items:center;transition:var(--trans);flex-shrink:0}
 .x:hover{background:var(--c-white);color:var(--c-black)}
 .modal-bd{padding:3.2rem}
-.modal-ft{
-  padding:2.4rem 3.2rem;border-top:1px solid var(--c-line);display:flex;gap:1.2rem;
-  justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--c-bg);
-  border-radius:0 0 var(--r-card) var(--r-card);
-}
+@media(max-width:640px){.modal-bd,.modal-hd,.modal-ft{padding-left:2rem;padding-right:2rem}}
+.modal-ft{padding:2.4rem 3.2rem;border-top:1px solid var(--c-line);display:flex;gap:1.2rem;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:var(--c-bg);border-radius:0 0 var(--r-card) var(--r-card)}
+.ov.-mini .modal-ft{position:static}
 
 /* ===== FORM ===== */
 .fld{margin-bottom:2.4rem}
 .fld > label,.fld > .lg{display:block;font-size:1.5rem;font-weight:500;margin-bottom:.6rem}
 .fld .hint{font-size:1.35rem;color:var(--c-gray-m);margin-bottom:1rem;line-height:1.5}
-.fld input[type=text],.fld textarea,.fld select{
-  width:100%;padding:1.2rem 1.4rem;border:1px solid var(--c-line);border-radius:.8rem;
-  background:var(--c-white);font-size:1.6rem;transition:var(--trans);font-family:inherit;
-}
+.fld input[type=text],.fld textarea,.fld select{width:100%;padding:1.2rem 1.4rem;border:1px solid var(--c-line);border-radius:.8rem;background:var(--c-white);font-size:1.6rem;transition:var(--trans);font-family:inherit;min-height:4.8rem}
 .fld textarea{resize:vertical;min-height:9rem;line-height:1.55}
-.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--c-black);outline:none;box-shadow:0 0 0 3px rgba(255,224,94,.5)}
-.fld .err{color:#b3261e;font-size:1.35rem;margin-top:.6rem;display:none}
-.fld.invalid input,.fld.invalid textarea,.fld.invalid select{border-color:#b3261e}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--c-black);outline:none;box-shadow:0 0 0 3px rgba(255,224,94,.6)}
+.fld .err{color:var(--c-err);font-size:1.35rem;margin-top:.6rem;display:none;font-weight:500}
+.fld.invalid input,.fld.invalid textarea{border-color:var(--c-err)}
 .fld.invalid .err{display:block}
+.counter{font-size:1.25rem;color:var(--c-gray-d);text-align:right;margin-top:.4rem;font-family:var(--mono)}
+.counter.-near{color:var(--c-warn)}
 .cols{display:grid;gap:2rem;grid-template-columns:1fr}
 @media(min-width:640px){.cols{grid-template-columns:1fr 1fr}}
 .radios{display:grid;gap:1rem;grid-template-columns:1fr}
-@media(min-width:640px){.radios{grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))}}
-.radio{
-  border:1px solid var(--c-line);border-radius:.8rem;background:var(--c-white);padding:1.4rem 1.6rem;
-  cursor:pointer;transition:var(--trans);display:flex;gap:1.2rem;align-items:flex-start;
-}
+.radio{border:1px solid var(--c-line);border-radius:.8rem;background:var(--c-white);padding:1.4rem 1.6rem;cursor:pointer;transition:var(--trans);display:flex;gap:1.2rem;align-items:flex-start}
 .radio:hover{border-color:var(--c-gray-l)}
-.radio input{margin-top:.4rem;accent-color:var(--c-black);flex-shrink:0}
+.radio input{margin-top:.4rem;accent-color:var(--c-black);flex-shrink:0;width:1.8rem;height:1.8rem}
 .radio:has(input:checked){border-color:var(--c-black);background:#fff;box-shadow:inset 0 0 0 1px var(--c-black)}
 .radio b{display:block;font-size:1.5rem;font-weight:500}
 .radio small{display:block;font-size:1.3rem;color:var(--c-gray-m);margin-top:.3rem;line-height:1.45}
 .radio .tdot{width:1rem;height:1rem;border-radius:50%;background:var(--tc);flex-shrink:0;margin-top:.6rem}
+.radio .nocode{font-size:1.2rem;font-weight:600;color:var(--c-ok);display:block;margin-top:.4rem}
 .chk-row{display:flex;gap:.8rem;flex-wrap:wrap}
-.chk{
-  border:1px solid var(--c-line);border-radius:var(--r-pill);background:var(--c-white);
-  padding:.8rem 1.5rem;font-size:1.4rem;cursor:pointer;transition:var(--trans);
-}
-.chk input{display:none}
+.chk{border:1px solid var(--c-line);border-radius:var(--r-pill);background:var(--c-white);padding:.9rem 1.6rem;font-size:1.4rem;cursor:pointer;transition:var(--trans);min-height:4.4rem;display:inline-flex;align-items:center}
+.chk input{position:absolute;opacity:0;width:0;height:0}
 .chk:has(input:checked){background:var(--c-black);color:var(--c-white);border-color:var(--c-black)}
+.chk:has(input:focus-visible){outline:3px solid var(--c-black);outline-offset:2px}
+.chk.-static{cursor:default}
+
+.notice{border-left:4px solid var(--c-yellow);background:#fffbeb;padding:1.6rem 2rem;border-radius:.8rem;font-size:1.45rem;line-height:1.6;margin-bottom:2.4rem;color:var(--c-black)}
+.notice b{font-weight:600}
+.notice.-dup{border-color:var(--c-warn);background:#fff4d6}
+.notice.-dup ul{margin:.8rem 0 0 1.8rem;font-size:1.4rem}
 
 /* ===== DETAIL ===== */
 .d-sec{margin-bottom:3rem}
-.d-sec h4{
-  font-size:1.25rem;text-transform:uppercase;letter-spacing:.12em;color:var(--c-gray-d);
-  font-weight:600;margin-bottom:1rem;
-}
+.d-sec h3{font-size:1.25rem;text-transform:uppercase;letter-spacing:.12em;color:var(--c-gray-d);font-weight:600;margin-bottom:1rem}
 .d-sec p{font-size:1.7rem;line-height:1.65}
 .d-facts{display:grid;gap:1.6rem;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));background:var(--c-white);border:1px solid var(--c-line);border-radius:var(--r-card);padding:2.4rem;margin-bottom:3rem}
 .fact .k{font-size:1.2rem;text-transform:uppercase;letter-spacing:.1em;color:var(--c-gray-d);font-weight:600}
@@ -380,35 +380,56 @@ select.sort{
 .crew-item .av{width:3.6rem;height:3.6rem;font-size:1.4rem;border:none;margin:0}
 .crew-item b{font-size:1.55rem;font-weight:500}
 .crew-item small{display:block;color:var(--c-gray-m);font-size:1.35rem}
-.crew-item .rm{margin-left:auto;background:none;border:none;color:var(--c-gray-d);cursor:pointer;font-size:1.8rem;padding:.4rem .8rem;border-radius:.4rem}
-.crew-item .rm:hover{background:var(--c-bg);color:#b3261e}
-.crew-empty{color:var(--c-gray-m);font-size:1.55rem;font-style:italic;padding:1.6rem;border:1px dashed var(--c-line);border-radius:.8rem;text-align:center}
+.crew-item .rm{margin-left:auto;background:none;border:1px solid var(--c-line);color:var(--c-gray-m);cursor:pointer;font-size:1.3rem;padding:.6rem 1.2rem;border-radius:var(--r-pill)}
+.crew-item .rm:hover{border-color:var(--c-err);color:var(--c-err)}
+.crew-empty{color:var(--c-gray-m);font-size:1.55rem;padding:1.6rem;border:1px dashed var(--c-line);border-radius:.8rem;text-align:center}
+.owner-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
 
-/* Toast */
+/* Toast — rein informativ, darf niemals Klicks abfangen */
 .toast{
-  position:fixed;bottom:2.4rem;left:50%;transform:translate(-50%,8rem);z-index:300;
+  position:fixed;bottom:2.4rem;left:50%;transform:translate(-50%,12rem);z-index:300;
   background:var(--c-black);color:var(--c-white);padding:1.4rem 2.4rem;border-radius:var(--r-pill);
-  font-size:1.5rem;box-shadow:0 1.2rem 3.2rem rgba(0,0,0,.24);transition:transform .3s cubic-bezier(.17,.67,.4,1);
+  font-size:1.5rem;box-shadow:0 1.2rem 3.2rem rgba(0,0,0,.24);
+  transition:transform .3s cubic-bezier(.17,.67,.4,1),bottom .25s ease;
   display:flex;align-items:center;gap:1rem;max-width:calc(100vw - 4rem);
+  pointer-events:none;
 }
 .toast.show{transform:translate(-50%,0)}
 .toast b{color:var(--c-yellow)}
+/* Wenn das Export-Banner steht, rutscht der Toast darüber statt dahinter */
+.reminder[data-open="true"] ~ .toast{bottom:12rem}
+@media(max-width:640px){.reminder[data-open="true"] ~ .toast{bottom:18rem}}
+
+/* Export-Reminder */
+.reminder{
+  position:fixed;left:0;right:0;bottom:0;z-index:150;background:var(--c-black);color:var(--c-white);
+  padding:1.6rem var(--pad-m);display:none;align-items:center;gap:1.6rem;flex-wrap:wrap;
+  border-top:3px solid var(--c-yellow);box-shadow:0 -.8rem 3rem rgba(0,0,0,.2);
+}
+.reminder[data-open="true"]{display:flex}
+.reminder p{font-size:1.45rem;flex:1 1 28rem;line-height:1.5;color:#d5d3c9}
+.reminder p b{color:var(--c-white)}
+.reminder .cta{padding:.9rem 1.8rem;font-size:1.4rem;min-height:4.4rem}
+.reminder .cta.-outline{border-color:var(--c-gray-l);color:var(--c-white)}
+.reminder .cta.-outline:hover{background:var(--c-white);color:var(--c-black)}
 
 /* Footer */
-footer{background:var(--c-black);color:var(--c-gray-l);padding:6rem 0 4rem;font-size:1.45rem}
+footer{background:var(--c-black);color:#d5d3c9;padding:6rem 0 4rem;font-size:1.45rem}
 footer .cols2{display:grid;gap:4rem;grid-template-columns:1fr;margin-bottom:4rem}
 @media(min-width:900px){footer .cols2{grid-template-columns:2fr 1fr}}
-footer h5{color:var(--c-white);font-size:1.8rem;font-weight:500;margin-bottom:1.4rem}
+footer h2{color:var(--c-white);font-size:1.8rem;font-weight:500;margin-bottom:1.4rem}
 footer p{line-height:1.7;max-width:58ch}
 footer .tools{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
-footer .bot{border-top:1px solid #3a3a38;padding-top:2.4rem;display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;font-size:1.3rem}
+footer .bot{border-top:1px solid #3a3a38;padding-top:2.4rem;display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;font-size:1.3rem;align-items:center}
 footer code{font-family:var(--mono);background:rgba(255,255,255,.08);padding:.3rem .8rem;border-radius:.4rem;color:var(--c-yellow);font-size:1.3rem}
-footer .cta.-ghost{border-color:#4a4a48;color:var(--c-gray-l)}
+footer .cta.-ghost{border-color:#4a4a48;color:#d5d3c9}
 footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
-@media print{.hdr,.toolbar,.vote,.hero-actions,footer .tools{display:none}}
+@media print{.hdr,.toolbar,.vote,.hero-actions,.reminder,footer .tools{display:none}}
 </style>
 </head>
 <body>
+
+<a href="#board" class="skip">Direkt zu den Ideen springen</a>
 
 <header class="hdr">
   <div class="wrap">
@@ -416,37 +437,42 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
       <b>pilot</b><span class="dot" aria-hidden="true"></span>
       <span class="sub">Ideen-Hangar</span>
     </a>
-    <nav>
+    <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav id="nav">
       <a href="#tracks">Tracks</a>
       <a href="#board">Ideen</a>
       <a href="#zuender">Ideen-Zünder</a>
       <a href="#ablauf">Ablauf</a>
-      <a href="#" class="cta -yellow -sm" data-open-submit>Idee einreichen</a>
+      <button class="cta -yellow -sm" data-open-submit>Idee einreichen</button>
     </nav>
   </div>
 </header>
 
 <main id="top">
 
-<!-- HERO -->
 <section class="hero">
   <div class="wrap">
     <p class="overline"><span class="pulse" aria-hidden="true"></span> Hackathon #1 · <span id="hero-date">—</span> · Hamburg &amp; remote</p>
     <h1>Jede gute Idee<br>braucht eine <em>Startbahn.</em></h1>
     <p class="lead">
-      Der Ideen-Hangar sammelt, was wir beim nächsten Hackathon bauen. Kein Programmier-Wissen
-      nötig — du beschreibst, was dich im Arbeitsalltag nervt, und wir finden gemeinsam heraus,
-      ob Langdock, Claude Code oder Claude Design das Richtige dafür ist.
+      Der Ideen-Hangar sammelt, was wir beim nächsten Hackathon bauen. Du beschreibst,
+      was dich im Arbeitsalltag nervt — mehr nicht. Ob daraus ein Langdock-Assistent,
+      eine kleine Webapp oder ein Prototyp wird, finden wir gemeinsam heraus.
     </p>
     <div class="hero-actions">
       <button class="cta -yellow" data-open-submit>Idee einreichen</button>
       <a href="#board" class="cta -outline">Ideen ansehen</a>
     </div>
+    <p class="reassure">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+      Kein Programmier-Wissen nötig. Zwei Felder reichen: Titel und was dich nervt.
+    </p>
     <div class="countdown" id="countdown"></div>
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats">
   <div class="wrap">
     <div class="stat"><b id="s-ideas">0</b><span>Ideen im Hangar</span></div>
@@ -456,48 +482,56 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </div>
 
-<!-- TRACKS -->
 <section class="tracks" id="tracks">
   <div class="wrap">
     <div class="sec-head">
       <p class="overline">Drei Tracks</p>
       <h2>Welches Werkzeug passt zu deiner Idee?</h2>
       <p>
-        Du musst dich nicht festlegen — das machen wir beim Kickoff gemeinsam. Aber die Tracks helfen
-        beim Denken: Sie unterscheiden sich darin, <em>wie tief</em> du einsteigst und <em>was am Ende rauskommt.</em>
+        Du musst dich nicht festlegen — das machen wir beim Kickoff gemeinsam. Die Tracks
+        helfen beim Denken: Sie unterscheiden sich darin, <em>wie tief</em> du einsteigst
+        und <em>was am Ende rauskommt.</em>
       </p>
     </div>
     <div class="track-grid" id="track-grid"></div>
   </div>
 </section>
 
-<!-- BOARD -->
 <section class="board" id="board">
   <div class="wrap">
     <div class="sec-head">
       <p class="overline">Der Hangar</p>
       <h2>Alle Ideen</h2>
-      <p>Stimme ab, was gebaut werden soll. Klick auf eine Idee, um der Crew beizutreten.</p>
+      <p>Stimme ab, was gebaut werden soll. Öffne eine Idee, um der Crew beizutreten.</p>
     </div>
 
     <div class="toolbar">
       <div class="tb-row">
         <div class="search">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input type="search" id="q" placeholder="Ideen durchsuchen — Titel, Problem, Abteilung …" aria-label="Ideen durchsuchen">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" id="q" placeholder="Ideen durchsuchen …" aria-label="Ideen durchsuchen">
+          <button class="clear" id="q-clear" aria-label="Suche zurücksetzen" type="button">×</button>
         </div>
         <select class="sort" id="sort" aria-label="Sortierung">
           <option value="votes">Meiste Stimmen</option>
           <option value="new">Neueste zuerst</option>
           <option value="effort">Kleinster Aufwand</option>
-          <option value="crew">Crew gesucht</option>
+          <option value="crew">Sucht noch Crew</option>
         </select>
+        <button class="chip filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filters">
+          Filter <span class="badge-n" id="filter-n">0</span>
+        </button>
         <button class="cta -black -sm" data-open-submit>+ Idee einreichen</button>
       </div>
-      <div class="tb-row">
+
+      <div class="filters" id="filters">
         <div class="chips" id="track-filters" role="group" aria-label="Nach Track filtern"></div>
         <div class="chips" id="status-filters" role="group" aria-label="Nach Status filtern"></div>
-        <span class="tb-count" id="count"></span>
+      </div>
+
+      <div class="tb-meta">
+        <span id="count" role="status" aria-live="polite"></span>
+        <button type="button" id="reset-filters" hidden>Filter zurücksetzen</button>
       </div>
     </div>
 
@@ -505,7 +539,6 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </section>
 
-<!-- ZÜNDER -->
 <section class="zuender" id="zuender">
   <div class="wrap">
     <div class="sec-head">
@@ -522,7 +555,7 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
         <div class="slot" id="slot-pain"><div class="lbl">Schmerzpunkt</div><div class="val">—</div></div>
         <div class="slot" id="slot-tool"><div class="lbl">Werkzeug</div><div class="val">—</div></div>
       </div>
-      <p class="spark-out" id="spark-out">Drück den Knopf — der Hangar denkt sich was aus.</p>
+      <p class="spark-out" id="spark-out" role="status" aria-live="polite">Drück den Knopf — der Hangar denkt sich was aus.</p>
       <div class="spark-actions">
         <button class="cta -yellow" id="roll">🎲 Idee würfeln</button>
         <button class="cta -outline" id="spark-take" disabled>Als Idee übernehmen</button>
@@ -531,7 +564,6 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </section>
 
-<!-- ABLAUF -->
 <section class="ablauf" id="ablauf">
   <div class="wrap">
     <div class="sec-head">
@@ -540,11 +572,11 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
       <p>Der Hangar ist Phase 1. Danach geht es los.</p>
     </div>
     <div class="timeline">
-      <div class="tl"><div class="t">JETZT → 4 WOCHEN VORHER</div><h4>Ideen sammeln</h4><p>Jede:r reicht ein, was nervt. Auch halbgare Gedanken. Der Ideen-Zünder hilft beim Anfangen.</p></div>
-      <div class="tl"><div class="t">2 WOCHEN VORHER</div><h4>Abstimmen &amp; Crews bilden</h4><p>Die Top-Ideen bekommen Crews aus 2–4 Piloten. Gemischt: technisch und nicht-technisch.</p></div>
-      <div class="tl"><div class="t">TAG 1, VORMITTAG</div><h4>Kickoff &amp; Setup</h4><p>Sandbox, Coolify-Zugang, kurze Einführung ins gewählte Werkzeug. Danach wird gebaut.</p></div>
-      <div class="tl"><div class="t">TAG 1–2</div><h4>Bauen</h4><p>Mentor:innen laufen rum. Zwischenstände landen im Showroom. Feedback holen via VibeFeedback.</p></div>
-      <div class="tl"><div class="t">TAG 2, 16 UHR</div><h4>Demo Day</h4><p>Jede Crew zeigt 5 Minuten live. Kein Slide-Deck ohne laufendes Ding. Publikum stimmt ab.</p></div>
+      <div class="tl"><p class="t">JETZT → 4 WOCHEN VORHER</p><h3>Ideen sammeln</h3><p>Jede:r reicht ein, was nervt. Auch halbgare Gedanken. Der Ideen-Zünder hilft beim Anfangen.</p></div>
+      <div class="tl"><p class="t">2 WOCHEN VORHER</p><h3>Abstimmen &amp; Crews bilden</h3><p>Die Top-Ideen bekommen Crews aus 2–4 Piloten. Gemischt: technisch und nicht-technisch.</p></div>
+      <div class="tl"><p class="t">TAG 1, VORMITTAG</p><h3>Kickoff &amp; Setup</h3><p>Sandbox, Coolify-Zugang, kurze Einführung ins gewählte Werkzeug. Danach wird gebaut.</p></div>
+      <div class="tl"><p class="t">TAG 1–2</p><h3>Bauen</h3><p>Mentor:innen laufen rum. Zwischenstände landen im Showroom. Feedback holen via VibeFeedback.</p></div>
+      <div class="tl"><p class="t">TAG 2, 16 UHR</p><h3>Demo Day</h3><p>Jede Crew zeigt 5 Minuten live. Kein Slide-Deck ohne laufendes Ding. Publikum stimmt ab.</p></div>
     </div>
 
     <div class="sec-head" style="margin-top:8rem;margin-bottom:2rem">
@@ -552,10 +584,10 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
       <h2>Woran wir Ideen messen</h2>
     </div>
     <div class="jury">
-      <div class="crit"><div class="pct">40%</div><h4>Wirkung</h4><p>Wie viel Zeit, Nerven oder Fehler spart das? Eine Idee, die zehn Menschen täglich hilft, schlägt eine, die einmal im Quartal beeindruckt.</p></div>
-      <div class="crit"><div class="pct">30%</div><h4>Machbarkeit</h4><p>Läuft am Ende von Tag 2 etwas Echtes? Ein fertiges kleines Tool schlägt einen ambitionierten Torso.</p></div>
-      <div class="crit"><div class="pct">20%</div><h4>Übertragbarkeit</h4><p>Können andere Teams oder andere Kunden das auch nutzen? Baut es auf Bestehendem auf?</p></div>
-      <div class="crit"><div class="pct">10%</div><h4>Mut</h4><p>Traut sich die Idee etwas? Der Hangar-Preis für die verrückteste Wildcard, die trotzdem lief.</p></div>
+      <div class="crit"><p class="pct">40%</p><h3>Wirkung</h3><p>Wie viel Zeit, Nerven oder Fehler spart das? Eine Idee, die zehn Menschen täglich hilft, schlägt eine, die einmal im Quartal beeindruckt.</p></div>
+      <div class="crit"><p class="pct">30%</p><h3>Machbarkeit</h3><p>Läuft am Ende von Tag 2 etwas Echtes? Ein fertiges kleines Tool schlägt einen ambitionierten Torso.</p></div>
+      <div class="crit"><p class="pct">20%</p><h3>Übertragbarkeit</h3><p>Können andere Teams oder andere Kunden das auch nutzen? Baut es auf Bestehendem auf?</p></div>
+      <div class="crit"><p class="pct">10%</p><h3>Mut</h3><p>Traut sich die Idee etwas? Der Hangar-Preis für die verrückteste Wildcard, die trotzdem lief.</p></div>
     </div>
   </div>
 </section>
@@ -566,13 +598,12 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   <div class="wrap">
     <div class="cols2">
       <div>
-        <h5>Ideen-Hangar</h5>
+        <h2>Ideen-Hangar</h2>
         <p>
           Teil der Citizen-Coding-Initiative der pilot Agenturgruppe. Die Ideen liegen in deinem
-          Browser (localStorage) — nichts wird an einen Server geschickt. Zum Teilen exportierst du
-          das Board als JSON und schickst es rum; die Sammlerin importiert alle Dateien und hat den
-          Gesamtstand. Für den scharfen Betrieb ziehen wir das Board hinter Coolify auf eine kleine
-          Datenbank um.
+          Browser — nichts wird an einen Server geschickt. Zum Teilen exportierst du das Board als
+          JSON und schickst es rum; die Sammlerin importiert alle Dateien und hat den Gesamtstand.
+          Für den scharfen Betrieb ziehen wir das Board hinter Coolify auf eine kleine Datenbank um.
         </p>
         <div class="tools">
           <button class="cta -ghost" id="export-json">Board als JSON exportieren</button>
@@ -583,7 +614,7 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
         </div>
       </div>
       <div>
-        <h5>Neue Ideen generieren</h5>
+        <h2>Neue Ideen generieren</h2>
         <p>
           Der Skill <code>/ideen-radar</code> in Claude Code würfelt dir jederzeit frische,
           konkrete Vorschläge für unsere AI-Transformation — er merkt sich, was schon
@@ -598,6 +629,13 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </footer>
 
+<!-- Export-Reminder -->
+<div class="reminder" id="reminder" role="region" aria-label="Hinweis zum Sichern">
+  <p><b>Deine Ideen liegen nur in diesem Browser.</b> Exportiere sie, damit nichts verloren geht — und schick die Datei an die Hackathon-Orga.</p>
+  <button class="cta -yellow" id="rem-export">Jetzt exportieren</button>
+  <button class="cta -outline" id="rem-close">Später</button>
+</div>
+
 <!-- SUBMIT MODAL -->
 <div class="ov" id="ov-submit" role="dialog" aria-modal="true" aria-labelledby="submit-title">
   <div class="modal">
@@ -607,29 +645,38 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
     </div>
     <form id="form-submit" novalidate>
       <div class="modal-bd">
+        <p class="notice">
+          <b>Du musst keine Lösung wissen.</b> Beschreib einfach, was dich nervt — den Rest
+          klären wir beim Kickoff gemeinsam. Zwei Felder sind Pflicht, alles andere ist optional.
+        </p>
+
+        <div id="dup-warn"></div>
+
         <div class="fld" id="f-title">
           <label for="i-title">Titel der Idee</label>
-          <p class="hint">Kurz und konkret. Nicht „KI für Media“, sondern „Mediaplan-Diff: zeigt was sich zwischen zwei Excel-Versionen geändert hat“.</p>
-          <input type="text" id="i-title" maxlength="90" required>
+          <p class="hint">Kurz und konkret. Nicht „KI für Media“, sondern „Mediaplan-Diff: zeigt, was sich zwischen zwei Excel-Versionen geändert hat“.</p>
+          <input type="text" id="i-title" maxlength="90" required aria-describedby="c-title">
+          <p class="counter" id="c-title">0/90</p>
           <p class="err">Bitte gib deiner Idee einen Titel.</p>
         </div>
 
         <div class="fld" id="f-problem">
           <label for="i-problem">Welches Problem löst sie?</label>
           <p class="hint">Beschreib den nervigen Ist-Zustand. Was kostet heute Zeit, geht schief oder findet niemand wieder?</p>
-          <textarea id="i-problem" maxlength="400" required></textarea>
+          <textarea id="i-problem" maxlength="400" required aria-describedby="c-problem"></textarea>
+          <p class="counter" id="c-problem">0/400</p>
           <p class="err">Ohne Problem keine Lösung — bitte ausfüllen.</p>
         </div>
 
         <div class="fld">
           <label for="i-solution">Wie könnte die Lösung aussehen? <span style="color:var(--c-gray-d);font-weight:400">(optional)</span></label>
-          <p class="hint">Wenn du schon eine Vorstellung hast. Wenn nicht: leer lassen, die Crew findet das beim Hackathon raus.</p>
+          <p class="hint">Wenn du schon eine Vorstellung hast. Wenn nicht: leer lassen — die Crew findet das beim Hackathon raus.</p>
           <textarea id="i-solution" maxlength="400" style="min-height:7rem"></textarea>
         </div>
 
         <div class="fld">
           <span class="lg">Welcher Track?</span>
-          <p class="hint">Nur eine Vermutung — beim Kickoff schauen wir gemeinsam drauf.</p>
+          <p class="hint">Nur eine Vermutung. Wenn du unsicher bist, nimm den ersten — beim Kickoff schauen wir gemeinsam drauf.</p>
           <div class="radios" id="track-radios"></div>
         </div>
 
@@ -641,10 +688,10 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
           <div class="fld">
             <label for="i-effort">Geschätzter Aufwand</label>
             <select id="i-effort">
+              <option value="?" selected>Keine Ahnung</option>
               <option value="S">S — halber Tag</option>
-              <option value="M" selected>M — 1–2 Tage</option>
+              <option value="M">M — 1–2 Tage</option>
               <option value="L">L — echtes Hackathon-Projekt</option>
-              <option value="?">Keine Ahnung</option>
             </select>
           </div>
         </div>
@@ -657,11 +704,13 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
         <div class="cols">
           <div class="fld" id="f-author">
             <label for="i-author">Dein Name</label>
+            <p class="hint">Damit die Crew weiß, wen sie zur Idee fragen kann.</p>
             <input type="text" id="i-author" maxlength="60" required autocomplete="name">
-            <p class="err">Damit wir wissen, wen wir fragen können.</p>
+            <p class="err">Bitte trag deinen Namen ein.</p>
           </div>
-          <div class="fld" style="display:flex;align-items:flex-end">
-            <label class="radio" style="width:100%">
+          <div class="fld">
+            <span class="lg">Besonderes</span>
+            <label class="radio" style="margin-top:1rem">
               <input type="checkbox" id="i-wild">
               <span><b>🎲 Wildcard</b><small>Mutig, ungewöhnlich, vielleicht verrückt. Zählt auf den Mut-Preis ein.</small></span>
             </label>
@@ -670,7 +719,7 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
       </div>
       <div class="modal-ft">
         <button type="button" class="cta -outline" data-close>Abbrechen</button>
-        <button type="submit" class="cta -yellow">Idee in den Hangar stellen</button>
+        <button type="submit" class="cta -yellow" id="submit-btn">Idee in den Hangar stellen</button>
       </div>
     </form>
   </div>
@@ -688,6 +737,23 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
   </div>
 </div>
 
+<!-- MINI MODAL (Name, Rolle, Bestätigung) -->
+<div class="ov -mini" id="ov-mini" role="dialog" aria-modal="true" aria-labelledby="mini-title">
+  <div class="modal">
+    <div class="modal-hd">
+      <div><p class="ol" id="mini-ol"></p><h2 id="mini-title"></h2></div>
+      <button class="x" data-close aria-label="Schließen">×</button>
+    </div>
+    <form id="form-mini">
+      <div class="modal-bd" id="mini-body"></div>
+      <div class="modal-ft">
+        <button type="button" class="cta -outline" data-close>Abbrechen</button>
+        <button type="submit" class="cta -yellow" id="mini-ok">OK</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -695,35 +761,36 @@ footer .cta.-ghost:hover{border-color:var(--c-yellow);color:var(--c-yellow)}
 'use strict';
 
 /* ============================================================
-   KONFIGURATION
+   KONFIGURATION — hier anpassen
    ============================================================ */
 const HACKATHON_DATE = '2026-09-24T09:00:00+02:00';
-const STORE_KEY = 'pilot-hangar-v1';
-const ME_KEY    = 'pilot-hangar-me';
+const STORE_KEY  = 'pilot-hangar-v1';
+const ME_KEY     = 'pilot-hangar-me';
+const CLEAN_KEY  = 'pilot-hangar-exported-at';
 
 const TRACKS = {
   'langdock-agent': {
-    label:'Langdock Agent', short:'Agent', color:'var(--track-langdock)', group:'langdock',
+    label:'Langdock Agent', short:'Agent', color:'var(--track-langdock)', group:'langdock', noCode:true,
     desc:'Ein KI-Assistent mit festem Auftrag, eigenem Wissen und Zugriff auf unsere Dokumente.',
-    hint:'Kein Code. Du schreibst eine Anleitung — der Agent hält sich daran, für alle im Team gleich.'
+    hint:'Du schreibst eine Anleitung — der Assistent hält sich daran, für alle im Team gleich.'
   },
   'langdock-workflow': {
-    label:'Langdock Workflow', short:'Workflow', color:'var(--track-langdock)', group:'langdock',
+    label:'Langdock Workflow', short:'Workflow', color:'var(--track-langdock)', group:'langdock', noCode:true,
     desc:'Eine Kette aus Schritten, die im Hintergrund läuft — mit Freigabe durch einen Menschen, wo es drauf ankommt.',
-    hint:'Kein Code. Für alles, was regelmäßig und gleich abläuft.'
+    hint:'Für alles, was regelmäßig und immer gleich abläuft.'
   },
   'claude-code-app': {
-    label:'Claude Code — Webapp', short:'Webapp', color:'var(--track-code)', group:'claude-code',
+    label:'Claude Code — Webapp', short:'Webapp', color:'var(--track-code)', group:'claude-code', noCode:false,
     desc:'Ein echtes kleines Tool im Browser, das wir über Coolify hosten und teilen können.',
-    hint:'Claude schreibt den Code, du sagst was rein soll und wie es aussehen muss.'
+    hint:'Claude schreibt den Code. Du sagst, was rein soll und wie es aussehen muss.'
   },
   'claude-code-skill': {
-    label:'Claude Code — Skill', short:'Skill', color:'var(--track-code)', group:'claude-code',
+    label:'Claude Code — Skill', short:'Skill', color:'var(--track-code)', group:'claude-code', noCode:false,
     desc:'Ein wiederverwendbarer Handgriff für Claude Code, den danach die ganze Agentur nutzt.',
-    hint:'Landet im Skill-Marktplatz. Der Hebel: einmal bauen, 550 Piloten nutzen es.'
+    hint:'Landet im Skill-Marktplatz. Einmal bauen, 550 Piloten nutzen es.'
   },
   'claude-design': {
-    label:'Claude Design', short:'Design', color:'var(--track-design)', group:'claude-design',
+    label:'Claude Design', short:'Design', color:'var(--track-design)', group:'claude-design', noCode:true,
     desc:'Prototyp, Pitch-Deck oder One-Pager im pilot-Design — aus einer Beschreibung heraus.',
     hint:'Für alles Visuelle. Kennt unser Design-System und hält sich dran.'
   }
@@ -731,19 +798,19 @@ const TRACKS = {
 
 const TRACK_GROUPS = [
   {
-    id:'langdock', name:'Langdock', tagline:'Der Einstieg für alle', color:'var(--track-langdock)',
+    id:'langdock', name:'Langdock', tagline:'Der Einstieg für alle', color:'var(--track-langdock)', noCode:true,
     desc:'Unsere DSGVO-konforme KI-Plattform. EU-gehostet, an unsere Dokumente angebunden. Hier fängst du an, wenn du noch nie etwas gebaut hast — es wird kein Code geschrieben, nur beschrieben.',
     items:['Agents: Assistenten mit festem Auftrag und eigenem Wissen','Workflows: mehrstufige Automationen im Hintergrund','Zugriff auf M365, Teams, Confluence & Co.'],
     foot:'<b>Gut für:</b> wiederkehrende Fleißarbeit, Wissen wiederfinden, Qualitätschecks nach festen Regeln.'
   },
   {
-    id:'claude-code', name:'Claude Code', tagline:'Wenn ein Tool rauskommen soll', color:'var(--track-code)',
+    id:'claude-code', name:'Claude Code', tagline:'Wenn ein Tool rauskommen soll', color:'var(--track-code)', noCode:false,
     desc:'Der Agent in unserer Sandbox. Er schreibt echten Code, du beschreibst das Ziel. Am Ende steht eine Webapp, die über Coolify läuft und einen Link hat, den du rumschicken kannst.',
     items:['Webapps: Rechner, Dashboards, Vergleichs-Tools','Skills: Handgriffe für den Skill-Marktplatz','Deploy per Push — Link teilen, fertig'],
     foot:'<b>Gut für:</b> alles, wofür es kein Tool gibt und Excel nicht mehr reicht.'
   },
   {
-    id:'claude-design', name:'Claude Design', tagline:'Wenn es gut aussehen muss', color:'var(--track-design)',
+    id:'claude-design', name:'Claude Design', tagline:'Wenn es gut aussehen muss', color:'var(--track-design)', noCode:true,
     desc:'Anthropics Design-Werkzeug kennt unser Design-System — Farben, Typo, Komponenten. Aus einer Beschreibung entsteht ein Prototyp, ein Deck oder ein One-Pager, der schon nach pilot aussieht.',
     items:['Klickbare Prototypen aus Skizzen','Pitch-Decks und One-Pager on-brand','Übergabe an Claude Code zum Ausbauen'],
     foot:'<b>Gut für:</b> Pitches, Kundenpräsentationen, Ideen sichtbar machen bevor gebaut wird.'
@@ -759,12 +826,11 @@ const STATUSES = {
   'gebaut':      {label:'Gebaut',      desc:'Läuft. Link im Showroom.'}
 };
 
+const EFFORTS = {'S':'halber Tag','M':'1–2 Tage','L':'echtes Hackathon-Projekt','?':'noch nicht eingeschätzt'};
 const ROLES = ['Idee & Fachwissen','Bauen','Design','Testen','Kunden-Sicht'];
 const NEEDS = ['Jemand der baut','Design-Blick','Fachwissen Media','Fachwissen Kreation','Daten-Zugang','Kunden-Sicht'];
-
 const EFFORT_ORDER = {'S':1,'M':2,'L':3,'?':4};
 
-/* Ideen-Zünder Achsen */
 const SPARK_DEPTS = DEPTS.filter(d => d !== 'Agenturweit');
 const SPARK_PAINS = [
   {t:'wiederkehrende Fleißarbeit', q:'was macht ihr jede Woche von Hand, obwohl es immer gleich abläuft?'},
@@ -782,94 +848,68 @@ const SPARK_TOOLS = Object.entries(TRACKS).map(([id,t]) => ({id, t:t.label}));
    SEED-DATEN
    ============================================================ */
 const SEED = [
-  {
-    title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
-    problem:'Kunden schicken überarbeitete Mediapläne als neue Excel. Wir vergleichen Zeile für Zeile von Hand und übersehen trotzdem Änderungen bei Budgets und Laufzeiten.',
-    solution:'Zwei Dateien reinziehen, das Tool markiert farbig jede Abweichung bei Budget, Zeitraum, Kanal und Format — plus eine Zusammenfassung in Prosa für die Mail an den Kunden.',
-    track:'claude-code-app', dept:'Mediaplanung', effort:'M', author:'Christopher Kipp',
-    status:'crew-gesucht', wildcard:false, needs:['Fachwissen Media','Design-Blick'],
-    votes:23, crew:[{name:'Christopher Kipp',role:'Bauen'}], days:14
-  },
-  {
-    title:'Briefing-Wächter: prüft eingehende Kunden-Briefings auf Lücken',
-    problem:'Briefings kommen unvollständig rein — kein Budget, keine KPIs, keine Zielgruppe. Das merken wir erst, wenn die Strategin schon zwei Stunden drin steckt.',
-    solution:'Ein Langdock-Agent, dem man das Briefing gibt. Er prüft gegen unsere Checkliste, listet was fehlt und formuliert die Rückfrage-Mail an den Kunden gleich mit.',
-    track:'langdock-agent', dept:'Strategie', effort:'S', author:'Erika Maier',
-    status:'idee', wildcard:false, needs:['Fachwissen Media'],
-    votes:31, crew:[], days:9
-  },
-  {
-    title:'Wettbewerbs-Radar: was machen die Wettbewerber unserer Kunden gerade?',
-    problem:'Vor jedem Jour Fixe googelt jemand händisch, was der Wettbewerb an Kampagnen gestartet hat. Dauert eine Stunde, ist am nächsten Tag veraltet.',
-    solution:'Ein Workflow, der wöchentlich Quellen abklappert, Neues zusammenfasst und montags eine kurze Mail an das Kundenteam schickt. Ein Mensch gibt vor dem Versand frei.',
-    track:'langdock-workflow', dept:'Account Management', effort:'M', author:'Jan Richter',
-    status:'idee', wildcard:false, needs:['Daten-Zugang','Kunden-Sicht'],
-    votes:19, crew:[], days:6
-  },
-  {
-    title:'Pitch-Deck-Rohbau aus dem Briefing',
-    problem:'Jeder Pitch fängt mit derselben leeren PowerPoint an. Struktur, Kapitel, pilot-Layout — jedes Mal von vorn, obwohl 60 % identisch sind.',
-    solution:'Briefing rein, Claude Design baut den Rohbau im pilot-Design: Agenda, Marktkapitel, Zielgruppen-Slide, Media-Strategie, Wirkungsnachweis. Inhalte füllt der Mensch — die Struktur steht.',
-    track:'claude-design', dept:'New Business', effort:'M', author:'Mia Hoffmann',
-    status:'in-arbeit', wildcard:false, needs:[],
-    votes:27, crew:[{name:'Mia Hoffmann',role:'Design'},{name:'Sophie Klein',role:'Idee & Fachwissen'},{name:'Jan Richter',role:'Bauen'}], days:21
-  },
-  {
-    title:'Onboarding-Lotse für neue Piloten',
-    problem:'Neue Kolleg:innen fragen in den ersten Wochen dieselben 40 Dinge — welches Tool wofür, wer entscheidet was, wo liegt die Vorlage. Immer bei den gleichen drei Leuten.',
-    solution:'Ein Langdock-Agent mit Zugriff auf unser Confluence, der geduldig antwortet und ehrlich sagt, wenn er etwas nicht weiß — inklusive Hinweis, wen man dann fragt.',
-    track:'langdock-agent', dept:'HR & People', effort:'S', author:'Sophie Klein',
-    status:'crew-gesucht', wildcard:false, needs:['Fachwissen Kreation','Jemand der baut'],
-    votes:16, crew:[{name:'Sophie Klein',role:'Idee & Fachwissen'}], days:11
-  },
-  {
-    title:'Tonalitäts-Check gegen die Marken-Guidelines',
-    problem:'Bei jedem Text stellt sich die Frage: klingt das nach der Marke? Die Guidelines liegen als 40-seitiges PDF herum und niemand liest sie beim Texten.',
-    solution:'Ein Skill für Claude Code: Text rein, Bewertung raus — welche Stelle bricht mit welcher Guideline-Regel, mit Formulierungsvorschlag. Landet danach im Skill-Marktplatz.',
-    track:'claude-code-skill', dept:'Kreation', effort:'M', author:'Christopher Kipp',
-    status:'idee', wildcard:false, needs:['Fachwissen Kreation'],
-    votes:14, crew:[], days:4
-  },
-  {
-    title:'Kampagnen-Obduktion: was können wir aus abgeschlossenen Kampagnen lernen?',
-    problem:'Nach dem Kampagnen-Ende wandert der Abschlussbericht ins Archiv. Beim nächsten ähnlichen Kunden erinnert sich niemand, was damals funktioniert hat.',
-    solution:'Alle Abschlussberichte in eine durchsuchbare Wissensbasis. Frage: „Was hat bei FMCG-Kunden im Weihnachtsgeschäft funktioniert?“ — Antwort mit Quellenangabe auf die echten Berichte.',
-    track:'langdock-agent', dept:'Werbewirkungsforschung', effort:'L', author:'Erika Maier',
-    status:'idee', wildcard:false, needs:['Daten-Zugang','Fachwissen Media'],
-    votes:22, crew:[], days:8
-  },
-  {
-    title:'Der Zahlen-Übersetzer: Reportings, die man auch ohne Media-Studium versteht',
-    problem:'Wir schicken Kunden Dashboards voller TKP, GRP und Viewability. Auf der anderen Seite sitzt oft eine Marketing-Managerin, die eigentlich nur wissen will, ob es funktioniert hat.',
-    solution:'Eine Webapp: Reporting-Daten rein, verständliche Zusammenfassung raus — in drei Absätzen, ohne Fachjargon, mit einer klaren Empfehlung fürs nächste Quartal.',
-    track:'claude-code-app', dept:'Account Management', effort:'M', author:'Jan Richter',
-    status:'idee', wildcard:false, needs:['Fachwissen Media','Kunden-Sicht'],
-    votes:18, crew:[], days:5
-  },
-  {
-    title:'Der Werbewirkungs-Simulator: Kampagne vorher durchspielen',
-    problem:'Wir wissen erst nach der Kampagne, ob der Mediamix gepasst hat. Vorher ist alles Erfahrung und Bauchgefühl.',
-    solution:'Ein Tool, das auf Basis unserer historischen Wirkungsdaten durchspielt, was passiert, wenn man Budget zwischen Kanälen verschiebt. Ehrlich gesagt: sportlich für zwei Tage. Aber selbst eine grobe Version wäre im Pitch Gold wert.',
-    track:'claude-code-app', dept:'Werbewirkungsforschung', effort:'L', author:'Christopher Kipp',
-    status:'idee', wildcard:true, needs:['Daten-Zugang','Jemand der baut','Fachwissen Media'],
-    votes:29, crew:[], days:3
-  },
-  {
-    title:'Meeting-Nachbereiter mit Aufgaben-Erkennung',
-    problem:'Nach Kundenterminen tippt jemand Notizen ab und vergisst die Hälfte der Zusagen. Aufgaben landen nirgends.',
-    solution:'Workflow: Transkript rein, strukturiertes Protokoll raus — plus eine Liste der Zusagen mit Verantwortlichen. Wer zugesagt hat, bekommt eine Teams-Nachricht.',
-    track:'langdock-workflow', dept:'Agenturweit', effort:'S', author:'Mia Hoffmann',
-    status:'gebaut', wildcard:false, needs:[],
-    votes:34, crew:[{name:'Mia Hoffmann',role:'Bauen'},{name:'Christopher Kipp',role:'Testen'}], days:30
-  }
+  {title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
+   problem:'Kunden schicken überarbeitete Mediapläne als neue Excel. Wir vergleichen Zeile für Zeile von Hand und übersehen trotzdem Änderungen bei Budgets und Laufzeiten.',
+   solution:'Zwei Dateien reinziehen, das Tool markiert farbig jede Abweichung bei Budget, Zeitraum, Kanal und Format — plus eine Zusammenfassung in Prosa für die Mail an den Kunden.',
+   track:'claude-code-app', dept:'Mediaplanung', effort:'M', author:'Christopher Kipp',
+   status:'crew-gesucht', wildcard:false, needs:['Fachwissen Media','Design-Blick'],
+   votes:23, crew:[{name:'Christopher Kipp',role:'Bauen'}], days:14},
+  {title:'Briefing-Wächter: prüft eingehende Kunden-Briefings auf Lücken',
+   problem:'Briefings kommen unvollständig rein — kein Budget, keine KPIs, keine Zielgruppe. Das merken wir erst, wenn die Strategin schon zwei Stunden drin steckt.',
+   solution:'Ein Langdock-Agent, dem man das Briefing gibt. Er prüft gegen unsere Checkliste, listet was fehlt und formuliert die Rückfrage-Mail an den Kunden gleich mit.',
+   track:'langdock-agent', dept:'Strategie', effort:'S', author:'Erika Maier',
+   status:'idee', wildcard:false, needs:['Fachwissen Media'], votes:31, crew:[], days:9},
+  {title:'Wettbewerbs-Radar: was machen die Wettbewerber unserer Kunden gerade?',
+   problem:'Vor jedem Jour Fixe googelt jemand händisch, was der Wettbewerb an Kampagnen gestartet hat. Dauert eine Stunde, ist am nächsten Tag veraltet.',
+   solution:'Ein Workflow, der wöchentlich Quellen abklappert, Neues zusammenfasst und montags eine kurze Mail an das Kundenteam schickt. Ein Mensch gibt vor dem Versand frei.',
+   track:'langdock-workflow', dept:'Account Management', effort:'M', author:'Jan Richter',
+   status:'idee', wildcard:false, needs:['Daten-Zugang','Kunden-Sicht'], votes:19, crew:[], days:6},
+  {title:'Pitch-Deck-Rohbau aus dem Briefing',
+   problem:'Jeder Pitch fängt mit derselben leeren PowerPoint an. Struktur, Kapitel, pilot-Layout — jedes Mal von vorn, obwohl 60 % identisch sind.',
+   solution:'Briefing rein, Claude Design baut den Rohbau im pilot-Design: Agenda, Marktkapitel, Zielgruppen-Slide, Media-Strategie, Wirkungsnachweis. Inhalte füllt der Mensch — die Struktur steht.',
+   track:'claude-design', dept:'New Business', effort:'M', author:'Mia Hoffmann',
+   status:'in-arbeit', wildcard:false, needs:[], votes:27,
+   crew:[{name:'Mia Hoffmann',role:'Design'},{name:'Sophie Klein',role:'Idee & Fachwissen'},{name:'Jan Richter',role:'Bauen'}], days:21},
+  {title:'Onboarding-Lotse für neue Piloten',
+   problem:'Neue Kolleg:innen fragen in den ersten Wochen dieselben 40 Dinge — welches Tool wofür, wer entscheidet was, wo liegt die Vorlage. Immer bei den gleichen drei Leuten.',
+   solution:'Ein Langdock-Agent mit Zugriff auf unser Confluence, der geduldig antwortet und ehrlich sagt, wenn er etwas nicht weiß — inklusive Hinweis, wen man dann fragt.',
+   track:'langdock-agent', dept:'HR & People', effort:'S', author:'Sophie Klein',
+   status:'crew-gesucht', wildcard:false, needs:['Fachwissen Kreation','Jemand der baut'],
+   votes:16, crew:[{name:'Sophie Klein',role:'Idee & Fachwissen'}], days:11},
+  {title:'Tonalitäts-Check gegen die Marken-Guidelines',
+   problem:'Bei jedem Text stellt sich die Frage: klingt das nach der Marke? Die Guidelines liegen als 40-seitiges PDF herum und niemand liest sie beim Texten.',
+   solution:'Ein Skill für Claude Code: Text rein, Bewertung raus — welche Stelle bricht mit welcher Guideline-Regel, mit Formulierungsvorschlag. Landet danach im Skill-Marktplatz.',
+   track:'claude-code-skill', dept:'Kreation', effort:'M', author:'Christopher Kipp',
+   status:'idee', wildcard:false, needs:['Fachwissen Kreation'], votes:14, crew:[], days:4},
+  {title:'Kampagnen-Obduktion: was können wir aus abgeschlossenen Kampagnen lernen?',
+   problem:'Nach dem Kampagnen-Ende wandert der Abschlussbericht ins Archiv. Beim nächsten ähnlichen Kunden erinnert sich niemand, was damals funktioniert hat.',
+   solution:'Alle Abschlussberichte in eine durchsuchbare Wissensbasis. Frage: „Was hat bei FMCG-Kunden im Weihnachtsgeschäft funktioniert?“ — Antwort mit Quellenangabe auf die echten Berichte.',
+   track:'langdock-agent', dept:'Werbewirkungsforschung', effort:'L', author:'Erika Maier',
+   status:'idee', wildcard:false, needs:['Daten-Zugang','Fachwissen Media'], votes:22, crew:[], days:8},
+  {title:'Der Zahlen-Übersetzer: Reportings, die man auch ohne Media-Studium versteht',
+   problem:'Wir schicken Kunden Dashboards voller TKP, GRP und Viewability. Auf der anderen Seite sitzt oft eine Marketing-Managerin, die eigentlich nur wissen will, ob es funktioniert hat.',
+   solution:'Eine Webapp: Reporting-Daten rein, verständliche Zusammenfassung raus — in drei Absätzen, ohne Fachjargon, mit einer klaren Empfehlung fürs nächste Quartal.',
+   track:'claude-code-app', dept:'Account Management', effort:'M', author:'Jan Richter',
+   status:'idee', wildcard:false, needs:['Fachwissen Media','Kunden-Sicht'], votes:18, crew:[], days:5},
+  {title:'Der Werbewirkungs-Simulator: Kampagne vorher durchspielen',
+   problem:'Wir wissen erst nach der Kampagne, ob der Mediamix gepasst hat. Vorher ist alles Erfahrung und Bauchgefühl.',
+   solution:'Ein Tool, das auf Basis unserer historischen Wirkungsdaten durchspielt, was passiert, wenn man Budget zwischen Kanälen verschiebt. Ehrlich gesagt: sportlich für zwei Tage. Aber selbst eine grobe Version wäre im Pitch Gold wert.',
+   track:'claude-code-app', dept:'Werbewirkungsforschung', effort:'L', author:'Christopher Kipp',
+   status:'idee', wildcard:true, needs:['Daten-Zugang','Jemand der baut','Fachwissen Media'], votes:29, crew:[], days:3},
+  {title:'Meeting-Nachbereiter mit Aufgaben-Erkennung',
+   problem:'Nach Kundenterminen tippt jemand Notizen ab und vergisst die Hälfte der Zusagen. Aufgaben landen nirgends.',
+   solution:'Workflow: Transkript rein, strukturiertes Protokoll raus — plus eine Liste der Zusagen mit Verantwortlichen. Wer zugesagt hat, bekommt eine Teams-Nachricht.',
+   track:'langdock-workflow', dept:'Agenturweit', effort:'S', author:'Mia Hoffmann',
+   status:'gebaut', wildcard:false, needs:[], votes:34,
+   crew:[{name:'Mia Hoffmann',role:'Bauen'},{name:'Christopher Kipp',role:'Testen'}], days:30}
 ];
 
 /* ============================================================
-   STATE
+   STATE & HELFER
    ============================================================ */
 let ideas = [];
 let me = localStorage.getItem(ME_KEY) || '';
-let filters = {q:'', tracks:new Set(), statuses:new Set(), sort:'votes'};
+let filters = {q:'', tracks:new Set(), statuses:new Set(), mine:false, sort:'votes'};
 let spark = null;
 let lastFocus = null;
 
@@ -886,43 +926,181 @@ function load(){
     const raw = localStorage.getItem(STORE_KEY);
     if (raw){
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length !== undefined){ ideas = parsed; return; }
+      if (Array.isArray(parsed)){ ideas = parsed; return; }
     }
-  } catch(e){ console.warn('Konnte Board nicht laden:', e); }
+  } catch(e){ console.warn('Board nicht lesbar, nutze Seed:', e); }
   ideas = SEED.map(s => ({
-    id: uid(), title:s.title, problem:s.problem, solution:s.solution || '',
+    id:uid(), title:s.title, problem:s.problem, solution:s.solution||'',
     track:s.track, dept:s.dept, effort:s.effort, author:s.author,
-    status:s.status, wildcard:s.wildcard, needs:s.needs || [],
-    votes:s.votes, voters:[], crew:s.crew || [], createdAt: daysAgo(s.days)
+    status:s.status, wildcard:s.wildcard, needs:s.needs||[],
+    votes:s.votes, voters:[], crew:s.crew||[], createdAt:daysAgo(s.days)
   }));
-  save();
+  save({clean:true});
 }
-function save(){
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(ideas)); }
-  catch(e){ toast('Speichern fehlgeschlagen — Browser-Speicher voll?'); }
+function save(opt={}){
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(ideas));
+    if (opt.clean) localStorage.setItem(CLEAN_KEY, String(Date.now()));
+    else localStorage.removeItem(CLEAN_KEY);
+  } catch(e){ toast('Speichern fehlgeschlagen — Browser-Speicher voll?'); }
 }
+const isDirty = () => !localStorage.getItem(CLEAN_KEY);
 function setMe(n){ me = n.trim(); localStorage.setItem(ME_KEY, me); renderWho(); }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
 let toastT;
 function toast(html){
   const el = $('#toast');
   el.innerHTML = html;
   el.classList.add('show');
   clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove('show'), 3600);
+  toastT = setTimeout(() => el.classList.remove('show'), 3800);
 }
 
 /* ============================================================
-   COUNTDOWN
+   MODAL-INFRASTRUKTUR
+   ============================================================ */
+function openOv(sel, focusSel){
+  if (!$('.ov.open')) lastFocus = document.activeElement;
+  const ov = $(sel);
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const f = focusSel ? $(focusSel, ov) : ov.querySelector('input:not([type=hidden]),textarea,select,button:not([data-close])');
+  if (f) setTimeout(() => f.focus(), 60);
+}
+function closeOv(ov){
+  ov.classList.remove('open');
+  if (!$$('.ov.open').length){
+    document.body.style.overflow = '';
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+  }
+}
+
+/* Generischer Mini-Dialog — ersetzt prompt() und confirm().
+   Gibt ein Promise zurück: Wert bei OK, null bei Abbruch. */
+let miniResolve = null;
+function mini({ol='', title, bodyHTML, ok='OK', okClass='-yellow', focus, read}){
+  return new Promise(resolve => {
+    miniResolve = {resolve, read};
+    $('#mini-ol').textContent = ol;
+    $('#mini-title').textContent = title;
+    $('#mini-body').innerHTML = bodyHTML;
+    const btn = $('#mini-ok');
+    btn.textContent = ok;
+    btn.className = 'cta ' + okClass;
+    openOv('#ov-mini', focus);
+  });
+}
+$('#form-mini').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!miniResolve) return;
+  const {resolve, read} = miniResolve;
+  const val = read ? read($('#mini-body')) : true;
+  if (val === undefined) return;          // Validierung fehlgeschlagen → offen lassen
+  miniResolve = null;
+  closeOv($('#ov-mini'));
+  resolve(val);
+});
+$('#ov-mini').addEventListener('transitionend', () => {});
+
+/* Beim Schließen eines Mini-Dialogs das Promise auflösen */
+function cancelMini(){
+  if (miniResolve){ const r = miniResolve.resolve; miniResolve = null; r(null); }
+}
+
+/* Namensabfrage — ersetzt prompt() */
+async function ensureMe(reason){
+  if (me) return true;
+  const name = await mini({
+    ol:'Kurz vorstellen',
+    title:'Wie heißt du?',
+    bodyHTML: `
+      <p class="hint" style="font-size:1.5rem;margin-bottom:1.6rem">
+        ${esc(reason || 'Damit die Crew weiß, wer abgestimmt hat.')}
+        Dein Name bleibt in diesem Browser und wird an keinen Server geschickt.
+      </p>
+      <div class="fld" style="margin:0">
+        <label for="mini-name">Name</label>
+        <input type="text" id="mini-name" maxlength="60" autocomplete="name" placeholder="Vorname Nachname">
+        <p class="err" id="mini-name-err">Bitte trag deinen Namen ein.</p>
+      </div>`,
+    ok:'Weiter', focus:'#mini-name',
+    read: body => {
+      const v = $('#mini-name', body).value.trim();
+      if (!v){ $('#mini-name', body).closest('.fld').classList.add('invalid'); return undefined; }
+      return v;
+    }
+  });
+  if (!name) return false;
+  setMe(name);
+  return true;
+}
+
+/* Bestätigung — ersetzt confirm() */
+function confirmDialog({title, text, ok='Ja, weiter', okClass='-danger', ol='Sicher?'}){
+  return mini({ol, title, bodyHTML:`<p style="font-size:1.6rem;line-height:1.6">${text}</p>`, ok, okClass});
+}
+
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-close]')){
+    const ov = e.target.closest('.ov');
+    if (ov.id === 'ov-mini') cancelMini();
+    if (ov.id === 'ov-submit'){ tryCloseSubmit(); return; }
+    closeOv(ov);
+  }
+  if (e.target.classList.contains('ov')){
+    if (e.target.id === 'ov-mini') cancelMini();
+    if (e.target.id === 'ov-submit'){ tryCloseSubmit(); return; }
+    closeOv(e.target);
+  }
+  if (e.target.closest('[data-open-submit]')){ e.preventDefault(); openSubmit(); }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    const open = $$('.ov.open');
+    const o = open[open.length-1];
+    if (!o) return;
+    if (o.id === 'ov-mini'){ cancelMini(); closeOv(o); return; }
+    if (o.id === 'ov-submit'){ tryCloseSubmit(); return; }
+    closeOv(o);
+    return;
+  }
+  if (e.key === 'Tab'){
+    const open = $$('.ov.open');
+    const o = open[open.length-1];
+    if (!o) return;
+    const f = $$('a[href],button:not([disabled]),input:not([hidden]),select,textarea,[tabindex]:not([tabindex="-1"])', o)
+      .filter(el => el.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length-1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+const burger = $('#burger'), nav = $('#nav');
+burger.addEventListener('click', () => {
+  const open = nav.dataset.open === 'true';
+  nav.dataset.open = String(!open);
+  burger.setAttribute('aria-expanded', String(!open));
+  burger.setAttribute('aria-label', open ? 'Menü öffnen' : 'Menü schließen');
+});
+nav.addEventListener('click', e => {
+  if (e.target.tagName === 'A' || e.target.closest('[data-open-submit]')){
+    nav.dataset.open = 'false';
+    burger.setAttribute('aria-expanded','false');
+  }
+});
+
+/* ============================================================
+   COUNTDOWN — ohne Sekunden, das flackert nur
    ============================================================ */
 function renderCountdown(){
   const target = new Date(HACKATHON_DATE);
-  const fmt = new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'long',year:'numeric'});
-  $('#hero-date').textContent = fmt.format(target);
-
+  $('#hero-date').textContent = new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'long',year:'numeric'}).format(target);
   const tick = () => {
     const diff = target - new Date();
     const box = $('#countdown');
@@ -930,17 +1108,14 @@ function renderCountdown(){
       box.innerHTML = '<div class="cd-meta"><b>Es geht los.</b>Der Hackathon läuft — viel Erfolg, Crews.</div>';
       return;
     }
-    const d = Math.floor(diff/864e5);
-    const h = Math.floor(diff/36e5) % 24;
-    const m = Math.floor(diff/6e4) % 60;
-    const s = Math.floor(diff/1e3) % 60;
+    const d = Math.floor(diff/864e5), h = Math.floor(diff/36e5)%24, m = Math.floor(diff/6e4)%60;
     box.innerHTML =
-      [[d,'Tage'],[h,'Stunden'],[m,'Minuten'],[s,'Sekunden']]
+      [[d,'Tage'],[h,'Stunden'],[m,'Minuten']]
         .map(([v,l]) => `<div class="cd-box"><b>${String(v).padStart(2,'0')}</b><span>${l}</span></div>`).join('') +
       `<div class="cd-meta"><b>Bis zum Kickoff</b>Ideen kannst du bis eine Woche vorher einreichen.</div>`;
   };
   tick();
-  setInterval(tick, 1000);
+  setInterval(tick, 30000);
 }
 
 /* ============================================================
@@ -952,7 +1127,8 @@ function renderTracks(){
       <p class="tag">${esc(g.tagline)}</p>
       <h3>${esc(g.name)}</h3>
       <p class="sub">${esc(Object.values(TRACKS).filter(t => t.group===g.id).map(t=>t.short).join(' · '))}</p>
-      <p>${esc(g.desc)}</p>
+      ${g.noCode ? '<span class="code-note">✓ Ohne Programmieren</span>' : '<span class="code-note">Claude schreibt den Code</span>'}
+      <p class="body">${esc(g.desc)}</p>
       <ul>${g.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
       <div class="foot">${g.foot}</div>
     </article>`).join('');
@@ -962,40 +1138,68 @@ function renderTracks(){
    FILTER
    ============================================================ */
 function renderFilters(){
-  const tf = $('#track-filters');
-  tf.innerHTML = Object.entries(TRACKS).map(([id,t]) => `
-    <button class="chip" role="button" aria-pressed="false" data-track="${id}" style="--cd:${t.color}">
-      <span class="dot" aria-hidden="true"></span>${esc(t.label)}
-      <span class="n" data-n="${id}"></span>
-    </button>`).join('');
+  $('#track-filters').innerHTML =
+    `<button class="chip -mine" data-mine aria-pressed="false">★ Von mir / meine Crew</button>` +
+    Object.entries(TRACKS).map(([id,t]) => `
+      <button class="chip" aria-pressed="false" data-track="${id}" style="--cd:${t.color}">
+        <span class="dot" aria-hidden="true"></span>${esc(t.label)}<span class="n" data-n="${id}"></span>
+      </button>`).join('');
 
-  const sf = $('#status-filters');
-  sf.innerHTML = Object.entries(STATUSES).map(([id,s]) => `
-    <button class="chip" role="button" aria-pressed="false" data-status="${id}" title="${esc(s.desc)}">
+  $('#status-filters').innerHTML = Object.entries(STATUSES).map(([id,s]) => `
+    <button class="chip" aria-pressed="false" data-status="${id}" title="${esc(s.desc)}">
       ${esc(s.label)}<span class="n" data-n="${id}"></span>
     </button>`).join('');
 
-  tf.addEventListener('click', e => {
+  $('#track-filters').addEventListener('click', e => {
+    const mineBtn = e.target.closest('[data-mine]');
+    if (mineBtn){
+      filters.mine = !filters.mine;
+      mineBtn.setAttribute('aria-pressed', String(filters.mine));
+      render(); return;
+    }
     const b = e.target.closest('[data-track]'); if (!b) return;
     toggle(filters.tracks, b.dataset.track, b); render();
   });
-  sf.addEventListener('click', e => {
+  $('#status-filters').addEventListener('click', e => {
     const b = e.target.closest('[data-status]'); if (!b) return;
     toggle(filters.statuses, b.dataset.status, b); render();
   });
+
+  const ft = $('#filter-toggle'), panel = $('#filters');
+  ft.addEventListener('click', () => {
+    const open = panel.dataset.open === 'true';
+    panel.dataset.open = String(!open);
+    ft.setAttribute('aria-expanded', String(!open));
+  });
+
+  $('#reset-filters').addEventListener('click', clearFilters);
 }
 function toggle(set, val, btn){
   if (set.has(val)) set.delete(val); else set.add(val);
   btn.setAttribute('aria-pressed', String(set.has(val)));
 }
+function activeFilterCount(){
+  return filters.tracks.size + filters.statuses.size + (filters.mine?1:0) + (filters.q?1:0);
+}
+function clearFilters(){
+  filters.tracks.clear(); filters.statuses.clear();
+  filters.mine = false; filters.q = '';
+  $('#q').value = '';
+  $$('.chip[aria-pressed]').forEach(c => c.setAttribute('aria-pressed','false'));
+  render();
+  $('#q').focus();
+}
+
+const mineIdea = i => me && (i.author === me || i.crew.some(c => c.name === me));
 
 function visible(){
   const q = filters.q.toLowerCase().trim();
-  let out = ideas.filter(i => {
+  const out = ideas.filter(i => {
     if (filters.tracks.size && !filters.tracks.has(i.track)) return false;
     if (filters.statuses.size && !filters.statuses.has(i.status)) return false;
+    if (filters.mine && !mineIdea(i)) return false;
     if (q){
-      const hay = [i.title, i.problem, i.solution, i.dept, i.author, ...(i.needs||[])].join(' ').toLowerCase();
+      const hay = [i.title,i.problem,i.solution,i.dept,i.author,...(i.needs||[])].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -1020,12 +1224,20 @@ function render(){
 
   grid.innerHTML = list.length ? list.map(cardHTML).join('') : `
     <div class="empty">
-      <b>Nichts gefunden.</b>
+      <b>Keine Idee passt zu diesen Filtern.</b>
       <p>Setz die Filter zurück — oder reich die Idee ein, die dir gerade fehlt.</p>
-      <p style="margin-top:2.4rem"><button class="cta -yellow" data-open-submit>Idee einreichen</button></p>
+      <button class="cta -outline" id="empty-clear">Filter zurücksetzen</button>
+      <button class="cta -yellow" data-open-submit>Idee einreichen</button>
     </div>`;
+  const ec = $('#empty-clear');
+  if (ec) ec.onclick = clearFilters;
 
-  $('#count').textContent = `${list.length} von ${ideas.length} Ideen`;
+  const n = activeFilterCount();
+  $('#count').textContent = n
+    ? `${list.length} von ${ideas.length} Ideen — ${n} ${n===1?'Filter':'Filter'} aktiv`
+    : `${ideas.length} Ideen im Hangar`;
+  $('#filter-n').textContent = filters.tracks.size + filters.statuses.size + (filters.mine?1:0);
+  $('#reset-filters').hidden = n === 0;
 
   Object.keys(TRACKS).forEach(id => {
     const el = $(`.n[data-n="${id}"]`, $('#track-filters'));
@@ -1040,6 +1252,8 @@ function render(){
   $('#s-votes').textContent = ideas.reduce((a,i) => a + i.votes, 0);
   $('#s-crew').textContent  = new Set(ideas.flatMap(i => i.crew.map(c => c.name))).size;
   $('#s-open').textContent  = ideas.filter(i => i.status === 'crew-gesucht').length;
+
+  showReminder();
 }
 
 function cardHTML(i){
@@ -1048,98 +1262,69 @@ function cardHTML(i){
   const crew = i.crew.slice(0,3).map(c => `<span class="av" title="${esc(c.name)}">${esc(initials(c.name))}</span>`).join('');
   const more = i.crew.length > 3 ? `<span class="av -more">+${i.crew.length-3}</span>` : '';
   return `
-  <article class="card" style="--tc:${t.color}" data-id="${i.id}" tabindex="0" role="button"
-           aria-label="Idee öffnen: ${esc(i.title)}">
-    <button class="vote" data-vote="${i.id}" aria-pressed="${voted}"
-            aria-label="${voted ? 'Stimme zurückziehen' : 'Für diese Idee stimmen'}">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l8 10h-5v6h-6v-6H4z"/></svg>
-      <b>${i.votes}</b><small>${i.votes === 1 ? 'Stimme' : 'Stimmen'}</small>
-    </button>
-    <div class="card-top">
-      <div class="badges">
-        <span class="badge -track" data-t="${i.track}" style="--tc:${t.color}">${esc(t.label)}</span>
-        ${i.wildcard ? '<span class="badge -wild">🎲 Wildcard</span>' : ''}
-      </div>
+  <article class="card" style="--tc:${t.color}" data-id="${i.id}">
+    <div class="badges">
+      <span class="badge -track" style="--tc:${t.color}">${esc(t.label)}</span>
+      ${i.wildcard ? '<span class="badge -wild" title="Mutige, ungewöhnliche Idee — zählt auf den Mut-Preis ein.">🎲 Wildcard</span>' : ''}
+      ${mineIdea(i) ? '<span class="badge -mine">Von dir</span>' : ''}
     </div>
-    <h3>${esc(i.title)}</h3>
+    <h3><button class="open" data-open="${i.id}">${esc(i.title)}</button></h3>
     <p class="prob">${esc(i.problem)}</p>
     <div class="badges">
-      <span class="badge -status" data-s="${i.status}">${esc(STATUSES[i.status].label)}</span>
-      <span class="badge -effort">${esc(i.effort)}</span>
+      <span class="badge -status" data-s="${i.status}" title="${esc(STATUSES[i.status].desc)}">${esc(STATUSES[i.status].label)}</span>
+      <span class="badge -effort" title="Aufwand: ${esc(EFFORTS[i.effort])}">${i.effort === '?' ? 'Aufwand offen' : `Aufwand ${esc(i.effort)}`}</span>
     </div>
-    <div class="card-meta">
-      <span>${esc(i.dept)}</span>
-      ${i.crew.length
-        ? `<span class="crew-strip">${crew}${more}</span>`
-        : `<span style="color:var(--c-warn)">Noch keine Crew</span>`}
+    <div class="card-foot">
+      <div class="card-meta">
+        <span class="dept">${esc(i.dept)}</span>
+        ${i.crew.length
+          ? `<span class="crew-strip">${crew}${more}</span>`
+          : `<span class="no-crew">Noch keine Crew</span>`}
+      </div>
+      <button class="vote" data-vote="${i.id}" aria-pressed="${voted}"
+              aria-label="${voted ? `Stimme für „${esc(i.title)}" zurückziehen` : `Für „${esc(i.title)}" stimmen`}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l8 10h-5v6h-6v-6H4z"/></svg>
+        <b>${i.votes}</b><small>${i.votes === 1 ? 'Stimme' : 'Stimmen'}</small>
+      </button>
     </div>
   </article>`;
 }
 
 function renderWho(){
   $('#who').innerHTML = me
-    ? `Angemeldet als <b style="color:var(--c-white)">${esc(me)}</b> · <button class="cta -ghost -sm" id="change-me" style="padding:.3rem 1.2rem;font-size:1.2rem">wechseln</button>`
+    ? `Angemeldet als <b style="color:var(--c-white)">${esc(me)}</b> · <button class="cta -ghost -sm" id="change-me" style="font-size:1.3rem">Name wechseln</button>`
     : 'Nicht angemeldet — dein Name wird beim ersten Klick abgefragt.';
   const b = $('#change-me');
-  if (b) b.onclick = () => { const n = prompt('Dein Name:', me); if (n && n.trim()) setMe(n); };
-}
-
-/* Sicherstellen, dass wir wissen wer klickt */
-function ensureMe(){
-  if (me) return true;
-  const n = prompt('Wie heißt du? (wird nur in deinem Browser gespeichert)');
-  if (!n || !n.trim()) return false;
-  setMe(n);
-  return true;
+  if (b) b.onclick = async () => {
+    const name = await mini({
+      ol:'Name ändern', title:'Wer bist du?',
+      bodyHTML:`<div class="fld" style="margin:0"><label for="mini-name">Name</label>
+        <input type="text" id="mini-name" maxlength="60" value="${esc(me)}">
+        <p class="err">Bitte trag deinen Namen ein.</p></div>`,
+      ok:'Speichern', focus:'#mini-name',
+      read: body => { const v = $('#mini-name',body).value.trim();
+        if (!v){ $('#mini-name',body).closest('.fld').classList.add('invalid'); return undefined; } return v; }
+    });
+    if (name){ setMe(name); render(); toast('Name geändert.'); }
+  };
 }
 
 /* ============================================================
    VOTING
    ============================================================ */
-function vote(id){
-  if (!ensureMe()) return;
+async function vote(id){
+  if (!await ensureMe('Damit jede Person nur einmal pro Idee abstimmt.')) return;
   const i = ideas.find(x => x.id === id); if (!i) return;
   const at = i.voters.indexOf(me);
   if (at > -1){ i.voters.splice(at,1); i.votes = Math.max(0, i.votes-1); }
-  else        { i.voters.push(me); i.votes++; toast(`Stimme für <b>${esc(i.title.slice(0,38))}${i.title.length>38?'…':''}</b>`); }
-  save(); render();
-  if ($('#ov-detail').classList.contains('open') && $('#ov-detail').dataset.id === id) openDetail(id, true);
-}
-
-/* ============================================================
-   MODAL-INFRASTRUKTUR
-   ============================================================ */
-function openOv(sel){
-  lastFocus = document.activeElement;
-  const ov = $(sel);
-  ov.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  const f = ov.querySelector('input,textarea,select,button:not([data-close])');
-  if (f) setTimeout(() => f.focus(), 60);
-}
-function closeOv(ov){
-  ov.classList.remove('open');
-  if (!$$('.ov.open').length) document.body.style.overflow = '';
-  if (lastFocus) lastFocus.focus();
-}
-document.addEventListener('click', e => {
-  if (e.target.closest('[data-close]')) closeOv(e.target.closest('.ov'));
-  if (e.target.classList.contains('ov')) closeOv(e.target);
-  if (e.target.closest('[data-open-submit]')){ e.preventDefault(); openSubmit(); }
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape'){ const o = $('.ov.open'); if (o) closeOv(o); }
-  /* Fokusfalle */
-  if (e.key === 'Tab'){
-    const o = $('.ov.open'); if (!o) return;
-    const f = $$('a[href],button:not([disabled]),input:not([hidden]),select,textarea,[tabindex]:not([tabindex="-1"])', o)
-      .filter(el => el.offsetParent !== null);
-    if (!f.length) return;
-    const first = f[0], last = f[f.length-1];
-    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  else {
+    i.voters.push(me); i.votes++;
+    toast(`Stimme für <b>${esc(i.title.slice(0,38))}${i.title.length>38?'…':''}</b>`);
   }
-});
+  save(); render();
+  const d = $('#ov-detail');
+  if (d.classList.contains('open') && d.dataset.id === id) openDetail(id, true);
+}
 
 /* ============================================================
    SUBMIT
@@ -1149,73 +1334,127 @@ function buildForm(){
     <label class="radio" style="--tc:${t.color}">
       <input type="radio" name="track" value="${id}" ${n===0?'checked':''}>
       <span class="tdot" aria-hidden="true"></span>
-      <span><b>${esc(t.label)}</b><small>${esc(t.hint)}</small></span>
+      <span>
+        <b>${esc(t.label)}</b>
+        <small>${esc(t.hint)}</small>
+        ${t.noCode ? '<span class="nocode">✓ Ohne Programmieren</span>' : ''}
+      </span>
     </label>`).join('');
 
   $('#i-dept').innerHTML = DEPTS.map(d => `<option${d==='Agenturweit'?' selected':''}>${esc(d)}</option>`).join('');
-
   $('#needs-chks').innerHTML = NEEDS.map(n => `
     <label class="chk"><input type="checkbox" value="${esc(n)}">${esc(n)}</label>`).join('');
+
+  [['#i-title','#c-title',90],['#i-problem','#c-problem',400]].forEach(([inp,cnt,max]) => {
+    const i = $(inp), c = $(cnt);
+    const upd = () => {
+      c.textContent = `${i.value.length}/${max}`;
+      c.classList.toggle('-near', i.value.length > max*0.9);
+    };
+    i.addEventListener('input', upd); upd();
+  });
+
+  $('#i-title').addEventListener('input', debounce(checkDuplicates, 400));
+}
+
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+/* Ähnliche Ideen finden — Wort-Überlappung im Titel */
+function similar(title){
+  const norm = s => s.toLowerCase().replace(/[^a-zäöüß0-9 ]/g,' ').split(/\s+/).filter(w => w.length > 3);
+  const a = new Set(norm(title));
+  if (a.size < 2) return [];
+  return ideas.map(i => {
+    const b = new Set(norm(i.title));
+    const shared = [...a].filter(w => b.has(w)).length;
+    return {i, score: shared / Math.min(a.size, b.size)};
+  }).filter(x => x.score >= 0.5).sort((x,y) => y.score - x.score).slice(0,3).map(x => x.i);
+}
+
+function checkDuplicates(){
+  const box = $('#dup-warn');
+  const hits = similar($('#i-title').value);
+  box.innerHTML = hits.length ? `
+    <div class="notice -dup">
+      <b>Gibt es das vielleicht schon?</b> Ähnliche Ideen stehen im Hangar:
+      <ul>${hits.map(h => `<li>${esc(h.title)} <span style="color:var(--c-gray-m)">— ${h.votes} Stimmen</span></li>`).join('')}</ul>
+      Wenn deine Idee etwas anderes meint, reich sie ruhig ein.
+    </div>` : '';
+}
+
+function formHasContent(){
+  return ['#i-title','#i-problem','#i-solution'].some(s => $(s).value.trim());
+}
+
+async function tryCloseSubmit(){
+  if (!formHasContent()){ closeOv($('#ov-submit')); return; }
+  const ok = await confirmDialog({
+    ol:'Eingaben verwerfen?',
+    title:'Idee verwerfen?',
+    text:'Du hast schon etwas getippt. Wenn du jetzt schließt, ist es weg.',
+    ok:'Ja, verwerfen'
+  });
+  if (ok) closeOv($('#ov-submit'));
 }
 
 function openSubmit(prefill){
   const f = $('#form-submit');
   f.reset();
   $$('.fld.invalid', f).forEach(el => el.classList.remove('invalid'));
-  $$('.chk input', f).forEach(c => c.checked = false);
+  $('#dup-warn').innerHTML = '';
   $('#i-author').value = me;
   if (prefill){
     if (prefill.title)   $('#i-title').value = prefill.title;
     if (prefill.problem) $('#i-problem').value = prefill.problem;
     if (prefill.dept)    $('#i-dept').value = prefill.dept;
-    if (prefill.track)   { const r = f.querySelector(`input[name=track][value="${prefill.track}"]`); if (r) r.checked = true; }
+    if (prefill.track){ const r = f.querySelector(`input[name=track][value="${prefill.track}"]`); if (r) r.checked = true; }
   }
-  openOv('#ov-submit');
+  ['#i-title','#i-problem'].forEach(s => $(s).dispatchEvent(new Event('input')));
+  openOv('#ov-submit', '#i-title');
 }
 
 $('#form-submit').addEventListener('submit', e => {
   e.preventDefault();
   const req = [['#f-title','#i-title'],['#f-problem','#i-problem'],['#f-author','#i-author']];
-  let ok = true;
+  let firstBad = null;
   req.forEach(([fld,inp]) => {
     const bad = !$(inp).value.trim();
     $(fld).classList.toggle('invalid', bad);
-    if (bad && ok){ $(inp).focus(); ok = false; }
+    if (bad && !firstBad) firstBad = $(inp);
   });
-  if (!ok) return;
+  if (firstBad){ firstBad.focus(); toast('Da fehlt noch was.'); return; }
 
   const author = $('#i-author').value.trim();
   setMe(author);
 
   const idea = {
-    id: uid(),
-    title:    $('#i-title').value.trim(),
-    problem:  $('#i-problem').value.trim(),
-    solution: $('#i-solution').value.trim(),
-    track:    $('#form-submit').querySelector('input[name=track]:checked').value,
-    dept:     $('#i-dept').value,
-    effort:   $('#i-effort').value,
+    id:uid(),
+    title:$('#i-title').value.trim(),
+    problem:$('#i-problem').value.trim(),
+    solution:$('#i-solution').value.trim(),
+    track:$('#form-submit').querySelector('input[name=track]:checked').value,
+    dept:$('#i-dept').value,
+    effort:$('#i-effort').value,
     author,
-    status:   'idee',
-    wildcard: $('#i-wild').checked,
-    needs:    $$('#needs-chks input:checked').map(c => c.value),
-    votes:    1,
-    voters:   [author],
-    crew:     [{name:author, role:'Idee & Fachwissen'}],
-    createdAt: new Date().toISOString()
+    status:'idee',
+    wildcard:$('#i-wild').checked,
+    needs:$$('#needs-chks input:checked').map(c => c.value),
+    votes:1, voters:[author],
+    crew:[{name:author, role:'Idee & Fachwissen'}],
+    createdAt:new Date().toISOString()
   };
   ideas.unshift(idea);
   save();
-  filters = {...filters, q:'', tracks:new Set(), statuses:new Set(), sort:'new'};
-  $('#q').value = ''; $('#sort').value = 'new';
-  $$('.chip').forEach(c => c.setAttribute('aria-pressed','false'));
+
+  clearFilters();
+  filters.sort = 'new'; $('#sort').value = 'new';
   render();
   closeOv($('#ov-submit'));
   toast('Idee steht im Hangar. <b>Danke!</b>');
   setTimeout(() => {
-    const el = $(`.card[data-id="${idea.id}"]`);
+    const el = $(`.card[data-id="${idea.id}"] .open`);
     if (el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.focus(); }
-  }, 240);
+  }, 260);
 });
 
 /* ============================================================
@@ -1227,70 +1466,81 @@ function openDetail(id, keepOpen){
   const ov = $('#ov-detail');
   ov.dataset.id = id;
 
-  $('#detail-ol').innerHTML = `${esc(t.label)} · ${esc(i.dept)}${i.wildcard ? ' · 🎲 Wildcard' : ''}`;
+  $('#detail-ol').textContent = `${t.label} · ${i.dept}${i.wildcard ? ' · 🎲 Wildcard' : ''}`;
   $('#detail-title').textContent = i.title;
 
   const inCrew = me && i.crew.some(c => c.name === me);
   const voted  = me && i.voters.includes(me);
+  const isOwner = me && i.author === me;
 
   $('#detail-body').innerHTML = `
     <div class="d-facts">
       <div class="fact"><div class="k">Stimmen</div><div class="v">${i.votes}</div></div>
       <div class="fact"><div class="k">Status</div><div class="v">${esc(STATUSES[i.status].label)}</div></div>
-      <div class="fact"><div class="k">Aufwand</div><div class="v">${esc(i.effort)}${i.effort==='S'?' — halber Tag':i.effort==='M'?' — 1–2 Tage':i.effort==='L'?' — Hackathon':''}</div></div>
+      <div class="fact"><div class="k">Aufwand</div><div class="v">${i.effort === '?' ? 'offen' : `${esc(i.effort)} — ${esc(EFFORTS[i.effort])}`}</div></div>
       <div class="fact"><div class="k">Eingereicht von</div><div class="v">${esc(i.author)}</div></div>
     </div>
 
-    <div class="d-sec">
-      <h4>Das Problem</h4>
-      <p>${esc(i.problem)}</p>
+    <div class="d-sec"><h3>Das Problem</h3><p>${esc(i.problem)}</p></div>
+    ${i.solution ? `<div class="d-sec"><h3>Lösungsidee</h3><p>${esc(i.solution)}</p></div>` : ''}
+    <div class="d-sec"><h3>Warum ${esc(t.label)}?</h3>
+      <p style="font-size:1.6rem;color:var(--c-gray-m)">${esc(t.desc)}${t.noCode ? ' <b style="color:var(--c-ok)">Ohne Programmieren machbar.</b>' : ''}</p>
     </div>
 
-    ${i.solution ? `<div class="d-sec"><h4>Lösungsidee</h4><p>${esc(i.solution)}</p></div>` : ''}
+    ${i.needs?.length ? `<div class="d-sec"><h3>Die Crew sucht</h3>
+      <div class="chk-row">${i.needs.map(n => `<span class="chk -static">${esc(n)}</span>`).join('')}</div></div>` : ''}
 
     <div class="d-sec">
-      <h4>Warum ${esc(t.label)}?</h4>
-      <p style="font-size:1.6rem;color:var(--c-gray-m)">${esc(t.desc)}</p>
-    </div>
-
-    ${i.needs?.length ? `
-    <div class="d-sec">
-      <h4>Die Crew sucht</h4>
-      <div class="chk-row">${i.needs.map(n => `<span class="chk" style="cursor:default">${esc(n)}</span>`).join('')}</div>
-    </div>` : ''}
-
-    <div class="d-sec">
-      <h4>Crew (${i.crew.length})</h4>
+      <h3>Crew (${i.crew.length})</h3>
       ${i.crew.length ? `<div class="crew-list">${i.crew.map((c,n) => `
         <div class="crew-item">
           <span class="av">${esc(initials(c.name))}</span>
           <div><b>${esc(c.name)}</b><small>${esc(c.role)}</small></div>
-          ${c.name === me ? `<button class="rm" data-leave="${n}" aria-label="Crew verlassen" title="Crew verlassen">×</button>` : ''}
-        </div>`).join('')}</div>`
-        : `<p class="crew-empty">Noch niemand an Bord. Sei die Erste.</p>`}
+          ${c.name === me ? `<button class="rm" data-leave="${n}">Verlassen</button>` : ''}
+        </div>`).join('')}</div>` : `<p class="crew-empty">Noch niemand an Bord. Sei die Erste.</p>`}
     </div>
 
     <div class="d-sec">
-      <h4>Status ändern</h4>
+      <h3>Status ändern</h3>
+      <p class="hint" style="margin-bottom:1rem">${inCrew || isOwner
+        ? 'Du gehörst zu dieser Idee — du darfst den Status setzen.'
+        : 'Nur die Crew dieser Idee ändert den Status. Tritt bei, wenn du mitarbeiten willst.'}</p>
       <div class="chk-row">
         ${Object.entries(STATUSES).map(([sid,s]) => `
-          <button class="chip" data-setstatus="${sid}" aria-pressed="${i.status===sid}" title="${esc(s.desc)}">${esc(s.label)}</button>`).join('')}
+          <button class="chip" data-setstatus="${sid}" aria-pressed="${i.status===sid}"
+            title="${esc(s.desc)}" ${(inCrew||isOwner) ? '' : 'disabled style="opacity:.45;cursor:not-allowed"'}>${esc(s.label)}</button>`).join('')}
       </div>
-    </div>`;
+    </div>
+
+    ${isOwner ? `<div class="d-sec">
+      <h3>Deine Idee</h3>
+      <div class="owner-actions">
+        <button class="cta -ghost" id="edit-idea">Bearbeiten</button>
+        <button class="cta -danger -sm" id="del-idea">Idee löschen</button>
+      </div>
+    </div>` : ''}`;
 
   $('#detail-foot').innerHTML = `
     <button class="cta -ghost" data-close>Schließen</button>
     <button class="cta -outline" data-vote="${i.id}">${voted ? 'Stimme zurückziehen' : '▲ Dafür stimmen'}</button>
-    ${inCrew
-      ? `<button class="cta -black" disabled>Du bist an Bord ✓</button>`
-      : `<button class="cta -yellow" id="join">Ich mach mit</button>`}`;
+    ${inCrew ? `<button class="cta -black" disabled>Du bist an Bord ✓</button>`
+             : `<button class="cta -yellow" id="join">Ich mach mit</button>`}`;
 
   const join = $('#join');
-  if (join) join.onclick = () => {
-    if (!ensureMe()) return;
-    const role = prompt(`Was bringst du mit?\n\nMögliche Rollen:\n${ROLES.map(r => '· '+r).join('\n')}`, ROLES[0]);
-    if (!role || !role.trim()) return;
-    i.crew.push({name:me, role:role.trim()});
+  if (join) join.onclick = async () => {
+    if (!await ensureMe('Damit die Crew weiß, wer mitmacht.')) return;
+    const role = await mini({
+      ol:'Crew beitreten', title:'Was bringst du mit?',
+      bodyHTML:`
+        <p class="hint" style="font-size:1.5rem;margin-bottom:1.6rem">Wähl, was am ehesten passt. Du musst nicht programmieren können — die meisten Rollen brauchen das nicht.</p>
+        <div class="radios">${ROLES.map((r,n) => `
+          <label class="radio"><input type="radio" name="role" value="${esc(r)}" ${n===0?'checked':''}>
+          <span><b>${esc(r)}</b></span></label>`).join('')}</div>`,
+      ok:'An Bord gehen',
+      read: body => $('input[name=role]:checked', body).value
+    });
+    if (!role) return;
+    i.crew.push({name:me, role});
     if (i.status === 'idee') i.status = 'crew-gesucht';
     save(); render(); openDetail(id, true);
     toast(`Willkommen an Bord, <b>${esc(me.split(' ')[0])}</b>.`);
@@ -1299,28 +1549,62 @@ function openDetail(id, keepOpen){
   $$('[data-leave]', $('#detail-body')).forEach(b => b.onclick = () => {
     i.crew.splice(+b.dataset.leave, 1);
     save(); render(); openDetail(id, true);
+    toast('Du bist nicht mehr in der Crew.');
   });
 
   $$('[data-setstatus]', $('#detail-body')).forEach(b => b.onclick = () => {
+    if (b.disabled) return;
     i.status = b.dataset.setstatus;
     save(); render(); openDetail(id, true);
     toast(`Status: <b>${esc(STATUSES[i.status].label)}</b>`);
   });
 
-  if (!keepOpen) openOv('#ov-detail');
+  const del = $('#del-idea');
+  if (del) del.onclick = async () => {
+    const ok = await confirmDialog({
+      title:'Idee löschen?',
+      text:`„${esc(i.title)}" wird endgültig entfernt — samt ${i.votes} ${i.votes===1?'Stimme':'Stimmen'} und Crew.`,
+      ok:'Ja, löschen'
+    });
+    if (!ok) return;
+    ideas = ideas.filter(x => x.id !== id);
+    save(); render(); closeOv($('#ov-detail'));
+    toast('Idee gelöscht.');
+  };
+
+  const edit = $('#edit-idea');
+  if (edit) edit.onclick = async () => {
+    const vals = await mini({
+      ol:'Bearbeiten', title:'Idee anpassen',
+      bodyHTML:`
+        <div class="fld"><label for="e-title">Titel</label>
+          <input type="text" id="e-title" maxlength="90" value="${esc(i.title)}"></div>
+        <div class="fld"><label for="e-problem">Problem</label>
+          <textarea id="e-problem" maxlength="400">${esc(i.problem)}</textarea></div>
+        <div class="fld" style="margin:0"><label for="e-solution">Lösungsidee</label>
+          <textarea id="e-solution" maxlength="400" style="min-height:7rem">${esc(i.solution)}</textarea></div>`,
+      ok:'Speichern', focus:'#e-title',
+      read: body => {
+        const t2 = $('#e-title',body).value.trim(), p = $('#e-problem',body).value.trim();
+        if (!t2 || !p){ toast('Titel und Problem dürfen nicht leer sein.'); return undefined; }
+        return {title:t2, problem:p, solution:$('#e-solution',body).value.trim()};
+      }
+    });
+    if (!vals) return;
+    Object.assign(i, vals);
+    save(); render(); openDetail(id, true);
+    toast('Idee aktualisiert.');
+  };
+
+  if (!keepOpen) openOv('#ov-detail', '#join, [data-vote]');
 }
 
 /* Karten-Interaktionen */
 $('#grid').addEventListener('click', e => {
   const v = e.target.closest('[data-vote]');
-  if (v){ e.stopPropagation(); vote(v.dataset.vote); return; }
-  const c = e.target.closest('.card');
-  if (c) openDetail(c.dataset.id);
-});
-$('#grid').addEventListener('keydown', e => {
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('card')){
-    e.preventDefault(); openDetail(e.target.dataset.id);
-  }
+  if (v){ vote(v.dataset.vote); return; }
+  const o = e.target.closest('[data-open]');
+  if (o) openDetail(o.dataset.open);
 });
 $('#detail-foot').addEventListener('click', e => {
   const v = e.target.closest('[data-vote]');
@@ -1331,17 +1615,13 @@ $('#detail-foot').addEventListener('click', e => {
    IDEEN-ZÜNDER
    ============================================================ */
 function roll(){
-  const dept = pick(SPARK_DEPTS);
-  const pain = pick(SPARK_PAINS);
-  const tool = pick(SPARK_TOOLS);
+  const dept = pick(SPARK_DEPTS), pain = pick(SPARK_PAINS), tool = pick(SPARK_TOOLS);
   spark = {dept, pain, tool};
-
-  [['#slot-dept', dept], ['#slot-pain', pain.t], ['#slot-tool', tool.t]].forEach(([sel,val]) => {
+  [['#slot-dept',dept],['#slot-pain',pain.t],['#slot-tool',tool.t]].forEach(([sel,val]) => {
     const el = $(sel);
     el.classList.remove('spin'); void el.offsetWidth; el.classList.add('spin');
     $('.val', el).textContent = val;
   });
-
   $('#spark-out').innerHTML =
     `Frag jemanden aus dem Bereich <b>${esc(dept)}</b>: „${esc(pain.q)}“ — ` +
     `und überleg, ob <b>${esc(tool.t)}</b> das lösen könnte.`;
@@ -1351,24 +1631,20 @@ $('#roll').addEventListener('click', roll);
 $('#spark-take').addEventListener('click', () => {
   if (!spark) return;
   openSubmit({
-    problem: `Aus dem Ideen-Zünder — Schmerzpunkt „${spark.pain.t}“ im Bereich ${spark.dept}: ${spark.pain.q}`,
-    dept: spark.dept,
-    track: spark.tool.id
+    problem:`Aus dem Ideen-Zünder — Schmerzpunkt „${spark.pain.t}“ im Bereich ${spark.dept}: ${spark.pain.q}`,
+    dept:spark.dept, track:spark.tool.id
   });
 });
 
 /* ============================================================
    TOOLBAR
    ============================================================ */
-let qT;
-$('#q').addEventListener('input', e => {
-  clearTimeout(qT);
-  qT = setTimeout(() => { filters.q = e.target.value; render(); }, 140);
-});
+$('#q').addEventListener('input', debounce(e => { filters.q = $('#q').value; render(); }, 160));
+$('#q-clear').addEventListener('click', () => { $('#q').value = ''; filters.q = ''; render(); $('#q').focus(); });
 $('#sort').addEventListener('change', e => { filters.sort = e.target.value; render(); });
 
 /* ============================================================
-   EXPORT / IMPORT
+   EXPORT / IMPORT / REMINDER
    ============================================================ */
 function download(name, text, type){
   const url = URL.createObjectURL(new Blob([text], {type}));
@@ -1378,29 +1654,49 @@ function download(name, text, type){
 }
 const stamp = () => new Date().toISOString().slice(0,10);
 
-$('#export-json').onclick = () => {
+function exportJSON(){
   download(`ideen-hangar-${stamp()}.json`, JSON.stringify(ideas, null, 2), 'application/json');
-  toast('Board exportiert.');
-};
+  localStorage.setItem(CLEAN_KEY, String(Date.now()));
+  hideReminder();
+  toast('Board exportiert. <b>Schick die Datei an die Orga.</b>');
+}
+$('#export-json').onclick = exportJSON;
+$('#rem-export').onclick = exportJSON;
+$('#rem-close').onclick = () => { hideReminder(true); };
+
+/* Der Reminder soll nicht beim ersten Laden aufpoppen, sondern erst wenn jemand
+   den Tab verlassen hat und mit ungesicherten Änderungen zurückkommt. */
+let reminderDismissed = false;
+let reminderArmed = false;
+function showReminder(){
+  if (!reminderArmed || reminderDismissed || !isDirty()) return;
+  $('#reminder').dataset.open = 'true';
+}
+function hideReminder(dismiss){
+  if (dismiss) reminderDismissed = true;
+  $('#reminder').dataset.open = 'false';
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden'){
+    if (isDirty()){ reminderArmed = true; reminderDismissed = false; }
+  } else {
+    showReminder();
+  }
+});
 
 $('#export-md').onclick = () => {
   const byVotes = [...ideas].sort((a,b) => b.votes - a.votes);
   const md = [
-    `# Ideen-Hangar — pilot Hackathon`,
-    ``,
-    `Stand: ${new Date().toLocaleDateString('de-DE')} · ${ideas.length} Ideen · ${ideas.reduce((a,i)=>a+i.votes,0)} Stimmen`,
-    ``,
+    `# Ideen-Hangar — pilot Hackathon`, ``,
+    `Stand: ${new Date().toLocaleDateString('de-DE')} · ${ideas.length} Ideen · ${ideas.reduce((a,i)=>a+i.votes,0)} Stimmen`, ``,
     ...byVotes.map(i => [
-      `## ${i.votes} ▲ — ${i.title}${i.wildcard ? ' 🎲' : ''}`,
-      ``,
-      `**Track:** ${TRACKS[i.track].label} · **Abteilung:** ${i.dept} · **Aufwand:** ${i.effort} · **Status:** ${STATUSES[i.status].label}`,
-      ``,
+      `## ${i.votes} ▲ — ${i.title}${i.wildcard ? ' 🎲' : ''}`, ``,
+      `**Track:** ${TRACKS[i.track].label} · **Abteilung:** ${i.dept} · **Aufwand:** ${i.effort === '?' ? 'offen' : i.effort} · **Status:** ${STATUSES[i.status].label}`, ``,
       `**Problem:** ${i.problem}`,
       i.solution ? `\n**Lösung:** ${i.solution}` : '',
       i.needs?.length ? `\n**Sucht:** ${i.needs.join(', ')}` : '',
       `\n**Crew:** ${i.crew.length ? i.crew.map(c => `${c.name} (${c.role})`).join(', ') : '— noch niemand'}`,
-      `\n**Eingereicht von:** ${i.author}`,
-      ``
+      `\n**Eingereicht von:** ${i.author}`, ``
     ].filter(Boolean).join('\n'))
   ].join('\n');
   download(`ideen-hangar-${stamp()}.md`, md, 'text/markdown');
@@ -1421,27 +1717,29 @@ $('#import-file').onchange = e => {
         if (!n || !n.id || !n.title) return;
         const cur = byId.get(n.id);
         if (!cur){ ideas.push(n); byId.set(n.id, n); added++; return; }
-        /* Zusammenführen: Voter und Crew vereinigen, Status vom neueren Stand */
         const voters = [...new Set([...(cur.voters||[]), ...(n.voters||[])])];
-        const names  = new Set(cur.crew.map(c => c.name));
+        const names = new Set(cur.crew.map(c => c.name));
         (n.crew||[]).forEach(c => { if (!names.has(c.name)){ cur.crew.push(c); names.add(c.name); } });
         cur.voters = voters;
-        cur.votes  = Math.max(voters.length, cur.votes, n.votes||0);
+        cur.votes = Math.max(voters.length, cur.votes, n.votes||0);
         if (n.status !== 'idee') cur.status = n.status;
         merged++;
       });
       save(); render();
       toast(`Import: <b>${added} neu</b>, ${merged} zusammengeführt.`);
-    } catch(err){
-      toast('Import fehlgeschlagen — ist das eine Hangar-JSON?');
-    }
+    } catch(err){ toast('Import fehlgeschlagen — ist das eine Hangar-JSON?'); }
     e.target.value = '';
   };
   r.readAsText(file);
 };
 
-$('#reset').onclick = () => {
-  if (!confirm('Alle Ideen in diesem Browser löschen und die Beispiel-Ideen wiederherstellen?\n\nExportiere vorher, wenn du die Ideen behalten willst.')) return;
+$('#reset').onclick = async () => {
+  const ok = await confirmDialog({
+    title:'Board zurücksetzen?',
+    text:`Alle ${ideas.length} Ideen in diesem Browser werden gelöscht und die Beispiel-Ideen wiederhergestellt. Exportiere vorher, wenn du sie behalten willst.`,
+    ok:'Ja, zurücksetzen'
+  });
+  if (!ok) return;
   localStorage.removeItem(STORE_KEY);
   load(); render();
   toast('Board zurückgesetzt.');
