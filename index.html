@@ -11,6 +11,12 @@
 <meta property="og:site_name" content="pilot Ideen-Hangar">
 <meta property="og:title" content="Ideen-Hangar — pilot Hackathon">
 <meta property="og:description" content="Sag uns, was dich nervt. Wir bauen es beim Hackathon.">
+<meta property="og:url" content="https://ceekay1901.github.io/ideen-hangar/">
+<meta property="og:image" content="https://ceekay1901.github.io/ideen-hangar/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141414'/%3E%3Ccircle cx='32' cy='26' r='11' fill='%23ffe05e'/%3E%3Crect x='18' y='44' width='28' height='5' rx='2.5' fill='%23eceef0'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -122,6 +128,7 @@ html.js .rv.in{opacity:1;transform:none}
   transition:color .2s,background .2s;
 }
 .nav a:hover{color:var(--fg);background:var(--bg-2)}
+.nav a.active{color:var(--fg);background:var(--bg-2)}
 .kbtn{
   display:inline-flex;align-items:center;gap:.9rem;background:var(--bg-2);border:1px solid var(--line);
   border-radius:.9rem;padding:.8rem 1rem .8rem 1.4rem;color:var(--fg-3);font-size:1.35rem;cursor:pointer;
@@ -1078,53 +1085,53 @@ const SPARK_PAINS = [
 const SPARK_TOOLS = Object.entries(TRACKS).map(([id,t]) => ({id, t:t.label}));
 
 const SEED = [
-  {title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
+  {id:'s-mediaplan-diff', title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
    problem:'Kunden schicken überarbeitete Mediapläne als neue Excel. Wir vergleichen Zeile für Zeile von Hand und übersehen trotzdem Änderungen bei Budgets und Laufzeiten.',
    solution:'Zwei Dateien reinziehen, das Tool markiert farbig jede Abweichung — plus eine Zusammenfassung für die Mail an den Kunden.',
    category:'qualitaet',track:'claude-code-app',dept:'Mediaplanung',effort:'M',author:'Christopher Kipp',
    status:'crew-gesucht',wildcard:false,needs:['Fachwissen Media','Design-Blick'],votes:23,crew:[{name:'Christopher Kipp',role:'Bauen'}],days:14},
-  {title:'Briefing-Wächter: prüft eingehende Kunden-Briefings auf Lücken',
+  {id:'s-briefing-waechter', title:'Briefing-Wächter: prüft eingehende Kunden-Briefings auf Lücken',
    problem:'Briefings kommen unvollständig rein — kein Budget, keine KPIs, keine Zielgruppe. Das merken wir erst, wenn die Strategin schon zwei Stunden drin steckt.',
    solution:'Ein Agent prüft gegen unsere Checkliste, listet was fehlt und formuliert die Rückfrage-Mail gleich mit.',
    category:'qualitaet',track:'langdock-agent',dept:'Strategie',effort:'S',author:'Erika Maier',
    status:'idee',wildcard:false,needs:['Fachwissen Media'],votes:31,crew:[],days:9},
-  {title:'Wettbewerbs-Radar: was machen die Wettbewerber unserer Kunden?',
+  {id:'s-wettbewerbs-radar', title:'Wettbewerbs-Radar: was machen die Wettbewerber unserer Kunden?',
    problem:'Vor jedem Jour Fixe googelt jemand händisch, was der Wettbewerb an Kampagnen gestartet hat. Dauert eine Stunde, ist am nächsten Tag veraltet.',
    solution:'Ein Workflow klappert wöchentlich Quellen ab und schickt montags eine kurze Mail. Ein Mensch gibt vor dem Versand frei.',
    category:'wissen',track:'langdock-workflow',dept:'Account Management',effort:'M',author:'Jan Richter',
    status:'idee',wildcard:false,needs:['Daten-Zugang','Kunden-Sicht'],votes:19,crew:[],days:6},
-  {title:'Pitch-Deck-Rohbau aus dem Briefing',
+  {id:'s-pitchdeck-rohbau', title:'Pitch-Deck-Rohbau aus dem Briefing',
    problem:'Jeder Pitch fängt mit derselben leeren PowerPoint an. Struktur, Kapitel, Layout — jedes Mal von vorn, obwohl 60 % identisch sind.',
    solution:'Briefing rein, Rohbau raus: Agenda, Marktkapitel, Zielgruppen-Slide, Media-Strategie. Inhalte füllt der Mensch.',
    category:'pitch',track:'claude-design',dept:'New Business',effort:'M',author:'Mia Hoffmann',
    status:'in-arbeit',wildcard:false,needs:[],votes:27,
    crew:[{name:'Mia Hoffmann',role:'Design'},{name:'Sophie Klein',role:'Idee & Fachwissen'},{name:'Jan Richter',role:'Bauen'}],days:21},
-  {title:'Onboarding-Lotse für neue Piloten',
+  {id:'s-onboarding-lotse', title:'Onboarding-Lotse für neue Piloten',
    problem:'Neue Kolleg:innen fragen in den ersten Wochen dieselben 40 Dinge. Immer bei den gleichen drei Leuten.',
    solution:'Ein Agent mit Zugriff aufs Confluence, der geduldig antwortet und ehrlich sagt, wenn er etwas nicht weiß.',
    category:'team',track:'langdock-agent',dept:'HR & People',effort:'S',author:'Sophie Klein',
    status:'crew-gesucht',wildcard:false,needs:['Fachwissen Kreation','Jemand der baut'],votes:16,crew:[{name:'Sophie Klein',role:'Idee & Fachwissen'}],days:11},
-  {title:'Tonalitäts-Check gegen die Marken-Guidelines',
+  {id:'s-tonalitaets-check', title:'Tonalitäts-Check gegen die Marken-Guidelines',
    problem:'Bei jedem Text die Frage: klingt das nach der Marke? Die Guidelines liegen als 40-seitiges PDF herum und niemand liest sie beim Texten.',
    solution:'Text rein, Bewertung raus — welche Stelle bricht mit welcher Regel, mit Formulierungsvorschlag.',
    category:'qualitaet',track:'claude-code-skill',dept:'Kreation',effort:'M',author:'Christopher Kipp',
    status:'idee',wildcard:false,needs:['Fachwissen Kreation'],votes:14,crew:[],days:4},
-  {title:'Kampagnen-Obduktion: was lernen wir aus abgeschlossenen Kampagnen?',
+  {id:'s-kampagnen-obduktion', title:'Kampagnen-Obduktion: was lernen wir aus abgeschlossenen Kampagnen?',
    problem:'Nach dem Kampagnen-Ende wandert der Abschlussbericht ins Archiv. Beim nächsten ähnlichen Kunden erinnert sich niemand.',
    solution:'Alle Berichte in eine durchsuchbare Wissensbasis, Antworten mit Quellenangabe auf die echten Berichte.',
    category:'wissen',track:'langdock-agent',dept:'Werbewirkungsforschung',effort:'L',author:'Erika Maier',
    status:'idee',wildcard:false,needs:['Daten-Zugang','Fachwissen Media'],votes:22,crew:[],days:8},
-  {title:'Der Zahlen-Übersetzer: Reportings ohne Media-Studium verstehen',
+  {id:'s-zahlen-uebersetzer', title:'Der Zahlen-Übersetzer: Reportings ohne Media-Studium verstehen',
    problem:'Wir schicken Kunden Dashboards voller TKP, GRP und Viewability. Dort sitzt oft jemand, der nur wissen will, ob es funktioniert hat.',
    solution:'Daten rein, verständliche Zusammenfassung raus — drei Absätze, kein Fachjargon, eine klare Empfehlung.',
    category:'formate',track:'claude-code-app',dept:'Account Management',effort:'M',author:'Jan Richter',
    status:'idee',wildcard:false,needs:['Fachwissen Media','Kunden-Sicht'],votes:18,crew:[],days:5},
-  {title:'Der Werbewirkungs-Simulator: Kampagne vorher durchspielen',
+  {id:'s-wirkungs-simulator', title:'Der Werbewirkungs-Simulator: Kampagne vorher durchspielen',
    problem:'Wir wissen erst nach der Kampagne, ob der Mediamix gepasst hat. Vorher ist alles Erfahrung und Bauchgefühl.',
    solution:'Ein Tool, das auf Basis historischer Wirkungsdaten durchspielt, was passiert, wenn man Budget verschiebt. Sportlich für zwei Tage — aber selbst grob wäre es im Pitch Gold wert.',
    category:'pitch',track:'claude-code-app',dept:'Werbewirkungsforschung',effort:'L',author:'Christopher Kipp',
    status:'idee',wildcard:true,needs:['Daten-Zugang','Jemand der baut','Fachwissen Media'],votes:29,crew:[],days:3},
-  {title:'Meeting-Nachbereiter mit Aufgaben-Erkennung',
+  {id:'s-meeting-nachbereiter', title:'Meeting-Nachbereiter mit Aufgaben-Erkennung',
    problem:'Nach Kundenterminen tippt jemand Notizen ab und vergisst die Hälfte der Zusagen. Aufgaben landen nirgends.',
    solution:'Transkript rein, Protokoll raus — plus Zusagen mit Verantwortlichen. Wer zugesagt hat, bekommt eine Nachricht.',
    category:'zeit',track:'langdock-workflow',dept:'Agenturweit',effort:'S',author:'Mia Hoffmann',
@@ -1146,13 +1153,14 @@ const daysAgo=n=>new Date(Date.now()-n*864e5).toISOString();
 const cat=i=>CATEGORIES[i.category]||CATEGORIES[CAT_DEFAULT];
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+const ago=iso=>{const d=Math.floor((Date.now()-new Date(iso))/864e5);return d<=0?'heute':d===1?'gestern':`vor ${d} Tagen`};
 
 const migrate=l=>l.map(i=>({...i,category:CATEGORIES[i.category]?i.category:CAT_DEFAULT}));
 function load(){
   try{const raw=localStorage.getItem(STORE_KEY);
     if(raw){const p=JSON.parse(raw); if(Array.isArray(p)){ideas=migrate(p);return}}
   }catch(e){console.warn('Board nicht lesbar:',e)}
-  ideas=SEED.map(s=>({id:uid(),title:s.title,problem:s.problem,solution:s.solution||'',category:s.category||CAT_DEFAULT,
+  ideas=SEED.map(s=>({id:s.id||uid(),title:s.title,problem:s.problem,solution:s.solution||'',category:s.category||CAT_DEFAULT,
     track:s.track,dept:s.dept,effort:s.effort,author:s.author,status:s.status,wildcard:s.wildcard,
     needs:s.needs||[],votes:s.votes,voters:[],crew:s.crew||[],createdAt:daysAgo(s.days)}));
   save({clean:true});
@@ -1220,6 +1228,8 @@ function openOv(sel, focusSel){
 }
 function closeOv(ov){
   ov.classList.remove('open');
+  if (ov.id === 'ov-detail' && location.hash.startsWith('#i/'))
+    history.replaceState(null, '', location.pathname + location.search);
   if (!$$('.ov.open').length && !$('#cmdk').classList.contains('open')){
     document.body.style.overflow = '';
     if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
@@ -1697,6 +1707,7 @@ function openDetail(id, keep){
       <div><div class="k">Aufwand</div><div class="v">${i.effort==='?'?'offen':`${esc(i.effort)} — ${esc(EFFORTS[i.effort])}`}</div></div>
       <div><div class="k">Abteilung</div><div class="v">${esc(i.dept)}</div></div>
       <div><div class="k">Von</div><div class="v">${esc(i.author)}</div></div>
+      <div><div class="k">Eingereicht</div><div class="v">${ago(i.createdAt)}</div></div>
     </div>
     <div class="d-sec"><h3>Das Problem</h3><p>${esc(i.problem)}</p></div>
     ${i.solution?`<div class="d-sec"><h3>Lösungsidee</h3><p>${esc(i.solution)}</p></div>`:''}
@@ -1717,6 +1728,14 @@ function openDetail(id, keep){
       <div class="chk-row">${Object.entries(STATUSES).map(([sid,s])=>`
         <button class="chip" data-setstatus="${sid}" aria-pressed="${i.status===sid}" title="${esc(s.desc)}"
         ${inTeam||owner?'':'disabled style="opacity:.4;cursor:not-allowed"'}>${esc(s.label)}</button>`).join('')}</div></div>
+    <div class="d-sec"><h3>Idea Card</h3>
+      <div style="display:flex;gap:2.4rem;align-items:center;flex-wrap:wrap">
+        ${scaledCard(i, deckNr(i), .48)}
+        <div style="flex:1;min-width:18rem">
+          <p style="color:var(--fg-3);font-size:1.35rem;line-height:1.6">So sieht die Idee im gedruckten Kartendeck aus.</p>
+          <button type="button" class="btn -ghost -sm" id="print-one" style="margin-top:1.2rem">Nur diese Karte drucken</button>
+        </div>
+      </div></div>
     ${owner?`<div class="d-sec"><h3>Deine Idee</h3>
       <div style="display:flex;gap:.7rem;flex-wrap:wrap">
         <button class="btn -ghost -sm" id="edit-idea">Bearbeiten</button>
@@ -1724,6 +1743,7 @@ function openDetail(id, keep){
 
   $('#d-foot').innerHTML = `
     <button class="btn -ghost" data-close>Schließen</button>
+    <button class="btn -ghost" id="share-idea">Link kopieren</button>
     <button class="btn -ghost" data-vote="${i.id}">${voted?'Stimme zurückziehen':'▲ Dafür stimmen'}</button>
     ${inTeam?`<button class="btn" disabled>Du bist dabei ✓</button>`:`<button class="btn -primary" id="join">Ich mach mit</button>`}`;
 
@@ -1772,8 +1792,30 @@ function openDetail(id, keep){
     if (!v) return;
     Object.assign(i, v); save(); render(); openDetail(id,true); toast('Idee aktualisiert.');
   };
-  if (!keep) openOv('#ov-detail', '#join, [data-vote]');
+  const po = $('#print-one');
+  if (po) po.onclick = () => {
+    $('#print-area').innerHTML = `<div class="sheet">${cardArt(i, deckNr(i))}</div>`;
+    setTimeout(() => window.print(), 100);
+  };
+  const sh = $('#share-idea');
+  if (sh) sh.onclick = async () => {
+    const url = location.origin + location.pathname + '#i/' + encodeURIComponent(i.id);
+    try {
+      await navigator.clipboard.writeText(url);
+      toast('Link kopiert — <b>führt direkt zu dieser Idee.</b>');
+    } catch(e){
+      mini({tag:'Link teilen', title:'Link zur Idee',
+        bodyHTML:`<div class="field" style="margin:0"><label>Zum Kopieren markieren</label>
+          <input type="text" readonly value="${esc(url)}" onfocus="this.select()"></div>`, ok:'Fertig'});
+    }
+  };
+  if (!keep){
+    openOv('#ov-detail', '#join, [data-vote]');
+    history.replaceState(null, '', '#i/' + encodeURIComponent(i.id));
+  }
 }
+/* Nummer der Idee im Kartendeck = Position nach Stimmen sortiert */
+const deckNr = i => [...ideas].sort((a,b)=>b.votes-a.votes).findIndex(x=>x.id===i.id)+1;
 $('#d-foot').addEventListener('click', e => { const v = e.target.closest('[data-vote]'); if (v) vote(v.dataset.vote); });
 
 /* ═══ ZÜNDER ═══ */
@@ -1802,7 +1844,7 @@ $('#spark-take').onclick = () => {
 /* ═══ TOOLBAR ═══ */
 $('#q').addEventListener('input', debounce(() => { filters.q = $('#q').value; render(); }, 160));
 $('#q-clr').onclick = () => { $('#q').value=''; filters.q=''; render(); $('#q').focus(); };
-$('#sort').onchange = e => { filters.sort = e.target.value; render(); };
+$('#sort').onchange = e => { filters.sort = e.target.value; localStorage.setItem('pilot-hangar-sort', filters.sort); render(); };
 
 /* ═══ IDEA CARD ═══ */
 const kurz = (t,max) => {
@@ -1975,12 +2017,40 @@ $('#reset').onclick = async () => {
 
 /* ═══ INIT ═══ */
 load();
+{
+  const sv = localStorage.getItem('pilot-hangar-sort');
+  if (sv && ['votes','new','effort','crew'].includes(sv)){ filters.sort = sv; $('#sort').value = sv; }
+}
 renderTracks();
 renderFilters();
 buildForm();
 render();
 renderWho();
 observeRv();
+
+/* Scrollspy — markiert die Sektion, in der man sich gerade befindet */
+if ('IntersectionObserver' in window){
+  const spy = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) $$('.nav a').forEach(a =>
+      a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  }), {rootMargin:'-40% 0px -55% 0px'});
+  ['tracks','board','zuender','ablauf'].forEach(id => {
+    const el = document.getElementById(id); if (el) spy.observe(el);
+  });
+}
+
+/* Deep-Link: #i/<id> öffnet die Idee direkt */
+{
+  const mh = location.hash.match(/^#i\/(.+)$/);
+  if (mh){
+    const t = ideas.find(x => x.id === decodeURIComponent(mh[1]));
+    if (t) setTimeout(() => openDetail(t.id), 350);
+    else {
+      history.replaceState(null, '', location.pathname + location.search);
+      toast('Diese Idee gibt es in deinem Board-Stand nicht — vielleicht erst die JSON der Orga importieren?');
+    }
+  }
+}
 })();
 </script>
 </body>
