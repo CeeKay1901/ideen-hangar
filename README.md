@@ -85,6 +85,17 @@ Dunkle Produkt-Oberfläche mit einem Akzent (pilot-Gelb) und Kategorien als Leuc
 - Alles respektiert `prefers-reduced-motion`. Der Inhalt hängt nie an einer Animation:
   Fällt der IntersectionObserver aus, wird alles sofort sichtbar.
 
+## Ideen teilen
+
+Jede Idee hat einen **Deep-Link** (`#i/<id>`), erreichbar über „Link kopieren" im Detail —
+gedacht für Teams-Chats: Link schicken, Empfänger:in landet direkt in der Idee.
+Die Beispiel-Ideen haben stabile IDs, damit ihre Links in jedem Browser funktionieren.
+Selbst eingereichte Ideen wandern per JSON-Export/Import mitsamt ID — der Link funktioniert
+also bei allen, die den Board-Stand importiert haben; andernfalls erklärt ein Hinweis, warum nicht.
+
+Im Detail lässt sich außerdem **eine einzelne Idea Card drucken**, und Link-Vorschauen
+in Teams/Slack zeigen ein eigenes OG-Bild (`og-image.png`).
+
 ## Anpassen
 
 Alles steckt in `index.html`, keine Abhängigkeiten, kein Build.
