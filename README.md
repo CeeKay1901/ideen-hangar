@@ -57,8 +57,8 @@ falschen Kategorie zugeordnet zu werden.
 ## Das Kartendeck
 
 Am Hackathon-Tag hilft kein Bildschirm. Über **„Karten drucken"** entsteht eine A4-Druckvorlage:
-vier **Idea Cards** pro Blatt, jede zum Ausschneiden. Wer ohne eigene Idee dasitzt, zieht eine
-Karte vom Stapel und baut, was darauf steht. Die Nummer oben führt zurück zur Idee im Board.
+vier **Idea Cards** pro Blatt, jede mit Eckwinkeln zum Ausschneiden. Wer ohne eigene Idee dasitzt,
+zieht eine Karte vom Stapel und baut, was darauf steht. Die Nummer oben führt zurück zur Idee im Board.
 
 Jede Karte trägt Kategorie-Kopf mit Symbol, Titel, Problem, Track, geschätzten Aufwand,
 Abteilung, Einreicher:in und die Stimmenzahl. Wildcards bekommen einen gelben Rahmen.
@@ -90,9 +90,21 @@ Akzentfarbe ist ausschließlich das pilot-Gelb; es markiert wie ein Textmarker.
 - Alles respektiert `prefers-reduced-motion`. Der Inhalt hängt nie an einer Animation:
   Fällt der IntersectionObserver aus, wird alles sofort sichtbar.
 
+## Beispiel-Ideen
+
+Das Board startet mit zehn Beispiel-Ideen. Sie sind im Board als **Beispiel** markiert und
+tragen erfundene Namen (bis auf Christopher Kipp) — niemand soll sie für echte Einreichungen
+halten. Ein Hinweis über dem Board erklärt das und bietet **„Beispiele entfernen"** an;
+den Befehl gibt es auch in der Command-Palette. Echte Einreichungen bleiben dabei stehen.
+
 ## Ideen teilen
 
-Jede Idee hat einen **Deep-Link** (`#i/<id>`), erreichbar über „Link kopieren" im Detail —
+Eine gefilterte Board-Ansicht ist teilbar: Die Filter stehen im **Query-String**
+(`?kat=wissen,pitch&status=crew-gesucht&q=…&meine=1`), und „Auswahl teilen" in der Toolbar
+kopiert den Link. So schickt die Orga z. B. „alle Ideen, die noch ein Team suchen" in den Chat.
+Unbekannte Werte werden ignoriert, nicht als leeres Board dargestellt.
+
+Jede Idee hat außerdem einen **Deep-Link** (`#i/<id>`), erreichbar über „Link kopieren" im Detail —
 gedacht für Teams-Chats: Link schicken, Empfänger:in landet direkt in der Idee.
 Die Beispiel-Ideen haben stabile IDs, damit ihre Links in jedem Browser funktionieren.
 Selbst eingereichte Ideen wandern per JSON-Export/Import mitsamt ID — der Link funktioniert
@@ -128,3 +140,6 @@ Alles steckt in `index.html`, keine Abhängigkeiten, kein Build.
 
 Öffentliches Repo mit internen Inhalten (`noindex` + `robots.txt` halten Suchmaschinen fern,
 keine Menschen). Die Namen in den Beispiel-Ideen sind erfunden — bis auf Christopher Kipp.
+
+`HACKATHON_DATE` steht auf dem **24. September 2026 — geraten.** Vor dem Rollout auf das
+echte Datum setzen, sonst zählt der Countdown im Hero auf einen Fantasietag herunter.

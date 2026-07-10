@@ -327,6 +327,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .flag{font-family:var(--mono);font-size:1rem;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .8rem;font-weight:600}
 .flag.-wild{background:var(--acid);color:var(--fg)}
 .flag.-mine{background:none;color:var(--fg-2);border:1px solid var(--line-2)}
+.flag.-demo{background:none;color:var(--fg-3);border:1px dashed var(--line-2)}
 .c-foot{margin-top:auto;padding-top:2rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:1.4rem}
 .c-meta{display:flex;flex-direction:column;gap:.7rem;font-family:var(--mono);font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);min-width:0}
 .c-meta .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -350,6 +351,14 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .vote.bump::after{content:'';position:absolute;inset:-1px;border:1.5px solid var(--fg);animation:ripple .6s var(--ease) forwards}
 @keyframes ripple{to{transform:scale(1.4);opacity:0}}
+
+.demo-note{
+  display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;margin-bottom:2.4rem;
+  border:1px dashed var(--line-2);padding:1.6rem 2rem;font-size:1.4rem;color:var(--fg-2);line-height:1.55;
+}
+.demo-note[hidden]{display:none}
+.demo-note > span{flex:1 1 34rem}
+.demo-note b{color:var(--fg);font-weight:600}
 
 .empty{grid-column:1/-1;border:1px dashed var(--line-2);padding:8rem 2rem;text-align:center;background:var(--bg-1)}
 .empty h3{font-size:2.4rem;font-weight:700;letter-spacing:-.02em}
@@ -598,16 +607,31 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .pmeta b{font-size:2rem;color:var(--fg);letter-spacing:-.02em;margin-right:.5rem}
 .pmeta .warn{color:var(--warn);text-transform:none;letter-spacing:0;font-family:'Archivo';font-size:1.35rem}
 
+/* Schnittmarken: vier Eckwinkel um jede Karte, damit man die Schere ansetzen kann.
+   Sie liegen außerhalb der Karte und verschwinden beim Schneiden selbst. */
+.cut{position:relative;width:88mm;height:125mm;break-inside:avoid;page-break-inside:avoid}
+.cut::before,.cut::after{
+  content:'';position:absolute;left:-2.5mm;right:-2.5mm;pointer-events:none;height:4mm;
+  background:
+    linear-gradient(#999,#999) left top/4mm .2mm no-repeat,
+    linear-gradient(#999,#999) left top/.2mm 4mm no-repeat,
+    linear-gradient(#999,#999) right top/4mm .2mm no-repeat,
+    linear-gradient(#999,#999) right top/.2mm 4mm no-repeat;
+}
+.cut::before{top:-2.5mm}
+.cut::after{bottom:-2.5mm;transform:scaleY(-1)}
+
 #print-area{display:none}
 @media print{
-  @page{size:A4;margin:9mm}
+  /* 8mm: lässt links und rechts 3mm Luft für die äußeren Schnittmarken. */
+  @page{size:A4;margin:8mm}
   body{padding:0;background:#fff}
   body > *{display:none !important}
   body > #print-area{display:block !important}
-  .sheet{display:grid;grid-template-columns:repeat(2,88mm);grid-auto-rows:125mm;gap:6mm;justify-content:center;break-after:page;page-break-after:always}
+  .sheet{display:grid;grid-template-columns:repeat(2,88mm);grid-auto-rows:125mm;gap:11mm 12mm;justify-content:center;break-after:page;page-break-after:always}
   .sheet:last-child{break-after:auto;page-break-after:auto}
   .ideacard{break-inside:avoid;page-break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none}
-  .ideacard .hero-band,.ideacard .foot,.ideacard .wildtag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ideacard .hero-band,.ideacard .foot,.ideacard .wildtag,.cut::before,.cut::after{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 /* ═══ TOAST / REMINDER / FOOTER ═══ */
@@ -747,10 +771,17 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
         <span id="count" role="status" aria-live="polite"></span>
         <span style="display:flex;gap:1rem;align-items:center">
           <button type="button" id="open-print">Karten drucken</button>
+          <button type="button" id="share-view" hidden>Auswahl teilen</button>
           <button type="button" id="clear-f" hidden>Filter löschen</button>
         </span>
       </div>
     </div>
+
+    <p class="demo-note" id="demo-note" hidden>
+      <span><b>Die markierten Ideen sind Beispiele.</b> Sie zeigen, wie eine gute Einreichung aussieht —
+      die Namen darauf sind erfunden. Wenn genug echte Ideen da sind, räumt die Orga sie weg.</span>
+      <button type="button" class="btn -ghost -sm" id="rm-demo">Beispiele entfernen</button>
+    </p>
 
     <div class="grid" id="grid"></div>
   </div>
@@ -1134,6 +1165,11 @@ const SEED = [
    status:'gebaut',wildcard:false,needs:[],votes:34,crew:[{name:'Mia Hoffmann',role:'Bauen'},{name:'Christopher Kipp',role:'Testen'}],days:30}
 ];
 
+/* Die Beispiel-Ideen tragen erfundene Namen. Sie werden im Board sichtbar als
+   Beispiele markiert, damit niemand sie für echte Einreichungen hält. */
+const DEMO_IDS = new Set(SEED.map(s => s.id));
+const isDemo = i => DEMO_IDS.has(i.id);
+
 /* ═══ STATE ═══ */
 let ideas=[], me=localStorage.getItem(ME_KEY)||'';
 let filters={q:'',cats:new Set(),tracks:new Set(),statuses:new Set(),mine:false,sort:'votes'};
@@ -1278,7 +1314,9 @@ const CMDS = [
   {name:'Nur meine Ideen zeigen',sc:'', run:()=>{ const b=$('[data-mine]'); filters.mine=!filters.mine; b.setAttribute('aria-pressed',String(filters.mine)); render(); $('#board').scrollIntoView(); }},
   {name:'Board als JSON exportieren', sc:'', run:()=>exportJSON()},
   {name:'Board als Markdown exportieren', sc:'', run:()=>$('#export-md').click()},
-  {name:'Filter zurücksetzen',  sc:'',  run:()=>clearFilters()}
+  {name:'Filter zurücksetzen',  sc:'',  run:()=>clearFilters()},
+  {name:'Beispiel-Ideen entfernen', sc:'', run:()=>removeDemos()},
+  {name:'Link zur aktuellen Auswahl kopieren', sc:'', run:()=>$('#share-view').click()}
 ];
 let cmdIdx = 0, cmdHits = CMDS;
 const cmdk = $('#cmdk');
@@ -1408,6 +1446,35 @@ function clearFiltersSilent(){
   $$('.chip[aria-pressed]').forEach(c => c.setAttribute('aria-pressed','false'));
 }
 function clearFilters(){ clearFiltersSilent(); render(); $('#q').focus(); }
+
+/* ═══ FILTER IN DER URL ═══
+   Damit die Orga eine Auswahl verschicken kann („alle ohne Team"). Der Hash
+   gehört dem Deep-Link auf eine Idee, also nutzen wir den Query-String. */
+function writeUrl(){
+  const p = new URLSearchParams();
+  if (filters.q) p.set('q', filters.q);
+  if (filters.cats.size) p.set('kat', [...filters.cats].join(','));
+  if (filters.tracks.size) p.set('track', [...filters.tracks].join(','));
+  if (filters.statuses.size) p.set('status', [...filters.statuses].join(','));
+  if (filters.mine) p.set('meine', '1');
+  const s = p.toString();
+  history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+}
+function readUrl(){
+  const p = new URLSearchParams(location.search);
+  const fill = (key, set, valid) => (p.get(key) || '').split(',').filter(v => valid[v]).forEach(v => set.add(v));
+  fill('kat', filters.cats, CATEGORIES);
+  fill('track', filters.tracks, TRACKS);
+  fill('status', filters.statuses, STATUSES);
+  filters.mine = p.get('meine') === '1';
+  filters.q = p.get('q') || '';
+  $('#q').value = filters.q;
+  const press = (sel, set) => $$(sel).forEach(b => b.setAttribute('aria-pressed', String(set.has(b.dataset.cat || b.dataset.track || b.dataset.status))));
+  press('[data-cat]', filters.cats); press('[data-track]', filters.tracks); press('[data-status]', filters.statuses);
+  $('[data-mine]').setAttribute('aria-pressed', String(filters.mine));
+  /* Kommt jemand über einen gefilterten Link, muss er sehen, dass gefiltert ist. */
+  if (nFilters()){ $('#filters').dataset.open = 'true'; $('#f-tog').setAttribute('aria-expanded','true'); }
+}
 const mineIdea = i => me && (i.author === me || i.crew.some(c => c.name === me));
 
 function visible(){
@@ -1453,8 +1520,24 @@ function render(){
   Object.keys(STATUSES).forEach(id  => { const e = $(`.n[data-n="s-${id}"]`); if (e) e.textContent = ideas.filter(i=>i.status===id).length || ''; });
   Object.keys(TRACKS).forEach(id    => { const e = $(`.n[data-n="t-${id}"]`); if (e) e.textContent = ideas.filter(i=>i.track===id).length || ''; });
 
+  $('#demo-note').hidden = !ideas.some(isDemo);
+  $('#share-view').hidden = !n;
+  writeUrl();
+
   renderMetrics(); showReminder();
 }
+
+async function removeDemos(){
+  const n = ideas.filter(isDemo).length;
+  if (!n){ toast('Es sind keine Beispiel-Ideen mehr im Board.'); return; }
+  const ok = await confirmDialog({tag:'Aufräumen', title:'Beispiele entfernen?',
+    text:`${n} Beispiel-${n===1?'Idee':'Ideen'} mit erfundenen Namen werden gelöscht. Echte Einreichungen bleiben.`,
+    ok:'Ja, entfernen'});
+  if (!ok) return;
+  ideas = ideas.filter(i => !isDemo(i));
+  save(); render(); toast(`${n} Beispiele entfernt.`);
+}
+$('#rm-demo').onclick = removeDemos;
 
 function cardHTML(i, n){
   const c = cat(i), t = TRACKS[i.track] || {label:'—'};
@@ -1474,6 +1557,7 @@ function cardHTML(i, n){
       <span class="st" data-s="${i.status}">${esc(STATUSES[i.status].label)}</span>
       ${i.wildcard ? '<span class="flag -wild">Wildcard</span>' : ''}
       ${mineIdea(i) ? '<span class="flag -mine">Von dir</span>' : ''}
+      ${isDemo(i) ? '<span class="flag -demo">Beispiel</span>' : ''}
     </div>
     <div class="c-foot">
       <div class="c-meta">
@@ -1675,6 +1759,18 @@ function submitIdea(){
   burst();
 }
 
+/* Kopiert in die Zwischenablage; wo das der Browser verbietet, zum Markieren anzeigen. */
+async function copyLink(url, okMsg, title){
+  try{
+    await navigator.clipboard.writeText(url);
+    toast(okMsg);
+  }catch(e){
+    mini({tag:'Teilen', title,
+      bodyHTML:`<div class="field" style="margin:0"><label>Zum Kopieren markieren</label>
+        <input type="text" readonly value="${esc(url)}" onfocus="this.select()"></div>`, ok:'Fertig'});
+  }
+}
+
 /* ═══ DETAIL ═══ */
 function openDetail(id, keep){
   const i = ideas.find(x => x.id === id); if (!i) return;
@@ -1780,24 +1876,17 @@ function openDetail(id, keep){
   };
   const po = $('#print-one');
   if (po) po.onclick = () => {
-    $('#print-area').innerHTML = `<div class="sheet">${cardArt(i, deckNr(i))}</div>`;
+    $('#print-area').innerHTML = `<div class="sheet">${cutCard(i, deckNr(i))}</div>`;
     setTimeout(() => window.print(), 100);
   };
   const sh = $('#share-idea');
-  if (sh) sh.onclick = async () => {
-    const url = location.origin + location.pathname + '#i/' + encodeURIComponent(i.id);
-    try {
-      await navigator.clipboard.writeText(url);
-      toast('Link kopiert — <b>führt direkt zu dieser Idee.</b>');
-    } catch(e){
-      mini({tag:'Link teilen', title:'Link zur Idee',
-        bodyHTML:`<div class="field" style="margin:0"><label>Zum Kopieren markieren</label>
-          <input type="text" readonly value="${esc(url)}" onfocus="this.select()"></div>`, ok:'Fertig'});
-    }
-  };
+  if (sh) sh.onclick = () => copyLink(
+    location.origin + location.pathname + '#i/' + encodeURIComponent(i.id),
+    'Link kopiert — <b>führt direkt zu dieser Idee.</b>', 'Link zur Idee');
   if (!keep){
     openOv('#ov-detail', '#join, [data-vote]');
-    history.replaceState(null, '', '#i/' + encodeURIComponent(i.id));
+    /* Der Query-String trägt die Filter — beim Öffnen darf er nicht verloren gehen. */
+    history.replaceState(null, '', location.pathname + location.search + '#i/' + encodeURIComponent(i.id));
   }
 }
 /* Nummer der Idee im Kartendeck = Position nach Stimmen sortiert */
@@ -1831,6 +1920,9 @@ $('#spark-take').onclick = () => {
 $('#q').addEventListener('input', debounce(() => { filters.q = $('#q').value; render(); }, 160));
 $('#q-clr').onclick = () => { $('#q').value=''; filters.q=''; render(); $('#q').focus(); };
 $('#sort').onchange = e => { filters.sort = e.target.value; localStorage.setItem('pilot-hangar-sort', filters.sort); render(); };
+$('#share-view').onclick = () => copyLink(
+  location.origin + location.pathname + location.search,
+  `Link kopiert — zeigt genau diese <b>${visible().length} Ideen</b>.`, 'Link zu dieser Auswahl');
 
 /* ═══ IDEA CARD ═══ */
 const kurz = (t,max) => {
@@ -1868,6 +1960,8 @@ function cardArt(i, nr){
 }
 const scaledCard = (i, nr, s) =>
   `<div class="card-scale" style="transform:scale(${s});width:calc(88mm * ${s});height:calc(125mm * ${s})">${cardArt(i,nr)}</div>`;
+/* Nur im Druck bekommt die Karte Schnittmarken — in der Vorschau stören sie. */
+const cutCard = (i, nr) => `<div class="cut">${cardArt(i, nr)}</div>`;
 
 function printScopes(){
   const n = nFilters();
@@ -1920,7 +2014,7 @@ $('#do-print').onclick = () => {
   const seiten = [];
   for (let n=0;n<list.length;n+=PRO_SEITE) seiten.push(list.slice(n,n+PRO_SEITE));
   $('#print-area').innerHTML = seiten.map((s,si) =>
-    `<div class="sheet">${s.map((l,n)=>cardArt(l, si*PRO_SEITE+n+1)).join('')}</div>`).join('');
+    `<div class="sheet">${s.map((l,n)=>cutCard(l, si*PRO_SEITE+n+1)).join('')}</div>`).join('');
   closeOv($('#ov-print'));
   setTimeout(() => window.print(), 140);
 };
@@ -2010,6 +2104,7 @@ load();
 renderTracks();
 renderFilters();
 buildForm();
+readUrl();     /* muss vor render() laufen — render() schreibt die URL zurück */
 render();
 renderWho();
 observeRv();
@@ -2024,8 +2119,12 @@ observeRv();
 /* Scrollspy — markiert die Sektion, in der man sich gerade befindet */
 if ('IntersectionObserver' in window){
   const spy = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) $$('.nav a').forEach(a =>
-      a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    if (!e.isIntersecting) return;
+    $$('.nav a').forEach(a => {
+      const on = a.getAttribute('href') === '#' + e.target.id;
+      a.classList.toggle('active', on);
+      on ? a.setAttribute('aria-current','true') : a.removeAttribute('aria-current');
+    });
   }), {rootMargin:'-40% 0px -55% 0px'});
   ['tracks','board','zuender','ablauf'].forEach(id => {
     const el = document.getElementById(id); if (el) spy.observe(el);
