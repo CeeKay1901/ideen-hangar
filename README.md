@@ -85,13 +85,28 @@ Akzentfarbe ist ausschließlich das pilot-Gelb; es markiert wie ein Textmarker.
 
 Und weil das Ding am Ende ein **Kartendeck** druckt, benimmt sich der Bildschirm auch wie eins:
 
+- **Das Board ist das Deck.** Auf dem Board liegt keine Zusammenfassung einer Idee, sondern
+  ihre Idea Card — dieselbe, die gedruckt wird. Was das Papier nicht kennt (Stimme, Status,
+  Team), liegt als Spielchip über der Karte: ein Jeton für die Stimme, ein Statusschild links,
+  Team-Marken daneben. Beispiel-Ideen tragen einen Stempel.
 - **Das Prägewerk.** Beim Einreichen wächst rechts die echte Idea Card mit — keine Attrappe,
   sondern dieselbe `cardArt()`, die später auf dem Papier landet. Die Kategorie färbt live den
   Kartenkopf, die Wildcard schlägt einen goldenen Rand. Der letzte Knopf heißt „Karte prägen",
   und die Karte dreht sich von der Rückseite ins Deck.
-- **Der Kartentisch.** Die Board-Karten werden ausgeteilt, neigen sich zum Zeiger und fangen
-  Licht. Wildcards schillern wie eine Holo-Sammelkarte.
+- **Der Kartentisch.** Die Karten werden ausgeteilt, neigen sich zum Zeiger und fangen Licht.
+  Wildcards schillern wie eine Holo-Sammelkarte.
 - **Der Lostopf** mit echtem Stapel und Kartenrückseite.
+
+Möglich wird das durch **eine einzige Karte für alle Größen**: Sämtliche Innenmaße der
+Idea Card hängen an der Breite ihres Containers (`cqw`), nicht an Millimetern. Bei 88 mm
+Containerbreite ergeben sich exakt dieselben Maße wie vorher — die Karte füllt also eine
+Board-Spalte, schrumpft zur Vorschau und wird gedruckt, ohne dass sich ein Verhältnis
+verschiebt. Der Container heißt `.card-box`; er muss außen liegen, weil ein Element seine
+eigenen `cq`-Einheiten nicht auflösen kann.
+
+Die Nummer auf der Karte (`deckNr`) ist der Rang nach Stimmen und überall dieselbe — im
+Board, in der Vorschau, auf dem Papier. Ein gefiltertes Deck hat deshalb Lücken in der
+Nummernfolge: die Nummer gehört zur Idee, nicht zum Blatt.
 - **Command-Palette** mit <kbd>⌘K</kbd> / <kbd>Strg+K</kbd> — alle Aktionen ohne Maus erreichbar.
 - **Kürzel**: <kbd>N</kbd> neue Idee, <kbd>/</kbd> Suche, <kbd>R</kbd> würfeln, <kbd>Z</kbd> Karte ziehen.
 - Im Hero liegen zwei **echte Karten** aus dem Board — das Produkt zeigt sich selbst.

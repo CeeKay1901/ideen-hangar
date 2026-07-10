@@ -292,44 +292,41 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .tb-meta button:hover{color:var(--fg);text-decoration:underline;text-underline-offset:.5rem}
 @media(max-width:920px){.tb-meta{width:100%;margin:1rem 0 0;justify-content:space-between}}
 
-/* ═══ IDEA CARDS (Board) ═══
-   Ein Kartentisch: die Karten werden ausgeteilt, kippen unter dem Zeiger und
-   fangen Licht. Wildcards schillern. Alles nur Deko — ohne sie bleibt jede
-   Karte vollständig lesbar und bedienbar. */
-.grid{display:grid;gap:1.6rem;grid-template-columns:1fr}
-@media(min-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}
+/* ═══ DAS BOARD IST DAS DECK ═══
+   Keine Zettel über Karten mehr: hier liegt die echte Idea Card. Was das Papier
+   nicht kennt — Stimme, Status, Team — liegt als Spielchip darüber. */
+.grid{display:grid;gap:2.8rem 2rem;grid-template-columns:1fr}
+@media(min-width:680px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1180px){.grid{grid-template-columns:repeat(3,1fr)}}
 /* Perspektive gehört auf den direkten Elternteil der gekippten Karte. */
-.deal{display:grid;perspective:1200px;animation:dealIn .55s var(--spring) backwards}
+.deal{perspective:1400px;animation:dealIn .55s var(--spring) backwards}
 @keyframes dealIn{
   from{opacity:0;transform:translate(-2.5rem,-1.5rem) rotate(-4deg) scale(.94)}
   to{opacity:1;transform:none}
 }
-.card{
-  --cc:var(--c-offen);
-  position:relative;background:var(--bg-2);border:1px solid var(--line);
-  padding:2.6rem;display:flex;flex-direction:column;gap:1.4rem;min-height:28rem;
-  overflow:hidden; /* macht die Karte im Grid schrumpfbar (nowrap-Metazeile) */
+.pcard{
+  position:relative;
   transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0);
-  transition:transform .4s var(--ease),border-color .15s,box-shadow .4s var(--ease);
+  transition:transform .4s var(--ease),filter .4s var(--ease);
+  filter:drop-shadow(0 1.2rem 2.4rem rgba(27,25,18,.16));
 }
-/* Kategorie-Band oben, wie auf der gedruckten Karte */
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:.4rem;background:var(--cc);z-index:2}
+.pcard:hover,.pcard:focus-within{filter:drop-shadow(0 3rem 4.5rem rgba(27,25,18,.3))}
+/* Die ganze Karte ist der Knopf zum Öffnen — außer den Chips darauf. */
+.pcard .open{position:absolute;inset:0;z-index:3;border:none;background:none;cursor:pointer;padding:0}
+.pcard .open:focus-visible{outline:3px solid var(--fg);outline-offset:4px}
 /* Licht auf Papier. Weißer Glanz wäre auf weißem Karton unsichtbar, also
    arbeiten wir umgekehrt: unter dem Zeiger bleibt die Karte hell, zum Rand hin
-   legt sich ein Hauch Schatten. z-index:-1 hält das Ganze unter dem Text — die
-   Karte hat durch ihr rotateX/Y bereits einen eigenen Stapelkontext. */
-.card::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:0;transition:opacity .35s;
-  background:radial-gradient(48rem circle at var(--mx,50%) var(--my,50%),transparent 0%,rgba(27,25,18,.09) 75%);
+   legt sich ein Hauch Schatten. */
+.pcard .card-box{position:relative}
+.pcard .card-box::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;transition:opacity .35s;
+  border-radius:4.55cqw;
+  background:radial-gradient(48rem circle at var(--mx,50%) var(--my,50%),transparent 0%,rgba(27,25,18,.1) 75%);
   mix-blend-mode:multiply;
 }
-.card:hover{border-color:var(--fg);box-shadow:0 2.6rem 5rem -1.6rem rgba(27,25,18,.34)}
-.card:hover::after{opacity:1}
-.card:focus-within{border-color:var(--cc)}
+.pcard:hover .card-box::after{opacity:1}
 /* Wildcards schillern wie eine Holo-Sammelkarte. */
-.card.-wild{border-color:var(--acid)}
-.card.-wild::after{
+.pcard.-wild .card-box::after{
   background:
     linear-gradient(112deg,transparent 26%,rgba(255,212,0,.75) 38%,rgba(244,114,182,.6) 47%,
       rgba(91,141,255,.6) 56%,rgba(61,214,140,.55) 64%,transparent 76%),
@@ -337,60 +334,73 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
   background-size:230% 230%,100% 100%;
   background-position:var(--mx,50%) var(--my,50%),0 0;
   mix-blend-mode:multiply;
-  opacity:.16;   /* auch in Ruhe ein Schimmer, aber der Text bleibt Chef */
+  opacity:.18;   /* auch in Ruhe ein Schimmer, aber der Text bleibt Chef */
 }
-.card.-wild:hover::after{opacity:.6}
+.pcard.-wild:hover .card-box::after{opacity:.62}
+.pcard .ideacard{box-shadow:none}
+/* Die Stimmenzahl steht schon auf dem Jeton — auf dem Kartenfuß wäre sie doppelt. */
+.pcard .ideacard .foot .votes{visibility:hidden}
 @media(prefers-reduced-motion:reduce){
-  .card{transform:none !important}
-  .card::after{display:none}
+  .pcard{transform:none !important}
+  .pcard .card-box::after{display:none}
 }
-.c-top{display:flex;justify-content:space-between;align-items:center;gap:1rem}
-.c-cat{display:inline-flex;align-items:center;gap:.8rem;font-family:var(--mono);font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cc);font-weight:600}
-.c-cat .sym{font-size:1.05rem;border:1px solid currentColor;padding:.15rem .45rem}
-.c-no{font-family:var(--mono);font-size:1.15rem;color:var(--fg-3)}
-.card h3{font-size:2rem;font-weight:700;letter-spacing:-.015em;line-height:1.24}
-.card h3 .open{background:none;border:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
-.card h3 .open::after{content:'';position:absolute;inset:0;z-index:1}
-.card .prob{font-size:1.45rem;color:var(--fg-2);line-height:1.6}
-.c-flags{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
-.st{font-family:var(--mono);font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:.6rem;color:var(--fg-3)}
-.st::before{content:'';width:.6rem;height:.6rem;background:currentColor}
-.st[data-s="crew-gesucht"]{color:var(--warn)}
-.st[data-s="in-arbeit"]{color:var(--c-wissen)}
-.st[data-s="gebaut"]{color:var(--ok)}
-.flag{font-family:var(--mono);font-size:1rem;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .8rem;font-weight:600}
-.flag.-wild{background:var(--acid);color:var(--fg)}
-.flag.-mine{background:none;color:var(--fg-2);border:1px solid var(--line-2)}
-.flag.-demo{background:none;color:var(--fg-3);border:1px dashed var(--line-2)}
-.c-foot{margin-top:auto;padding-top:2rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:1.4rem}
-.c-meta{display:flex;flex-direction:column;gap:.7rem;font-family:var(--mono);font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);min-width:0}
-.c-meta .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.c-meta .team{display:flex;align-items:center}
-.av{width:2.4rem;height:2.4rem;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:.95rem;font-weight:600;font-family:'Archivo';border:1.5px solid var(--bg-2);flex-shrink:0}
-.av + .av{margin-left:-.8rem}
+
+/* Beispiel-Ideen bekommen einen Stempel quer über die Karte. */
+/* 62%: unterhalb des Problemtexts, oberhalb der Kennzahlen — der Stempel darf
+   nichts überdecken, was gelesen werden muss. */
+.stamp{
+  position:absolute;left:50%;top:62%;z-index:2;transform:translate(-50%,-50%) rotate(-11deg);
+  border:.3rem double var(--fg-3);color:var(--fg-3);opacity:.3;pointer-events:none;
+  font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:.24em;
+  text-transform:uppercase;padding:.6rem 1.4rem;border-radius:.4rem;
+}
+
+/* Chips liegen über der Karte und ragen an ihren Rand. */
+.chip-row{position:absolute;left:-.6rem;bottom:-1.4rem;z-index:4;display:flex;align-items:center;gap:.6rem;max-width:calc(100% - 6rem)}
+.st{
+  display:inline-flex;align-items:center;gap:.7rem;background:var(--bg-2);border:1px solid var(--fg);
+  font-family:var(--mono);font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.7rem 1.1rem;color:var(--fg);white-space:nowrap;
+}
+.st::before{content:'';width:.7rem;height:.7rem;background:var(--fg-3);flex-shrink:0}
+.st[data-s="crew-gesucht"]::before{background:var(--warn)}
+.st[data-s="in-arbeit"]::before{background:var(--c-wissen)}
+.st[data-s="gebaut"]::before{background:var(--ok)}
+.team{display:flex;align-items:center;padding-left:.4rem}
+.av{width:2.8rem;height:2.8rem;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:1.05rem;font-weight:600;font-family:'Archivo';border:2px solid var(--bg);flex-shrink:0}
+.av + .av{margin-left:-.9rem}
 .av.-more{background:var(--line-2);color:var(--fg)}
-.nocrew{color:var(--warn)}
-.vote{
-  position:relative;z-index:2;flex-shrink:0;min-width:5.6rem;height:5.6rem;border-radius:var(--r);
-  background:var(--bg-2);border:1px solid var(--line-2);cursor:pointer;display:grid;place-items:center;
-  transition:border-color .15s,background .15s;
+.av.-none{background:var(--bg-2);border:1px dashed var(--warn);color:var(--warn);font-family:var(--mono);font-size:1.2rem}
+.flag.-mine{
+  position:absolute;left:-.6rem;top:1.6rem;z-index:4;background:var(--bg-2);border:1px solid var(--fg);
+  font-family:var(--mono);font-size:1rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.5rem .9rem;font-weight:600;color:var(--fg);
 }
-.vote .arrow{position:absolute;top:.7rem;font-size:.75rem;color:var(--fg-3);transition:color .15s}
-.vote b{font-family:var(--mono);font-size:1.7rem;font-weight:600;margin-top:.8rem;font-variant-numeric:tabular-nums}
-.vote:hover{border-color:var(--fg)}
+/* Der Stimm-Chip: ein Jeton, der über die Kartenecke ragt. */
+.vote{
+  position:absolute;right:-1.4rem;bottom:-1.6rem;z-index:5;
+  width:6.4rem;height:6.4rem;border-radius:50%;
+  background:var(--bg-2);border:2px solid var(--fg);cursor:pointer;display:grid;place-items:center;
+  box-shadow:0 .8rem 1.6rem -.4rem rgba(27,25,18,.35);
+  transition:transform .22s var(--spring),background .15s,color .15s;
+}
+.vote::before{content:'';position:absolute;inset:.5rem;border-radius:50%;border:1px dashed currentColor;opacity:.35}
+.vote .arrow{position:absolute;top:1rem;font-size:.8rem;color:var(--fg-3);transition:color .15s}
+.vote b{font-family:var(--mono);font-size:1.9rem;font-weight:700;margin-top:.9rem;font-variant-numeric:tabular-nums}
+.vote:hover{transform:translateY(-.4rem) rotate(-4deg)}
 .vote:hover .arrow{color:var(--fg)}
-.vote[aria-pressed="true"]{background:var(--acid);border-color:var(--fg);color:var(--fg)}
+.vote[aria-pressed="true"]{background:var(--acid);color:var(--fg)}
 .vote[aria-pressed="true"] .arrow{color:var(--fg)}
 .vote.bump{animation:bump .5s var(--spring)}
-@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
-.vote.bump::after{content:'';position:absolute;inset:-1px;border:1.5px solid var(--fg);animation:ripple .6s var(--ease) forwards}
-@keyframes ripple{to{transform:scale(1.4);opacity:0}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18) rotate(-8deg)}100%{transform:scale(1)}}
+.vote.bump::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--fg);animation:ripple .6s var(--ease) forwards}
+@keyframes ripple{to{transform:scale(1.45);opacity:0}}
 .plus1{
-  position:absolute;left:50%;top:-.4rem;transform:translateX(-50%);pointer-events:none;
-  font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--fg);
+  position:absolute;left:50%;top:-1rem;transform:translateX(-50%);pointer-events:none;
+  font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--fg);
   animation:plus1 .9s var(--ease) forwards;
 }
-@keyframes plus1{0%{opacity:0;transform:translate(-50%,0) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-3.4rem) scale(1)}}
+@keyframes plus1{0%{opacity:0;transform:translate(-50%,0) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-3.8rem) scale(1)}}
 
 .demo-note{
   display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;margin-bottom:2.4rem;
@@ -438,15 +448,13 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .pot-act{display:flex;gap:.8rem;margin-top:2.4rem;flex-wrap:wrap}
 .pot-left{margin-top:1.4rem;font-family:var(--mono);font-size:1.1rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);min-height:1.6rem}
 .pot-table{display:flex;align-items:center;justify-content:center;gap:3.2rem;perspective:1400px}
-/* translate() vor scale(), sonst schrumpft der Versatz mit und der Stapel
-   sieht aus wie eine einzelne dicke Karte. */
-.pot-stack{position:relative;width:calc(88mm * .5);height:calc(125mm * .5);flex-shrink:0}
-.pot-stack .card-scale{position:absolute;left:0;top:0}
-.pot-stack .card-scale:nth-child(1){transform:translate(-2.4rem,1.6rem) rotate(-6deg) scale(.5) !important}
-.pot-stack .card-scale:nth-child(2){transform:translate(-1.1rem,.7rem) rotate(3deg) scale(.5) !important}
-.pot-stack .card-scale:nth-child(3){transform:rotate(-1deg) scale(.5) !important}
+.pot-stack{position:relative;width:calc(88mm * .5);aspect-ratio:88 / 125;flex-shrink:0}
+.pot-stack .card-box{position:absolute;left:0;top:0;width:100%}
+.pot-stack .card-box:nth-child(1){transform:translate(-2.4rem,1.6rem) rotate(-6deg)}
+.pot-stack .card-box:nth-child(2){transform:translate(-1.1rem,.7rem) rotate(3deg)}
+.pot-stack .card-box:nth-child(3){transform:rotate(-1deg)}
 .pot-slot{
-  width:calc(88mm * .5);height:calc(125mm * .5);flex-shrink:0;position:relative;
+  width:calc(88mm * .5);aspect-ratio:88 / 125;flex-shrink:0;position:relative;
   border:1px dashed var(--line-2);display:grid;place-items:center;
 }
 .pot-slot:has(.flip){border-color:transparent}
@@ -456,10 +464,9 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 @media(max-width:560px){
   .pot{padding:2.6rem 2rem}
   .pot-table{flex-direction:column;gap:3.4rem;padding-left:1.6rem}
-  .pot-stack,.pot-slot{width:calc(88mm * .46);height:calc(125mm * .46)}
-  .pot-stack .card-scale:nth-child(1){transform:translate(-1.4rem,1rem) rotate(-6deg) scale(.46) !important}
-  .pot-stack .card-scale:nth-child(2){transform:translate(-.6rem,.45rem) rotate(3deg) scale(.46) !important}
-  .pot-stack .card-scale:nth-child(3){transform:rotate(-1deg) scale(.46) !important}
+  .pot-stack,.pot-slot{width:calc(88mm * .46)}
+  .pot-stack .card-box:nth-child(1){transform:translate(-1.4rem,1rem) rotate(-6deg)}
+  .pot-stack .card-box:nth-child(2){transform:translate(-.6rem,.45rem) rotate(3deg)}
 }
 /* Schwarzer Kasten — wie der Fuß der gedruckten Karte */
 .deck-note{
@@ -528,9 +535,9 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
   }
 }
 .press-k{font-family:var(--mono);font-size:1.05rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3)}
-.press-holder{width:calc(88mm * .58);height:calc(125mm * .58);position:relative}
+.press-holder{width:calc(88mm * .58);aspect-ratio:88 / 125;position:relative}
 .press-holder .ideacard{transition:transform .5s var(--spring)}
-.press-holder .card-scale{position:absolute;left:0;top:0}
+.press-holder .card-box{position:absolute;left:0;top:0;width:100%}
 .press-hint{font-size:1.3rem;color:var(--fg-3);text-align:center;line-height:1.5;margin-top:auto;max-width:26ch}
 /* Wenn die Kategorie wechselt, zuckt die Karte kurz. */
 .press-holder.-beat .ideacard{animation:beat .45s var(--spring)}
@@ -617,11 +624,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 /* Mint-Finale */
 .mint{padding:4.4rem 3rem;text-align:center;position:relative;overflow:hidden}
 .mint .holder{display:grid;place-items:center;perspective:1200px;position:relative}
-.mint .ideacard{text-align:left;animation:mintIn .9s var(--ease) backwards}
-@keyframes mintIn{
-  0%{opacity:0;transform:rotateY(-18deg) rotateX(10deg) translateY(2.4rem) scale(.9)}
-  100%{opacity:1;transform:none}
-}
+.mint .ideacard{text-align:left}
 .mint h3{font-size:2.4rem;font-weight:800;letter-spacing:-.02em;margin-top:3.2rem;opacity:0;animation:fadeIn .5s .85s var(--ease) forwards}
 .mint p{color:var(--fg-2);margin-top:.8rem;opacity:0;animation:fadeIn .5s 1s var(--ease) forwards}
 .mint .acts{margin-top:2.8rem;display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeIn .5s 1.15s var(--ease) forwards}
@@ -660,62 +663,69 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .crew-item .rm:hover{border-color:var(--err);color:var(--err)}
 .crew-empty{border:1px dashed var(--line-2);padding:1.8rem;text-align:center;color:var(--fg-3)}
 
-/* ═══ IDEA CARD (Druck-Los) ═══
-   Trading-Card. Auf Papier hell — Tinte sparen, Lesbarkeit gewinnen. */
+/* ═══ IDEA CARD ═══
+   Eine einzige Karte für Papier und Bildschirm. Alle Innenmaße hängen an der
+   Breite ihres Containers (cqw), nicht an Millimetern — dieselbe Karte wird
+   88mm breit gedruckt, füllt eine Board-Spalte oder schrumpft zur Vorschau,
+   ohne dass sich ein Verhältnis verschiebt. 1cqw = 0,88mm.
+   Der Container ist .card-box; ein Element kann seine eigenen cq-Einheiten
+   nicht auflösen, deshalb sitzt die Karte darin statt selbst Container zu sein. */
+.card-box{container-type:inline-size;aspect-ratio:88 / 125;flex-shrink:0}
 .ideacard{
   --cc:var(--c-offen);
-  position:relative;width:88mm;height:125mm;border-radius:4mm;overflow:hidden;
+  position:relative;width:100%;height:100%;border-radius:4.55cqw;overflow:hidden;
   background:#fff;color:#111;display:flex;flex-direction:column;
-  border:1px solid #ddd;
+  border:1px solid #ddd;box-shadow:0 1rem 2.8rem -.8rem rgba(27,25,18,.24);
 }
 .ideacard .hero-band{
-  background:var(--cc);color:#fff;padding:5mm 5mm 4mm;position:relative;overflow:hidden;flex-shrink:0;
+  background:var(--cc);color:#fff;padding:5.68cqw 5.68cqw 4.55cqw;position:relative;overflow:hidden;flex-shrink:0;
 }
 .ideacard .hero-band::after{
-  content:'';position:absolute;right:-8mm;top:-8mm;width:26mm;height:26mm;border-radius:50%;
+  content:'';position:absolute;right:-9.09cqw;top:-9.09cqw;width:29.55cqw;height:29.55cqw;border-radius:50%;
   background:rgba(255,255,255,.14);
 }
-.ideacard .idx{font-family:var(--mono);font-size:9mm;font-weight:700;line-height:.9;letter-spacing:-.04em;opacity:.95}
-.ideacard .idx small{display:block;font-size:2.2mm;letter-spacing:.24em;font-weight:600;opacity:.8;margin-bottom:.8mm}
-.ideacard .catline{display:flex;align-items:center;gap:2mm;margin-top:3.5mm;position:relative;z-index:1}
-.ideacard .catline .sym{font-family:var(--mono);font-size:2.6mm;font-weight:600;letter-spacing:.1em;border:.3mm solid rgba(255,255,255,.75);padding:.5mm 1.1mm;border-radius:.6mm;line-height:1.2}
-.ideacard .catline .nm{font-size:2.9mm;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
-.ideacard .body{padding:5mm;flex:1;min-height:0;display:flex;flex-direction:column;gap:3mm}
-.ideacard .body h3{font-size:5.2mm;line-height:1.16;font-weight:700;letter-spacing:-.02em}
-.ideacard .body p{font-size:3.2mm;line-height:1.45;color:#4a4a4a}
-.ideacard .stats{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;padding-top:3mm;border-top:1px solid #eee}
-.ideacard .stat .k{font-size:2.1mm;text-transform:uppercase;letter-spacing:.16em;color:#999;font-weight:600}
-.ideacard .stat .v{font-size:3.1mm;font-weight:600;margin-top:.7mm}
+.ideacard .idx{font-family:var(--mono);font-size:10.23cqw;font-weight:700;line-height:.9;letter-spacing:-.04em;opacity:.95}
+.ideacard .idx small{display:block;font-size:2.5cqw;letter-spacing:.24em;font-weight:600;opacity:.8;margin-bottom:.91cqw}
+.ideacard .catline{display:flex;align-items:center;gap:2.27cqw;margin-top:3.98cqw;position:relative;z-index:1}
+.ideacard .catline .sym{font-family:var(--mono);font-size:2.95cqw;font-weight:600;letter-spacing:.1em;border:.34cqw solid rgba(255,255,255,.75);padding:.57cqw 1.25cqw;border-radius:.68cqw;line-height:1.2}
+.ideacard .catline .nm{font-size:3.3cqw;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
+.ideacard .body{padding:5.68cqw;flex:1;min-height:0;display:flex;flex-direction:column;gap:3.41cqw}
+.ideacard .body h3{font-size:5.91cqw;line-height:1.16;font-weight:700;letter-spacing:-.02em}
+.ideacard .body p{font-size:3.64cqw;line-height:1.45;color:#4a4a4a}
+.ideacard .stats{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:2.84cqw;padding-top:3.41cqw;border-top:1px solid #eee}
+.ideacard .stat .k{font-size:2.39cqw;text-transform:uppercase;letter-spacing:.16em;color:#999;font-weight:600}
+.ideacard .stat .v{font-size:3.52cqw;font-weight:600;margin-top:.8cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ideacard .foot{
-  padding:3mm 5mm;background:#111;color:#fff;display:flex;align-items:center;gap:3mm;flex-shrink:0;
+  padding:3.41cqw 5.68cqw;background:#111;color:#fff;display:flex;align-items:center;gap:3.41cqw;flex-shrink:0;
 }
-.ideacard .foot .mark{font-size:2.6mm;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.ideacard .foot .mark{font-size:2.95cqw;font-weight:700;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
 .ideacard .foot .mark i{font-style:normal;color:var(--acid)}
-.ideacard .foot .votes{margin-left:auto;font-family:var(--mono);font-size:3mm;font-weight:700}
-.ideacard .foot .bars{display:flex;gap:.6mm;align-items:flex-end;height:4mm}
-.ideacard .foot .bars i{width:.7mm;background:#fff;opacity:.5;display:block}
-.ideacard.-wild{border:1.2mm solid var(--acid)}
+.ideacard .foot .votes{margin-left:auto;font-family:var(--mono);font-size:3.41cqw;font-weight:700}
+.ideacard .foot .bars{display:flex;gap:.68cqw;align-items:flex-end;height:4.55cqw}
+.ideacard .foot .bars i{width:.8cqw;background:#fff;opacity:.5;display:block}
+.ideacard.-wild{border:1.36cqw solid var(--acid)}
 .ideacard.-wild .wildtag{
-  position:absolute;top:0;right:0;background:var(--acid);color:#111;font-size:2.3mm;font-weight:800;
-  letter-spacing:.14em;text-transform:uppercase;padding:1.4mm 3mm;border-radius:0 0 0 2mm;z-index:3;
+  position:absolute;top:0;right:0;background:var(--acid);color:#111;font-size:2.61cqw;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;padding:1.59cqw 3.41cqw;border-radius:0 0 0 2.27cqw;z-index:3;
 }
-/* Rückseite — dieselben Maße, damit sich die Karte sauber umdrehen lässt. */
+/* Rückseite — dieselbe Geometrie, damit sich die Karte sauber umdrehen lässt. */
 .ideacard.-back{
   background:#1b1912;border-color:#1b1912;align-items:center;justify-content:center;
   background-image:
-    radial-gradient(circle,rgba(255,212,0,.5) .5mm,transparent .55mm),
-    repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 1mm,transparent 1mm 3mm);
-  background-size:7mm 7mm,auto;
+    radial-gradient(circle,rgba(255,212,0,.5) .57cqw,transparent .63cqw),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 1.14cqw,transparent 1.14cqw 3.41cqw);
+  background-size:7.95cqw 7.95cqw,auto;
 }
 .ideacard.-back .mark{
-  color:#fff;font-size:3.4mm;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
-  border:.4mm solid rgba(255,255,255,.28);padding:2.5mm 4mm;background:#1b1912;
+  color:#fff;font-size:3.86cqw;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+  border:.45cqw solid rgba(255,255,255,.28);padding:2.84cqw 4.55cqw;background:#1b1912;
 }
 .ideacard.-back .mark i{font-style:normal;color:var(--acid)}
 
 /* Umdrehen: startet auf der Rückseite, landet auf der Vorderseite. */
-.flip{position:relative;transform-style:preserve-3d;animation:flipIn 1.05s var(--spring) backwards}
+.flip{position:relative;aspect-ratio:88 / 125;transform-style:preserve-3d;animation:flipIn 1.05s var(--spring) backwards}
 .flip > *{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.flip .card-box{width:100%}
 .flip > .-rear{transform:rotateY(180deg)}
 @keyframes flipIn{
   0%{opacity:0;transform:rotateY(180deg) translateY(3rem) scale(.86)}
@@ -724,8 +734,6 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 }
 @media(prefers-reduced-motion:reduce){.flip{animation:none}}
 
-.card-scale{transform-origin:top left}
-.card-scale .ideacard{box-shadow:0 10px 28px rgba(27,25,18,.18)}
 .deck-preview{background:var(--bg-3);border:1px solid var(--line);padding:2rem;overflow:auto;max-height:44vh;display:flex;gap:1.6rem;flex-wrap:wrap;justify-content:center}
 .pmeta{display:flex;gap:2.2rem;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.8rem 0;margin:2.4rem 0;font-family:var(--mono);font-size:1.1rem;text-transform:uppercase;letter-spacing:.12em;color:var(--fg-3)}
 .pmeta b{font-size:2rem;color:var(--fg);letter-spacing:-.02em;margin-right:.5rem}
@@ -733,7 +741,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 
 /* Schnittmarken: vier Eckwinkel um jede Karte, damit man die Schere ansetzen kann.
    Sie liegen außerhalb der Karte und verschwinden beim Schneiden selbst. */
-.cut{position:relative;width:88mm;height:125mm;break-inside:avoid;page-break-inside:avoid}
+.cut{position:relative;container-type:inline-size;width:88mm;height:125mm;break-inside:avoid;page-break-inside:avoid}
 .cut::before,.cut::after{
   content:'';position:absolute;left:-2.5mm;right:-2.5mm;pointer-events:none;height:4mm;
   background:
@@ -1693,38 +1701,31 @@ async function removeDemos(){
 }
 $('#rm-demo').onclick = removeDemos;
 
+/* Eine Board-Kachel ist die echte Idea Card plus die Chips, die das Papier
+   nicht kennt: Stimme, Status, Team. Der .deal-Wrapper trägt die Austeil-
+   Animation, die .pcard den Kipp-Effekt — beides auf einem Element würde sich
+   um transform prügeln. */
 function cardHTML(i, n){
-  const c = cat(i), t = TRACKS[i.track] || {label:'—'};
   const voted = me && i.voters.includes(me);
   const team = i.crew.slice(0,3).map(x => `<span class="av" title="${esc(x.name)}">${esc(inits(x.name))}</span>`).join('');
-  const more = i.crew.length > 3 ? `<span class="av -more">+${i.crew.length-3}</span>` : '';
+  const more = i.crew.length > 3 ? `<span class="av -more" title="${i.crew.length-3} weitere">+${i.crew.length-3}</span>` : '';
   const d = reduced() ? 0 : Math.min(n,11)*0.045;
-  /* Der .deal-Wrapper trägt die Austeil-Animation, die .card den Kipp-Effekt.
-     Beides auf demselben Element würde sich um transform prügeln. */
   return `
   <div class="deal" style="animation-delay:${d}s">
-  <article class="card ${i.wildcard?'-wild':''}" style="--cc:${c.color}" data-id="${i.id}">
-    <div class="c-top">
-      <span class="c-cat"><span class="sym" aria-hidden="true">${c.sym}</span>${esc(c.label)}</span>
-      <span class="c-no">#${String(n+1).padStart(2,'0')}</span>
-    </div>
-    <h3><button class="open" data-open="${i.id}">${esc(i.title)}</button></h3>
-    <p class="prob">${esc(i.problem)}</p>
-    <div class="c-flags">
+  <article class="pcard ${i.wildcard?'-wild':''}" data-id="${i.id}">
+    <div class="card-box">${cardArt(i, deckNr(i))}</div>
+    ${isDemo(i) ? '<span class="stamp" aria-hidden="true">Beispiel</span>' : ''}
+    ${mineIdea(i) ? '<span class="flag -mine">Von dir</span>' : ''}
+    <button class="open" data-open="${i.id}"><span class="sr">${esc(i.title)} — Details öffnen</span></button>
+    <div class="chip-row">
       <span class="st" data-s="${i.status}">${esc(STATUSES[i.status].label)}</span>
-      ${i.wildcard ? '<span class="flag -wild">Wildcard</span>' : ''}
-      ${mineIdea(i) ? '<span class="flag -mine">Von dir</span>' : ''}
-      ${isDemo(i) ? '<span class="flag -demo">Beispiel</span>' : ''}
+      <span class="team">${i.crew.length
+        ? team + more
+        : `<span class="av -none" title="Dieses Team sucht noch Leute" aria-hidden="true">?</span>`}</span>
     </div>
-    <div class="c-foot">
-      <div class="c-meta">
-        <span class="who">${esc(t.label)} · ${esc(i.dept)}</span>
-        ${i.crew.length ? `<span class="team">${team}${more}</span>` : `<span class="nocrew">Kein Team</span>`}
-      </div>
-      <button class="vote" data-vote="${i.id}" aria-pressed="${voted}"
-        aria-label="${voted?`Stimme für „${esc(i.title)}" zurückziehen`:`Für „${esc(i.title)}" stimmen`}">
-        <span class="arrow" aria-hidden="true">▲</span><b>${i.votes}</b></button>
-    </div>
+    <button class="vote" data-vote="${i.id}" aria-pressed="${voted}"
+      aria-label="${voted?`Stimme für „${esc(i.title)}" zurückziehen`:`Für „${esc(i.title)}" stimmen`}">
+      <span class="arrow" aria-hidden="true">▲</span><b>${i.votes}</b></button>
   </article></div>`;
 }
 
@@ -1760,7 +1761,7 @@ async function vote(id, btn){
     toast(`Stimme für <b>${esc(i.title.slice(0,34))}${i.title.length>34?'…':''}</b>`);
   }
   save();
-  const card = $(`.card[data-id="${id}"]`);
+  const card = $(`.pcard[data-id="${id}"]`);
   if (card && btn){
     btn.setAttribute('aria-pressed', String(i.voters.includes(me)));
     $('b', btn).textContent = i.votes;
@@ -1783,7 +1784,7 @@ if (!reduced()){
   const flat = c => { if (!c) return; c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); };
   grid.addEventListener('pointermove', e => {
     if (e.pointerType !== 'mouse') return;
-    const c = e.target.closest('.card');
+    const c = e.target.closest('.pcard');
     if (c !== tilted){ flat(tilted); tilted = c; }
     if (!c) return;
     const r = c.getBoundingClientRect();
@@ -1949,7 +1950,7 @@ function openNew(prefill){
 $('#n-again').onclick = () => openNew();
 $('#n-done').onclick = () => {
   closeOv($('#ov-new'));
-  const el = $('.card');
+  const el = $('.pcard');
   if (el) el.scrollIntoView({behavior:reduced()?'auto':'smooth', block:'center'});
 };
 
@@ -2218,18 +2219,20 @@ function cardArt(i, nr){
     </div>
   </article>`;
 }
-const box = (s, inner) =>
-  `<div class="card-scale" style="transform:scale(${s});width:calc(88mm * ${s});height:calc(125mm * ${s})">${inner}</div>`;
+/* Die Karte skaliert über die Breite ihres Containers, nicht über transform:
+   s=1 ist die Druckgröße von 88mm. Höhe folgt aus dem Seitenverhältnis. */
+const box = (s, inner) => `<div class="card-box" style="width:calc(88mm * ${s})">${inner}</div>`;
 const scaledCard = (i, nr, s) => box(s, cardArt(i, nr));
 const backArt = () => `<article class="ideacard -back"><span class="mark">pilot<i>.</i>Hangar</span></article>`;
 const scaledBack = s => box(s, backArt());
 /* Karte, die sich von der Rückseite auf die Vorderseite dreht. */
 const flipCard = (i, nr, s) => `
-  <div class="flip" style="width:calc(88mm * ${s});height:calc(125mm * ${s})">
+  <div class="flip" style="width:calc(88mm * ${s})">
     <div class="-rear">${scaledBack(s)}</div>
     <div class="-face">${scaledCard(i, nr, s)}</div>
   </div>`;
-/* Nur im Druck bekommt die Karte Schnittmarken — in der Vorschau stören sie. */
+/* Nur im Druck bekommt die Karte Schnittmarken — in der Vorschau stören sie.
+   .cut ist zugleich der Container, an dem die Karte ihre Maße misst. */
 const cutCard = (i, nr) => `<div class="cut">${cardArt(i, nr)}</div>`;
 
 function printScopes(){
@@ -2271,7 +2274,7 @@ function renderPMeta(){
   $('#do-print').disabled = !list.length;
   const prev = list.slice(0,2);
   $('#deck-preview').innerHTML = prev.length
-    ? prev.map((l,n) => scaledCard(l, n+1, .62)).join('') +
+    ? prev.map(l => scaledCard(l, deckNr(l), .62)).join('') +
       (list.length>2 ? `<p style="width:100%;text-align:center;color:var(--fg-3);font-size:1.35rem;padding-top:1rem">… und ${list.length-2} weitere.</p>` : '')
     : `<p style="color:var(--fg-3);padding:3rem;width:100%;text-align:center">Nichts ausgewählt.</p>`;
 }
@@ -2282,8 +2285,11 @@ $('#do-print').onclick = () => {
   const list = selectedCards(); if (!list.length) return;
   const seiten = [];
   for (let n=0;n<list.length;n+=PRO_SEITE) seiten.push(list.slice(n,n+PRO_SEITE));
-  $('#print-area').innerHTML = seiten.map((s,si) =>
-    `<div class="sheet">${s.map((l,n)=>cutCard(l, si*PRO_SEITE+n+1)).join('')}</div>`).join('');
+  /* deckNr statt laufender Blattposition: dieselbe Idee trägt im Board, in der
+     Vorschau und auf dem Papier dieselbe Nummer. Beim gefilterten Deck entstehen
+     dadurch Lücken — genau richtig, die Nummer gehört zur Idee, nicht zum Blatt. */
+  $('#print-area').innerHTML = seiten.map(s =>
+    `<div class="sheet">${s.map(l => cutCard(l, deckNr(l))).join('')}</div>`).join('');
   closeOv($('#ov-print'));
   setTimeout(() => window.print(), 140);
 };
