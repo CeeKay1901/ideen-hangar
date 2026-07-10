@@ -38,15 +38,18 @@ Wer eine Idee eingereicht hat, kann sie später **bearbeiten oder löschen**. De
 Jede Idee bekommt eine Kategorie. Sie beschreibt, **was die Idee bewirkt** — im Unterschied
 zum Track, der beschreibt, **womit sie gebaut wird**.
 
+Jede Kategorie trägt ein zweibuchstabiges Kürzel wie ein Aktenzeichen. Es steht überall
+neben dem ausgeschriebenen Namen — die Karten bleiben also auch schwarzweiß eindeutig.
+
 | | Kategorie | Bedeutung |
 |---|---|---|
-| ⏱ | Zeit zurückholen | Wiederkehrende Handarbeit, die eine Maschine übernehmen könnte |
-| 🔎 | Wissen finden | Informationen, die verstreut sind und jedes Mal neu gesucht werden |
-| ✓ | Fehler vermeiden | Prüfen, was sonst jemand übersieht — vor der Abgabe |
-| 🔄 | Formate übersetzen | Excel zu Slides, Zahlen zu Klartext, Daten zu Text |
-| 🤝 | Zusammenarbeit | Abstimmung, Übergaben, Onboarding, Wissen teilen |
-| 🏆 | Kunde & Pitch | Neues Geschäft gewinnen, Kunden überzeugen |
-| · | Noch offen | Standard — niemand wird gezwungen, sich festzulegen |
+| ZT | Zeit zurückholen | Wiederkehrende Handarbeit, die eine Maschine übernehmen könnte |
+| WS | Wissen finden | Informationen, die verstreut sind und jedes Mal neu gesucht werden |
+| QS | Fehler vermeiden | Prüfen, was sonst jemand übersieht — vor der Abgabe |
+| FM | Formate übersetzen | Excel zu Slides, Zahlen zu Klartext, Daten zu Text |
+| TM | Zusammenarbeit | Abstimmung, Übergaben, Onboarding, Wissen teilen |
+| PT | Kunde & Pitch | Neues Geschäft gewinnen, Kunden überzeugen |
+| — | Noch offen | Standard — niemand wird gezwungen, sich festzulegen |
 
 Ideen aus älteren Board-Ständen landen sichtbar unter *„Noch offen"*, statt still einer
 falschen Kategorie zugeordnet zu werden.
@@ -69,19 +72,21 @@ Drei Auswahlmöglichkeiten:
 Der Dialog zeigt vorab, wie viele Karten, Blätter und Kategorien herauskommen, plus eine
 Vorschau. **Hintergrundgrafiken müssen in den Druckeinstellungen aktiviert sein**, sonst
 bleiben die Kategorie-Köpfe weiß — die Karten funktionieren dann trotzdem, weil jede
-Kategorie neben der Farbe auch ein Symbol und ihren Namen trägt. Auf dem Papier werden
-gedämpftere Farbtöne benutzt als auf dem Bildschirm (`PRINT_HEX`), damit weiße Schrift
-auf dem Kategorie-Kopf lesbar bleibt.
+Kategorie neben der Farbe auch ihr Kürzel und ihren Namen trägt.
 
 ## Oberfläche
 
-Dunkle Produkt-Oberfläche mit einem Akzent (pilot-Gelb) und Kategorien als Leuchtfarben.
+Kein Dark Mode: **Papier, Tinte und ein Gelb.** Der Bildschirm spricht dieselbe Sprache
+wie das gedruckte Kartendeck — weiße Karten mit farbigem Kategorie-Band, schwarzer Fuß,
+Haarlinien statt Schatten. Die Kategoriefarben am Bildschirm *sind* die Druckfarben
+(`PRINT_HEX` = die `--c-*`-Tokens), es gibt also keine Überraschung beim Ausdruck.
+Akzentfarbe ist ausschließlich das pilot-Gelb; es markiert wie ein Textmarker.
 
 - **Command-Palette** mit <kbd>⌘K</kbd> / <kbd>Strg+K</kbd> — alle Aktionen ohne Maus erreichbar.
 - **Kürzel**: <kbd>N</kbd> neue Idee, <kbd>/</kbd> Suche, <kbd>R</kbd> Ideen-Zünder würfeln.
 - **Einreichen in vier Schritten** statt eines langen Formulars: Problem → Kategorie → Werkzeug → Du.
   Am Ende wird die Idea Card sichtbar „gedruckt".
-- Cursor-Spotlight auf Karten, Zähler zählen hoch, Scroll-Reveal, Spring-Kurven.
+- Im Hero liegen zwei **echte Karten** aus dem Board — das Produkt zeigt sich selbst.
 - Alles respektiert `prefers-reduced-motion`. Der Inhalt hängt nie an einer Animation:
   Fällt der IntersectionObserver aus, wird alles sofort sichtbar.
 
@@ -104,12 +109,12 @@ Alles steckt in `index.html`, keine Abhängigkeiten, kein Build.
 |---|---|
 | Hackathon-Datum (Countdown) | `HACKATHON_DATE` |
 | Tracks | `TRACKS`, `TRACK_CARDS` |
-| Kategorien (Name, Symbol, Farbe) | `CATEGORIES` + `--c-*` in den CSS-Tokens |
+| Kategorien (Name, Kürzel, Farbe) | `CATEGORIES` + `--c-*` in den CSS-Tokens |
 | Abteilungen | `DEPTS` |
 | Status-Stufen | `STATUSES` |
 | Beispiel-Ideen | `SEED` |
 | Würfel des Ideen-Zünders | `SPARK_PAINS` |
-| Druckfarben der Kategorien | `PRINT_HEX` |
+| Druckfarben der Kategorien | `PRINT_HEX` (muss zu `--c-*` passen) |
 | Karten pro Druckseite | `PRO_SEITE` |
 
 ## Verwandt
