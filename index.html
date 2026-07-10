@@ -38,7 +38,7 @@
   --line-2:#b3ad9c;
   --fg:#1b1912;        /* Tinte */
   --fg-2:#57534a;
-  --fg-3:#8b8577;
+  --fg-3:#6b6659;   /* ~5,0:1 auf Papier — alter Wert #8b8577 lag bei ~3,3:1 (WCAG AA) */
   --acid:#ffd400;      /* pilot-Gelb — der einzige Akzent */
   --acid-dim:#fdf3c2;
   --ok:#1f7a4d;
@@ -231,6 +231,20 @@ section{padding:9rem 0;position:relative;border-bottom:1px solid var(--line)}
 .head{max-width:60ch;margin-bottom:5.2rem}
 .head h2{font-size:clamp(2.8rem,4.2vw,4.4rem);font-weight:800;letter-spacing:-.025em;line-height:1.06;margin-top:2rem}
 .head p{margin-top:1.8rem;font-size:1.75rem;color:var(--fg-2);line-height:1.65}
+/* „Deine Hand": was dem Spieler gehört — klickbar, filtert auf die eigenen Karten. */
+.hand{
+  display:inline-flex;align-items:center;gap:1.4rem;margin-top:2.4rem;cursor:pointer;
+  background:var(--bg-2);border:1px solid var(--fg);padding:1.1rem 1.6rem;
+  font-family:var(--mono);font-size:1.25rem;color:var(--fg);text-align:left;
+  transition:background .15s,color .15s;
+}
+.hand[hidden]{display:none}
+.hand:hover{background:var(--fg);color:var(--bg)}
+.hand:hover .hand-k{color:var(--bg)}
+.hand b{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+.hand .hand-k{color:var(--fg-2);letter-spacing:.06em;text-transform:uppercase;font-size:1.05rem}
+.hand .hand-sep{width:1px;height:2.2rem;background:var(--line-2)}
+.hand:hover .hand-sep{background:rgba(255,255,255,.3)}
 
 /* ═══ TRACKS ═══ */
 .trk-grid{display:grid;gap:1.6rem;grid-template-columns:1fr}
@@ -356,7 +370,9 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 }
 
 /* Chips liegen über der Karte und ragen an ihren Rand. */
-.chip-row{position:absolute;left:-.6rem;bottom:-1.4rem;z-index:4;display:flex;align-items:center;gap:.6rem;max-width:calc(100% - 6rem)}
+/* Dekorativ und klick-durchlässig: nur .open (ganze Karte) und .vote (Jeton)
+   fangen Klicks, damit ein Klick irgendwo auf der Karte sie öffnet. */
+.chip-row{position:absolute;left:-.6rem;bottom:-1.4rem;z-index:4;display:flex;align-items:center;gap:.6rem;max-width:calc(100% - 6rem);pointer-events:none}
 .st{
   display:inline-flex;align-items:center;gap:.7rem;background:var(--bg-2);border:1px solid var(--fg);
   font-family:var(--mono);font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase;
@@ -374,7 +390,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .flag.-mine{
   position:absolute;left:-.6rem;top:1.6rem;z-index:4;background:var(--bg-2);border:1px solid var(--fg);
   font-family:var(--mono);font-size:1rem;letter-spacing:.12em;text-transform:uppercase;
-  padding:.5rem .9rem;font-weight:600;color:var(--fg);
+  padding:.5rem .9rem;font-weight:600;color:var(--fg);pointer-events:none;
 }
 /* Der Stimm-Chip: ein Jeton, der über die Kartenecke ragt. */
 .vote{
@@ -391,16 +407,13 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .vote:hover .arrow{color:var(--fg)}
 .vote[aria-pressed="true"]{background:var(--acid);color:var(--fg)}
 .vote[aria-pressed="true"] .arrow{color:var(--fg)}
-.vote.bump{animation:bump .5s var(--spring)}
-@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18) rotate(-8deg)}100%{transform:scale(1)}}
-.vote.bump::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--fg);animation:ripple .6s var(--ease) forwards}
-@keyframes ripple{to{transform:scale(1.45);opacity:0}}
-.plus1{
-  position:absolute;left:50%;top:-1rem;transform:translateX(-50%);pointer-events:none;
-  font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--fg);
-  animation:plus1 .9s var(--ease) forwards;
+/* Landepunkt: die aufgestiegene Karte leuchtet kurz gelb, wo sie ankommt. */
+.pcard.risen{animation:risen 1.1s var(--ease)}
+@keyframes risen{
+  0%,100%{filter:drop-shadow(0 1.2rem 2.4rem rgba(27,25,18,.16))}
+  30%{filter:drop-shadow(0 0 1.4rem rgba(255,212,0,.95))}
 }
-@keyframes plus1{0%{opacity:0;transform:translate(-50%,0) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-3.8rem) scale(1)}}
+@media(prefers-reduced-motion:reduce){.pcard.risen{animation:none}}
 
 .demo-note{
   display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;margin-bottom:2.4rem;
@@ -693,7 +706,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ideacard .body h3{font-size:5.91cqw;line-height:1.16;font-weight:700;letter-spacing:-.02em}
 .ideacard .body p{font-size:3.64cqw;line-height:1.45;color:#4a4a4a}
 .ideacard .stats{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:2.84cqw;padding-top:3.41cqw;border-top:1px solid #eee}
-.ideacard .stat .k{font-size:2.39cqw;text-transform:uppercase;letter-spacing:.16em;color:#999;font-weight:600}
+.ideacard .stat .k{font-size:2.39cqw;text-transform:uppercase;letter-spacing:.16em;color:#6f6a5c;font-weight:600}
 .ideacard .stat .v{font-size:3.52cqw;font-weight:600;margin-top:.8cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ideacard .foot{
   padding:3.41cqw 5.68cqw;background:#111;color:#fff;display:flex;align-items:center;gap:3.41cqw;flex-shrink:0;
@@ -878,6 +891,7 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
       <p class="eyebrow">02 · Das Board</p>
       <h2>Alle Ideen</h2>
       <p>Stimme ab, was gebaut werden soll. Öffne eine Idee, um dem Team beizutreten.</p>
+      <button class="hand" id="hand" hidden></button>
     </div>
 
     <div class="toolbar">
@@ -890,6 +904,7 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
         <select class="sort" id="sort" aria-label="Sortierung">
           <option value="votes">Meiste Stimmen</option>
           <option value="new">Neueste</option>
+          <option value="cat">Nach Farbe</option>
           <option value="effort">Kleinster Aufwand</option>
           <option value="crew">Sucht Team</option>
         </select>
@@ -1123,10 +1138,12 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
             <div class="spark-burst" id="burst" aria-hidden="true"></div>
             <div class="holder" id="mint-card"></div>
             <h3>Deine Karte ist im Deck.</h3>
-            <p>Andere können jetzt abstimmen und deinem Team beitreten.</p>
+            <p>Sie liegt jetzt in <b>diesem Browser</b>. Damit die Orga und die Kolleg:innen
+              abstimmen können, exportier dein Board und schick es rüber.</p>
             <div class="acts">
+              <button type="button" class="btn -primary" id="n-export">Board exportieren &amp; teilen</button>
               <button type="button" class="btn -ghost" id="n-again">Noch eine Idee</button>
-              <button type="button" class="btn -primary" id="n-done">Zum Board</button>
+              <button type="button" class="btn -ghost" id="n-done">Zum Board</button>
             </div>
           </div>
         </div>
@@ -1231,6 +1248,8 @@ const CATEGORIES = {
   offen:     {label:'Noch offen',       sym:'—',  color:'var(--c-offen)',     hex:'#5c6066', desc:'Du musst dich nicht festlegen.'}
 };
 const CAT_DEFAULT = 'offen';
+/* Feste Suit-Reihenfolge fürs Sortieren „Nach Farbe" — Reihenfolge der Definition. */
+const CAT_ORDER = Object.fromEntries(Object.keys(CATEGORIES).map((k,n) => [k,n]));
 /* Bildschirm und Papier benutzen dieselben Druckfarben (siehe --c-* im CSS). */
 const PRINT_HEX = {zeit:'#c2571a',wissen:'#2f5fa8',qualitaet:'#1f7a4d',formate:'#6b4ca8',team:'#12706f',pitch:'#a8436f',offen:'#5c6066'};
 
@@ -1244,8 +1263,8 @@ const TRACKS = {
 const TRACK_CARDS = [
   {no:'01', name:'Langdock', hex:'#2f5fa8', nocode:true, tags:['Ohne Programmieren','Agent','Workflow'],
    desc:'Unsere DSGVO-konforme KI-Plattform, EU-gehostet und an unsere Dokumente angebunden. Hier fängst du an, wenn du noch nie etwas gebaut hast: Es wird kein Code geschrieben, nur beschrieben.'},
-  {no:'02', name:'Claude Code', hex:'#ffd400', nocode:false, tags:['Webapp','Skill','Deploy per Push'],
-   desc:'Der Agent in unserer Sandbox schreibt echten Code, du beschreibst das Ziel. Am Ende steht eine Webapp mit einem Link, den du rumschicken kannst.'},
+  {no:'02', name:'Claude Code', hex:'#ffd400', nocode:false, tags:['Webapp','Skill','Sofort online'],
+   desc:'Du beschreibst das Ziel, der Agent in unserer Sandbox schreibt den Code. Am Ende steht eine echte Webapp mit einem Link, den du rumschicken kannst.'},
   {no:'03', name:'Claude Design', hex:'#a8436f', nocode:true, tags:['Ohne Programmieren','Prototyp','Deck'],
    desc:'Kennt unser Design-System. Aus einer Beschreibung entsteht ein Prototyp, ein Deck oder ein One-Pager, der schon nach pilot aussieht.'}
 ];
@@ -1346,7 +1365,29 @@ const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
 const ago=iso=>{const d=Math.floor((Date.now()-new Date(iso))/864e5);return d<=0?'heute':d===1?'gestern':`vor ${d} Tagen`};
 
-const migrate=l=>l.map(i=>({...i,category:CATEGORIES[i.category]?i.category:CAT_DEFAULT}));
+/* Jede Idee auf ein vollständiges Schema bringen. cardHTML/mineIdea lesen
+   i.voters.includes() und i.crew.some() — fehlen diese Arrays (hand-editierte
+   oder alte JSON), stürzt render() ab und ein leeres Board wird gespeichert. */
+function normIdea(i){
+  const str = (v, d='') => typeof v === 'string' ? v : d;
+  const o = {...i};
+  o.title = str(o.title);
+  o.problem = str(o.problem);       // kurz(undefined) in cardArt würde sonst werfen
+  o.solution = str(o.solution);
+  o.dept = str(o.dept, '—');
+  o.author = str(o.author, 'Unbekannt');
+  o.category = CATEGORIES[o.category] ? o.category : CAT_DEFAULT;
+  o.track = TRACKS[o.track] ? o.track : Object.keys(TRACKS)[0];
+  o.effort = EFFORTS[o.effort] ? o.effort : '?';
+  o.status = STATUSES[o.status] ? o.status : 'idee';
+  ['voters','crew','needs'].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  o.crew = o.crew.filter(c => c && typeof c.name === 'string');
+  o.votes = Number.isFinite(+o.votes) ? +o.votes : o.voters.length;
+  o.createdAt = str(o.createdAt) || new Date().toISOString();
+  o.wildcard = !!o.wildcard;
+  return o;
+}
+const migrate=l=>l.map(normIdea);
 function load(){
   try{const raw=localStorage.getItem(STORE_KEY);
     if(raw){const p=JSON.parse(raw); if(Array.isArray(p)){ideas=migrate(p);return}}
@@ -1652,9 +1693,11 @@ function visible(){
     return true;
   });
   const s = filters.sort;
+  const catRank = i => CAT_ORDER[i.category] ?? 99;
   out.sort((a,b) =>
     s==='votes'  ? b.votes-a.votes :
     s==='new'    ? new Date(b.createdAt)-new Date(a.createdAt) :
+    s==='cat'    ? catRank(a)-catRank(b) || b.votes-a.votes :
     s==='effort' ? (EFFORT_ORDER[a.effort]||9)-(EFFORT_ORDER[b.effort]||9) || b.votes-a.votes :
     s==='crew'   ? (b.status==='crew-gesucht')-(a.status==='crew-gesucht') || b.votes-a.votes : 0);
   return out;
@@ -1683,11 +1726,34 @@ function render(){
 
   $('#demo-note').hidden = !ideas.some(isDemo);
   $('#share-view').hidden = !n;
+  renderHand();
   renderPot();
   writeUrl();
 
   renderMetrics(); showReminder();
 }
+
+/* Deine Hand: eigene Karten, Stimmen darauf, beigetretene Teams. Klick filtert
+   auf „Von mir". Nur sichtbar, wenn ein Name gesetzt ist. */
+function renderHand(){
+  const el = $('#hand');
+  if (!me){ el.hidden = true; return; }
+  const eigene = ideas.filter(i => i.author === me);
+  const stimmen = eigene.reduce((a,i) => a + i.votes, 0);
+  const teams = ideas.filter(i => i.crew.some(c => c.name === me)).length;
+  if (!eigene.length && !teams){ el.hidden = true; return; }
+  el.hidden = false;
+  el.setAttribute('aria-pressed', String(filters.mine));
+  el.innerHTML =
+    `<span><span class="hand-k">Deine Karten</span> <b>${eigene.length}</b></span><span class="hand-sep"></span>` +
+    `<span><span class="hand-k">Stimmen darauf</span> <b>${stimmen}</b></span><span class="hand-sep"></span>` +
+    `<span><span class="hand-k">Teams</span> <b>${teams}</b></span>`;
+}
+$('#hand').onclick = () => {
+  filters.mine = !filters.mine;
+  const b = $('[data-mine]'); if (b) b.setAttribute('aria-pressed', String(filters.mine));
+  render(); $('#board').scrollIntoView({behavior:reduced()?'auto':'smooth'});
+};
 
 async function removeDemos(){
   const n = ideas.filter(isDemo).length;
@@ -1710,21 +1776,29 @@ function cardHTML(i, n){
   const team = i.crew.slice(0,3).map(x => `<span class="av" title="${esc(x.name)}">${esc(inits(x.name))}</span>`).join('');
   const more = i.crew.length > 3 ? `<span class="av -more" title="${i.crew.length-3} weitere">+${i.crew.length-3}</span>` : '';
   const d = reduced() ? 0 : Math.min(n,11)*0.045;
+  /* Der Screenreader hört genau eine Karte: die visuelle Idea Card und die Chips
+     sind aria-hidden (sonst dreifache Ansage), der Öffnen-Knopf trägt die ganze
+     Zusammenfassung. Der Stimm-Jeton bleibt ein eigener, echter Knopf. */
+  const teamText = i.crew.length
+    ? `Team: ${i.crew.length} ${i.crew.length===1?'Person':'Personen'}`
+    : 'sucht noch ein Team';
+  const label = `${i.title}. ${cat(i).label}, ${STATUSES[i.status].label}, ` +
+    `${i.votes} ${i.votes===1?'Stimme':'Stimmen'}, ${teamText}${isDemo(i)?', Beispiel-Idee':''}. Details öffnen`;
   return `
   <div class="deal" style="animation-delay:${d}s">
   <article class="pcard ${i.wildcard?'-wild':''}" data-id="${i.id}">
-    <div class="card-box">${cardArt(i, deckNr(i))}</div>
+    <div class="card-box" aria-hidden="true">${cardArt(i, deckNr(i))}</div>
     ${isDemo(i) ? '<span class="stamp" aria-hidden="true">Beispiel</span>' : ''}
-    ${mineIdea(i) ? '<span class="flag -mine">Von dir</span>' : ''}
-    <button class="open" data-open="${i.id}"><span class="sr">${esc(i.title)} — Details öffnen</span></button>
-    <div class="chip-row">
+    ${mineIdea(i) ? '<span class="flag -mine" aria-hidden="true">Von dir</span>' : ''}
+    <button class="open" data-open="${i.id}" aria-label="${esc(label)}"></button>
+    <div class="chip-row" aria-hidden="true">
       <span class="st" data-s="${i.status}">${esc(STATUSES[i.status].label)}</span>
       <span class="team">${i.crew.length
         ? team + more
-        : `<span class="av -none" title="Dieses Team sucht noch Leute" aria-hidden="true">?</span>`}</span>
+        : `<span class="av -none" title="Dieses Team sucht noch Leute">?</span>`}</span>
     </div>
     <button class="vote" data-vote="${i.id}" aria-pressed="${voted}"
-      aria-label="${voted?`Stimme für „${esc(i.title)}" zurückziehen`:`Für „${esc(i.title)}" stimmen`}">
+      aria-label="${voted?`Stimme für „${esc(i.title)}“ zurückziehen`:`Für „${esc(i.title)}“ stimmen`}">
       <span class="arrow" aria-hidden="true">▲</span><b>${i.votes}</b></button>
   </article></div>`;
 }
@@ -1732,7 +1806,7 @@ function cardHTML(i, n){
 function renderWho(){
   $('#who').innerHTML = me
     ? `${esc(me)} · <button class="btn -ghost -sm" id="chg" style="padding:.5rem 1.2rem;font-size:1.05rem">Wechseln</button>`
-    : 'Nicht angemeldet';
+    : 'Kein Name gesetzt — nur lokal';
   const b = $('#chg');
   if (b) b.onclick = async () => {
     const n = await mini({tag:'Name ändern', title:'Wer bist du?',
@@ -1749,26 +1823,56 @@ async function vote(id, btn){
   if (!await ensureMe('Damit jede Person nur einmal pro Idee abstimmt.')) return;
   const i = ideas.find(x => x.id === id); if (!i) return;
   const at = i.voters.indexOf(me);
-  if (at > -1){ i.voters.splice(at,1); i.votes = Math.max(0,i.votes-1); }
-  else{
+  const kurz = i.title.slice(0,34) + (i.title.length>34?'…':'');
+  if (at > -1){
+    i.voters.splice(at,1); i.votes = Math.max(0,i.votes-1);
+    /* Zurückziehen ist ein Zug wie das Setzen — also auch mit Rückmeldung. */
+    toast(`Stimme zurückgezogen von <b>${esc(kurz)}</b>`);
+  } else {
     i.voters.push(me); i.votes++;
-    if (btn && !reduced()){
-      btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
-      const p = Object.assign(document.createElement('span'), {className:'plus1', textContent:'+1'});
-      p.setAttribute('aria-hidden','true');
-      btn.appendChild(p); setTimeout(() => p.remove(), 950);
-    }
-    toast(`Stimme für <b>${esc(i.title.slice(0,34))}${i.title.length>34?'…':''}</b>`);
+    toast(`Stimme für <b>${esc(kurz)}</b>`);
   }
   save();
-  const card = $(`.pcard[data-id="${id}"]`);
-  if (card && btn){
-    btn.setAttribute('aria-pressed', String(i.voters.includes(me)));
-    $('b', btn).textContent = i.votes;
-    renderMetrics(); showReminder();
-  } else render();
+  /* Der Kernzug des Spiels: die Karte steigt sichtbar im Deck auf. Früher lief
+     hier ein Schnellpfad, der nur den Jeton hochzählte — Rangnummer, Reihenfolge
+     und aria-label veralteten still. Jetzt rendert das Board neu und die Karte
+     klettert per FLIP an ihre neue Position. */
+  flipRender(id);
   const d = $('#ov-detail');
   if (d.classList.contains('open') && d.dataset.id === id) openDetail(id, true);
+}
+
+/* FLIP: First/Last-Positionen messen, die verschobene Karte von ihrer alten
+   Stelle zurück an die neue gleiten lassen. Läuft auf dem .deal-Wrapper, nicht
+   auf der .pcard — die trägt den Kipp-Effekt, beides auf transform prügelt sich. */
+function flipRender(risenId){
+  const grid = $('#grid');
+  if (reduced() || !grid.children.length){ render(); showReminder(); return; }
+  const first = new Map();
+  $$('#grid .pcard').forEach(c => first.set(c.dataset.id, c.closest('.deal').getBoundingClientRect()));
+  render();
+  /* dealIn abschalten, bevor gemessen wird — sonst verfälscht dessen transform die Last-Position. */
+  $$('#grid .pcard').forEach(c => { if (first.has(c.dataset.id)) c.closest('.deal').style.animation = 'none'; });
+  const moved = [];
+  $$('#grid .pcard').forEach(c => {
+    const f = first.get(c.dataset.id); if (!f) return;
+    const deal = c.closest('.deal');
+    const l = deal.getBoundingClientRect();
+    const dx = f.left - l.left, dy = f.top - l.top;
+    if (!dx && !dy) return;
+    deal.style.transition = 'none';
+    deal.style.transform = `translate(${dx}px, ${dy}px)`;
+    moved.push([deal, c.dataset.id]);
+  });
+  requestAnimationFrame(() => moved.forEach(([deal, cid]) => {
+    deal.style.transition = 'transform .6s var(--spring)';
+    deal.style.transform = '';
+    if (cid === risenId){
+      const p = deal.querySelector('.pcard');
+      p.classList.remove('risen'); void p.offsetWidth; p.classList.add('risen');
+    }
+    deal.addEventListener('transitionend', () => { deal.style.transition = ''; }, {once:true});
+  }));
 }
 $('#grid').addEventListener('click', e => {
   const v = e.target.closest('[data-vote]'); if (v){ vote(v.dataset.vote, v); return; }
@@ -1948,6 +2052,7 @@ function openNew(prefill){
   openOv('#ov-new', '#i-title');
 }
 $('#n-again').onclick = () => openNew();
+$('#n-export').onclick = () => { closeOv($('#ov-new')); exportJSON(); };
 $('#n-done').onclick = () => {
   closeOv($('#ov-new'));
   const el = $('.pcard');
@@ -2150,11 +2255,14 @@ function renderPot(){
     drawnIdea = null; $('#draw-open').disabled = true;
     $('#pot-slot').innerHTML = '<p class="pot-empty">Hier landet deine Karte.</p>';
   }
-  $('#pot-stack').innerHTML = pool.length ? scaledBack(.5).repeat(Math.min(pool.length, 3)) : '';
-  $('#draw').disabled = !pool.length;
+  /* Der Stapel wird sichtbar dünner: die Zahl der Rückseiten folgt den noch nicht
+     gezogenen Karten. Ein Kartenspiel-Stapel schrumpft, bis er durch ist. */
   const rest = pool.length - gezogen.size;
+  const dick = Math.max(0, Math.min(rest, 3));
+  $('#pot-stack').innerHTML = scaledBack(.5).repeat(dick);
+  $('#draw').disabled = !pool.length;
   $('#pot-left').textContent = !pool.length ? 'Der Stapel ist leer — alles schon gebaut.'
-    : drawnIdea ? `Noch ${rest} von ${pool.length} Karten im Stapel`
+    : drawnIdea ? (rest ? `Noch ${rest} von ${pool.length} Karten im Stapel` : `Stapel durch — beim nächsten Zug wird neu gemischt`)
     : `${pool.length} ${pool.length===1?'Karte':'Karten'} im Stapel`;
 }
 function draw(){
@@ -2374,7 +2482,7 @@ $('#reset').onclick = async () => {
 load();
 {
   const sv = localStorage.getItem('pilot-hangar-sort');
-  if (sv && ['votes','new','effort','crew'].includes(sv)){ filters.sort = sv; $('#sort').value = sv; }
+  if (sv && ['votes','new','cat','effort','crew'].includes(sv)){ filters.sort = sv; $('#sort').value = sv; }
 }
 renderTracks();
 renderFilters();

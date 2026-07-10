@@ -95,7 +95,14 @@ Und weil das Ding am Ende ein **Kartendeck** druckt, benimmt sich der Bildschirm
   und die Karte dreht sich von der Rückseite ins Deck.
 - **Der Kartentisch.** Die Karten werden ausgeteilt, neigen sich zum Zeiger und fangen Licht.
   Wildcards schillern wie eine Holo-Sammelkarte.
-- **Der Lostopf** mit echtem Stapel und Kartenrückseite.
+- **Die Karte steigt auf.** Der Kernzug des Spiels: eine Stimme, und die Karte klettert per
+  FLIP-Animation sichtbar an ihre neue Position im Deck und leuchtet dort kurz gelb auf. Damit
+  werden zugleich die aufgedruckte Rangnummer und das Vorlese-Label wieder ehrlich.
+- **Nach Farbe sortieren.** Neben Stimmen/Neueste/Aufwand/Team legt „Nach Farbe" das Deck nach
+  Suits zusammen — die Kartenspiel-Geste, gleiche Farben beieinander zu sehen.
+- **Deine Hand.** Über dem Board zeigt eine Leiste, was dir gehört: deine Karten, die Stimmen
+  darauf, deine Teams. Ein Klick filtert auf deine Karten.
+- **Der Lostopf** mit echtem Stapel und Kartenrückseite — der Stapel wird beim Ziehen sichtbar dünner.
 
 Möglich wird das durch **eine einzige Karte für alle Größen**: Sämtliche Innenmaße der
 Idea Card hängen an der Breite ihres Containers (`cqw`), nicht an Millimetern. Bei 88 mm
