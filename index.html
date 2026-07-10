@@ -293,23 +293,57 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 @media(max-width:920px){.tb-meta{width:100%;margin:1rem 0 0;justify-content:space-between}}
 
 /* ═══ IDEA CARDS (Board) ═══
-   Weiße Karteikarten mit Kategorie-Band oben — wie im Druck. */
+   Ein Kartentisch: die Karten werden ausgeteilt, kippen unter dem Zeiger und
+   fangen Licht. Wildcards schillern. Alles nur Deko — ohne sie bleibt jede
+   Karte vollständig lesbar und bedienbar. */
 .grid{display:grid;gap:1.6rem;grid-template-columns:1fr}
 @media(min-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}
+/* Perspektive gehört auf den direkten Elternteil der gekippten Karte. */
+.deal{display:grid;perspective:1200px;animation:dealIn .55s var(--spring) backwards}
+@keyframes dealIn{
+  from{opacity:0;transform:translate(-2.5rem,-1.5rem) rotate(-4deg) scale(.94)}
+  to{opacity:1;transform:none}
+}
 .card{
   --cc:var(--c-offen);
   position:relative;background:var(--bg-2);border:1px solid var(--line);
   padding:2.6rem;display:flex;flex-direction:column;gap:1.4rem;min-height:28rem;
   overflow:hidden; /* macht die Karte im Grid schrumpfbar (nowrap-Metazeile) */
-  transition:border-color .15s;
-  opacity:0;transform:translateY(.8rem);animation:cardIn .4s var(--ease) forwards;
+  transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0);
+  transition:transform .4s var(--ease),border-color .15s,box-shadow .4s var(--ease);
 }
-@keyframes cardIn{to{opacity:1;transform:none}}
 /* Kategorie-Band oben, wie auf der gedruckten Karte */
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:.4rem;background:var(--cc)}
-.card:hover{border-color:var(--fg)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:.4rem;background:var(--cc);z-index:2}
+/* Licht auf Papier. Weißer Glanz wäre auf weißem Karton unsichtbar, also
+   arbeiten wir umgekehrt: unter dem Zeiger bleibt die Karte hell, zum Rand hin
+   legt sich ein Hauch Schatten. z-index:-1 hält das Ganze unter dem Text — die
+   Karte hat durch ihr rotateX/Y bereits einen eigenen Stapelkontext. */
+.card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:0;transition:opacity .35s;
+  background:radial-gradient(48rem circle at var(--mx,50%) var(--my,50%),transparent 0%,rgba(27,25,18,.09) 75%);
+  mix-blend-mode:multiply;
+}
+.card:hover{border-color:var(--fg);box-shadow:0 2.6rem 5rem -1.6rem rgba(27,25,18,.34)}
+.card:hover::after{opacity:1}
 .card:focus-within{border-color:var(--cc)}
+/* Wildcards schillern wie eine Holo-Sammelkarte. */
+.card.-wild{border-color:var(--acid)}
+.card.-wild::after{
+  background:
+    linear-gradient(112deg,transparent 26%,rgba(255,212,0,.75) 38%,rgba(244,114,182,.6) 47%,
+      rgba(91,141,255,.6) 56%,rgba(61,214,140,.55) 64%,transparent 76%),
+    radial-gradient(40rem circle at var(--mx,50%) var(--my,50%),transparent 0%,rgba(27,25,18,.08) 80%);
+  background-size:230% 230%,100% 100%;
+  background-position:var(--mx,50%) var(--my,50%),0 0;
+  mix-blend-mode:multiply;
+  opacity:.16;   /* auch in Ruhe ein Schimmer, aber der Text bleibt Chef */
+}
+.card.-wild:hover::after{opacity:.6}
+@media(prefers-reduced-motion:reduce){
+  .card{transform:none !important}
+  .card::after{display:none}
+}
 .c-top{display:flex;justify-content:space-between;align-items:center;gap:1rem}
 .c-cat{display:inline-flex;align-items:center;gap:.8rem;font-family:var(--mono);font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cc);font-weight:600}
 .c-cat .sym{font-size:1.05rem;border:1px solid currentColor;padding:.15rem .45rem}
@@ -351,6 +385,12 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .vote.bump::after{content:'';position:absolute;inset:-1px;border:1.5px solid var(--fg);animation:ripple .6s var(--ease) forwards}
 @keyframes ripple{to{transform:scale(1.4);opacity:0}}
+.plus1{
+  position:absolute;left:50%;top:-.4rem;transform:translateX(-50%);pointer-events:none;
+  font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--fg);
+  animation:plus1 .9s var(--ease) forwards;
+}
+@keyframes plus1{0%{opacity:0;transform:translate(-50%,0) scale(.7)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-3.4rem) scale(1)}}
 
 .demo-note{
   display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap;margin-bottom:2.4rem;
@@ -386,6 +426,41 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .spark-out{max-width:64ch;margin:0 auto;text-align:center;font-size:clamp(1.8rem,2.1vw,2.3rem);font-weight:400;line-height:1.6;color:var(--fg-2);min-height:7rem;letter-spacing:-.01em}
 .spark-out b{color:var(--fg);font-weight:600;background:var(--acid);padding:0 .5rem;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .spark-act{display:flex;gap:1rem;justify-content:center;margin-top:3.2rem;flex-wrap:wrap}
+
+/* ═══ LOSTOPF ═══ */
+.pot{
+  margin-top:7rem;border:1px solid var(--line);background:var(--bg-1);padding:3.6rem;
+  display:grid;gap:3.6rem;grid-template-columns:1fr;align-items:center;
+}
+@media(min-width:940px){.pot{grid-template-columns:1fr auto;padding:4.4rem}}
+.pot-hd h3{font-size:2.6rem;font-weight:800;letter-spacing:-.025em;margin-top:1.4rem}
+.pot-hd > p{margin-top:1rem;color:var(--fg-2);font-size:1.55rem;line-height:1.6;max-width:44ch}
+.pot-act{display:flex;gap:.8rem;margin-top:2.4rem;flex-wrap:wrap}
+.pot-left{margin-top:1.4rem;font-family:var(--mono);font-size:1.1rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);min-height:1.6rem}
+.pot-table{display:flex;align-items:center;justify-content:center;gap:3.2rem;perspective:1400px}
+/* translate() vor scale(), sonst schrumpft der Versatz mit und der Stapel
+   sieht aus wie eine einzelne dicke Karte. */
+.pot-stack{position:relative;width:calc(88mm * .5);height:calc(125mm * .5);flex-shrink:0}
+.pot-stack .card-scale{position:absolute;left:0;top:0}
+.pot-stack .card-scale:nth-child(1){transform:translate(-2.4rem,1.6rem) rotate(-6deg) scale(.5) !important}
+.pot-stack .card-scale:nth-child(2){transform:translate(-1.1rem,.7rem) rotate(3deg) scale(.5) !important}
+.pot-stack .card-scale:nth-child(3){transform:rotate(-1deg) scale(.5) !important}
+.pot-slot{
+  width:calc(88mm * .5);height:calc(125mm * .5);flex-shrink:0;position:relative;
+  border:1px dashed var(--line-2);display:grid;place-items:center;
+}
+.pot-slot:has(.flip){border-color:transparent}
+.pot-empty{font-family:var(--mono);font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);text-align:center;padding:1rem}
+/* Schmale Viewports: nebeneinander wäre die gezogene Karte unleserlich klein.
+   Also untereinander — Stapel oben, Ziehung darunter, beide groß genug zum Lesen. */
+@media(max-width:560px){
+  .pot{padding:2.6rem 2rem}
+  .pot-table{flex-direction:column;gap:3.4rem;padding-left:1.6rem}
+  .pot-stack,.pot-slot{width:calc(88mm * .46);height:calc(125mm * .46)}
+  .pot-stack .card-scale:nth-child(1){transform:translate(-1.4rem,1rem) rotate(-6deg) scale(.46) !important}
+  .pot-stack .card-scale:nth-child(2){transform:translate(-.6rem,.45rem) rotate(3deg) scale(.46) !important}
+  .pot-stack .card-scale:nth-child(3){transform:rotate(-1deg) scale(.46) !important}
+}
 /* Schwarzer Kasten — wie der Fuß der gedruckten Karte */
 .deck-note{
   margin-top:7rem;border:1px solid var(--fg);padding:3.2rem;
@@ -437,6 +512,30 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .psteps{display:flex;justify-content:space-between;padding:1.4rem 3rem .6rem;font-family:var(--mono);font-size:1rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3)}
 .psteps span[data-on="true"]{color:var(--fg);font-weight:600}
 @media(max-width:640px){.pbar,.psteps{margin-left:2rem;margin-right:2rem;padding-left:0;padding-right:0}.psteps{font-size:.88rem;letter-spacing:.08em}}
+/* ═══ PRÄGEWERK ═══
+   Rechts wächst die echte Idea Card mit, während links getippt wird.
+   Ab 1040px — darunter fehlt die Breite und der Text hat Vorrang. */
+.stage-wrap{display:block}
+.press{display:none}
+@media(min-width:1040px){
+  #ov-new .panel{max-width:102rem}
+  .stage-wrap{display:grid;grid-template-columns:1fr 32rem;align-items:stretch}
+  .stage-wrap[data-solo="true"]{grid-template-columns:1fr}
+  .stage-wrap[data-solo="true"] .press{display:none}
+  .press{
+    display:flex;flex-direction:column;align-items:center;gap:1.8rem;
+    border-left:1px solid var(--line);background:var(--bg-3);padding:3rem 2rem;
+  }
+}
+.press-k{font-family:var(--mono);font-size:1.05rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3)}
+.press-holder{width:calc(88mm * .58);height:calc(125mm * .58);position:relative}
+.press-holder .ideacard{transition:transform .5s var(--spring)}
+.press-holder .card-scale{position:absolute;left:0;top:0}
+.press-hint{font-size:1.3rem;color:var(--fg-3);text-align:center;line-height:1.5;margin-top:auto;max-width:26ch}
+/* Wenn die Kategorie wechselt, zuckt die Karte kurz. */
+.press-holder.-beat .ideacard{animation:beat .45s var(--spring)}
+@keyframes beat{0%{transform:scale(1)}45%{transform:scale(1.045) rotate(-.6deg)}100%{transform:scale(1)}}
+
 .stage{position:relative}
 .pane{display:none;padding:3rem}
 .pane[data-on="true"]{display:block;animation:paneIn .35s var(--ease)}
@@ -600,6 +699,31 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
   position:absolute;top:0;right:0;background:var(--acid);color:#111;font-size:2.3mm;font-weight:800;
   letter-spacing:.14em;text-transform:uppercase;padding:1.4mm 3mm;border-radius:0 0 0 2mm;z-index:3;
 }
+/* Rückseite — dieselben Maße, damit sich die Karte sauber umdrehen lässt. */
+.ideacard.-back{
+  background:#1b1912;border-color:#1b1912;align-items:center;justify-content:center;
+  background-image:
+    radial-gradient(circle,rgba(255,212,0,.5) .5mm,transparent .55mm),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 1mm,transparent 1mm 3mm);
+  background-size:7mm 7mm,auto;
+}
+.ideacard.-back .mark{
+  color:#fff;font-size:3.4mm;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+  border:.4mm solid rgba(255,255,255,.28);padding:2.5mm 4mm;background:#1b1912;
+}
+.ideacard.-back .mark i{font-style:normal;color:var(--acid)}
+
+/* Umdrehen: startet auf der Rückseite, landet auf der Vorderseite. */
+.flip{position:relative;transform-style:preserve-3d;animation:flipIn 1.05s var(--spring) backwards}
+.flip > *{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.flip > .-rear{transform:rotateY(180deg)}
+@keyframes flipIn{
+  0%{opacity:0;transform:rotateY(180deg) translateY(3rem) scale(.86)}
+  25%{opacity:1}
+  100%{opacity:1;transform:none}
+}
+@media(prefers-reduced-motion:reduce){.flip{animation:none}}
+
 .card-scale{transform-origin:top left}
 .card-scale .ideacard{box-shadow:0 10px 28px rgba(27,25,18,.18)}
 .deck-preview{background:var(--bg-3);border:1px solid var(--line);padding:2rem;overflow:auto;max-height:44vh;display:flex;gap:1.6rem;flex-wrap:wrap;justify-content:center}
@@ -710,8 +834,9 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
       <span class="l"><span>Wir bauen es.</span></span>
     </h1>
     <p class="lead">
-      Zwei Felder, neunzig Sekunden. Ob daraus ein Assistent, eine kleine Webapp oder ein
-      Prototyp wird, findet dein Team beim Hackathon heraus.
+      Zwei Felder, neunzig Sekunden — und du hältst deine eigene Karte im Deck. Ob daraus
+      ein Assistent, eine kleine Webapp oder ein Prototyp wird, findet dein Team beim
+      Hackathon heraus.
     </p>
     <div class="hero-cta">
       <button class="btn -primary" data-new>Idee einreichen <kbd>N</kbd></button>
@@ -792,7 +917,7 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
     <div class="head rv">
       <p class="eyebrow">03 · Keine Idee?</p>
       <h2>Der Ideen-Zünder</h2>
-      <p>Drei Zufallswürfe: eine Abteilung, ein Schmerzpunkt, ein Werkzeug. Wirf, bis es klick macht.</p>
+      <p>Zwei Wege: würfeln, bis es klick macht — oder blind eine Karte aus dem Stapel ziehen.</p>
     </div>
     <div class="slots">
       <div class="slot" id="slot-dept"><p class="k">Abteilung</p><p class="v">—</p></div>
@@ -803,6 +928,24 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
     <div class="spark-act">
       <button class="btn -primary" id="roll">Würfeln <kbd>R</kbd></button>
       <button class="btn -ghost" id="spark-take" disabled>Als Idee übernehmen</button>
+    </div>
+
+    <div class="pot rv" id="pot">
+      <div class="pot-hd">
+        <p class="eyebrow">Oder zieh eine Karte</p>
+        <h3>Der Lostopf</h3>
+        <p>Derselbe Stapel, den du gleich ausdruckst — nur schon gemischt. Zieh blind eine Idee
+          und schau, ob sie dich packt.</p>
+        <div class="pot-act">
+          <button type="button" class="btn -primary" id="draw">Karte ziehen <kbd>Z</kbd></button>
+          <button type="button" class="btn -ghost" id="draw-open" disabled>Idee öffnen</button>
+        </div>
+        <p class="pot-left" id="pot-left" role="status" aria-live="polite"></p>
+      </div>
+      <div class="pot-table">
+        <div class="pot-stack" id="pot-stack" aria-hidden="true"></div>
+        <div class="pot-slot" id="pot-slot"><p class="pot-empty">Hier landet deine Karte.</p></div>
+      </div>
     </div>
 
     <div class="deck-note rv">
@@ -902,6 +1045,7 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
     <div class="pbar"><div class="fill" id="pfill"></div></div>
 
     <form id="n-form" novalidate>
+     <div class="stage-wrap" id="stage-wrap">
       <div class="stage" id="stage">
 
         <div class="pane" data-pane="0" data-on="true">
@@ -980,6 +1124,13 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
         </div>
 
       </div>
+
+      <aside class="press" id="press">
+        <p class="press-k">Deine Karte</p>
+        <div class="press-holder"><div id="press-card"></div></div>
+        <p class="press-hint" id="press-hint">Sie entsteht, während du tippst.</p>
+      </aside>
+     </div>
 
       <div class="p-nav" id="p-nav">
         <button type="button" class="btn -ghost -sm" id="n-back">Zurück</button>
@@ -1310,6 +1461,7 @@ const CMDS = [
   {name:'Neue Idee einreichen', sc:'N', run:()=>openNew()},
   {name:'Ideen durchsuchen',    sc:'/', run:()=>{ $('#board').scrollIntoView(); setTimeout(()=>$('#q').focus(),400); }},
   {name:'Ideen-Zünder würfeln', sc:'R', run:()=>{ $('#zuender').scrollIntoView(); setTimeout(roll,400); }},
+  {name:'Karte aus dem Lostopf ziehen', sc:'Z', run:()=>{ $('#pot').scrollIntoView({block:'center'}); setTimeout(draw,400); }},
   {name:'Idea Cards drucken',   sc:'',  run:()=>openPrint()},
   {name:'Nur meine Ideen zeigen',sc:'', run:()=>{ const b=$('[data-mine]'); filters.mine=!filters.mine; b.setAttribute('aria-pressed',String(filters.mine)); render(); $('#board').scrollIntoView(); }},
   {name:'Board als JSON exportieren', sc:'', run:()=>exportJSON()},
@@ -1381,6 +1533,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'n' || e.key === 'N'){ e.preventDefault(); openNew(); }
   else if (e.key === '/'){ e.preventDefault(); $('#board').scrollIntoView(); setTimeout(()=>$('#q').focus(),400); }
   else if (e.key === 'r' || e.key === 'R'){ e.preventDefault(); $('#zuender').scrollIntoView(); setTimeout(roll,400); }
+  else if (e.key === 'z' || e.key === 'Z'){ e.preventDefault(); $('#pot').scrollIntoView({block:'center'}); setTimeout(draw,400); }
 });
 
 /* ═══ NAV ═══ */
@@ -1522,6 +1675,7 @@ function render(){
 
   $('#demo-note').hidden = !ideas.some(isDemo);
   $('#share-view').hidden = !n;
+  renderPot();
   writeUrl();
 
   renderMetrics(); showReminder();
@@ -1544,9 +1698,12 @@ function cardHTML(i, n){
   const voted = me && i.voters.includes(me);
   const team = i.crew.slice(0,3).map(x => `<span class="av" title="${esc(x.name)}">${esc(inits(x.name))}</span>`).join('');
   const more = i.crew.length > 3 ? `<span class="av -more">+${i.crew.length-3}</span>` : '';
-  const d = reduced() ? 0 : Math.min(n,11)*0.04;
+  const d = reduced() ? 0 : Math.min(n,11)*0.045;
+  /* Der .deal-Wrapper trägt die Austeil-Animation, die .card den Kipp-Effekt.
+     Beides auf demselben Element würde sich um transform prügeln. */
   return `
-  <article class="card" style="--cc:${c.color};animation-delay:${d}s" data-id="${i.id}">
+  <div class="deal" style="animation-delay:${d}s">
+  <article class="card ${i.wildcard?'-wild':''}" style="--cc:${c.color}" data-id="${i.id}">
     <div class="c-top">
       <span class="c-cat"><span class="sym" aria-hidden="true">${c.sym}</span>${esc(c.label)}</span>
       <span class="c-no">#${String(n+1).padStart(2,'0')}</span>
@@ -1568,7 +1725,7 @@ function cardHTML(i, n){
         aria-label="${voted?`Stimme für „${esc(i.title)}" zurückziehen`:`Für „${esc(i.title)}" stimmen`}">
         <span class="arrow" aria-hidden="true">▲</span><b>${i.votes}</b></button>
     </div>
-  </article>`;
+  </article></div>`;
 }
 
 function renderWho(){
@@ -1594,7 +1751,12 @@ async function vote(id, btn){
   if (at > -1){ i.voters.splice(at,1); i.votes = Math.max(0,i.votes-1); }
   else{
     i.voters.push(me); i.votes++;
-    if (btn && !reduced()){ btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump'); }
+    if (btn && !reduced()){
+      btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+      const p = Object.assign(document.createElement('span'), {className:'plus1', textContent:'+1'});
+      p.setAttribute('aria-hidden','true');
+      btn.appendChild(p); setTimeout(() => p.remove(), 950);
+    }
     toast(`Stimme für <b>${esc(i.title.slice(0,34))}${i.title.length>34?'…':''}</b>`);
   }
   save();
@@ -1611,6 +1773,28 @@ $('#grid').addEventListener('click', e => {
   const v = e.target.closest('[data-vote]'); if (v){ vote(v.dataset.vote, v); return; }
   const o = e.target.closest('[data-open]'); if (o) openDetail(o.dataset.open);
 });
+
+/* ═══ KARTEN KIPPEN ═══
+   Die Karte neigt sich zum Zeiger und fängt Licht. Beim Wechsel auf eine andere
+   Karte muss die alte zurückgestellt werden — sonst bleibt sie schief liegen. */
+if (!reduced()){
+  const grid = $('#grid');
+  let tilted = null;
+  const flat = c => { if (!c) return; c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); };
+  grid.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const c = e.target.closest('.card');
+    if (c !== tilted){ flat(tilted); tilted = c; }
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    c.style.setProperty('--ry', ((px - .5) * 9).toFixed(2) + 'deg');
+    c.style.setProperty('--rx', ((.5 - py) * 9).toFixed(2) + 'deg');
+    c.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+    c.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+  }, {passive:true});
+  grid.addEventListener('pointerleave', () => { flat(tilted); tilted = null; });
+}
 
 /* ═══ SUBMIT-FLOW ═══ */
 const PANES = 4;
@@ -1656,6 +1840,44 @@ function checkDup(){
        Meinst du etwas anderes? Dann reich sie ruhig ein.</div>` : '';
 }
 
+/* ═══ PRÄGEWERK ═══
+   Die Vorschau ist keine Attrappe: sie rendert dieselbe cardArt(), die später
+   auf dem Papier landet. Wer tippt, sieht sein Los entstehen. */
+const PRESS_HINTS = [
+  'Titel und Problem stehen vorne auf der Karte.',
+  'Die Kategorie färbt den Kopf — auch im Druck.',
+  'Track und Aufwand stehen unten in den Feldern.',
+  'Dein Name kommt in die Fußzeile. Wildcards bekommen einen goldenen Rand.'
+];
+function draftIdea(){
+  return {
+    id:'draft',
+    title:$('#i-title').value.trim() || 'Noch ohne Titel',
+    problem:$('#i-problem').value.trim() || 'Was dich nervt, erscheint hier — schreib einen Satz.',
+    solution:'',
+    category:(nForm.querySelector('input[name=category]:checked')||{value:CAT_DEFAULT}).value,
+    track:(nForm.querySelector('input[name=track]:checked')||{value:Object.keys(TRACKS)[0]}).value,
+    dept:$('#i-dept').value || '—',
+    effort:$('#i-effort').value || '?',
+    author:$('#i-author').value.trim() || me || 'Du',
+    wildcard:$('#i-wild').checked,
+    votes:1
+  };
+}
+let lastCat = null;
+function updatePress(){
+  if (step >= PANES) return;
+  const d = draftIdea();
+  $('#press-card').innerHTML = scaledCard(d, ideas.length + 1, .58);
+  const h = $('.press-holder');
+  if (lastCat !== null && lastCat !== d.category && !reduced()){
+    h.classList.remove('-beat'); void h.offsetWidth; h.classList.add('-beat');
+  }
+  lastCat = d.category;
+}
+nForm.addEventListener('input', updatePress);
+nForm.addEventListener('change', updatePress);
+
 function goStep(n, back){
   step = n;
   $$('.pane', $('#stage')).forEach(p => {
@@ -1670,7 +1892,9 @@ function goStep(n, back){
   $('#n-title').textContent = done ? 'Willkommen im Board' : 'Erzähl uns davon';
   $('#n-back').style.visibility = n === 0 ? 'hidden' : 'visible';
   $('#n-hint').textContent = `Schritt ${n+1} von ${PANES}`;
-  $('#n-next').innerHTML = n === PANES-1 ? 'Idee einreichen <kbd>⏎</kbd>' : 'Weiter <kbd>⏎</kbd>';
+  $('#n-next').innerHTML = n === PANES-1 ? 'Karte prägen <kbd>⏎</kbd>' : 'Weiter <kbd>⏎</kbd>';
+  $('#stage-wrap').dataset.solo = String(done);
+  if (!done){ $('#press-hint').textContent = PRESS_HINTS[n]; updatePress(); }
   const f = $(`.pane[data-pane="${n}"] input:not([type=radio]), .pane[data-pane="${n}"] textarea`);
   if (f && n < PANES) setTimeout(() => f.focus(), 130);
 }
@@ -1718,6 +1942,7 @@ function openNew(prefill){
     if (prefill.category){ const r = nForm.querySelector(`input[name=category][value="${prefill.category}"]`); if (r) r.checked = true; }
   }
   ['#i-title','#i-problem'].forEach(s => $(s).dispatchEvent(new Event('input')));
+  lastCat = null;   /* kein Zucken der Karte beim Öffnen */
   goStep(0);
   openOv('#ov-new', '#i-title');
 }
@@ -1754,9 +1979,9 @@ function submitIdea(){
   ideas.unshift(idea); save();
   clearFiltersSilent(); filters.sort = 'new'; $('#sort').value = 'new';
   render();
-  $('#mint-card').innerHTML = scaledCard(idea, 1, .74);
+  $('#mint-card').innerHTML = flipCard(idea, deckNr(idea), .74);
   goStep(PANES);
-  burst();
+  setTimeout(burst, reduced() ? 0 : 520);
 }
 
 /* Kopiert in die Zwischenablage; wo das der Browser verbietet, zum Markieren anzeigen. */
@@ -1910,6 +2135,41 @@ function roll(){
   }, reduced() ? 0 : 400);
 }
 $('#roll').onclick = roll;
+
+/* ═══ LOSTOPF ═══
+   Gezogen wird aus denselben Karten, die auch gedruckt werden: alles, was noch
+   nicht gebaut ist. Jede Karte kommt einmal dran, dann wird neu gemischt. */
+const gezogen = new Set();
+let drawnIdea = null;
+const potPool = () => ideas.filter(i => i.status !== 'gebaut');
+function renderPot(){
+  const pool = potPool();
+  /* Die gezogene Idee kann inzwischen gelöscht worden sein. */
+  if (drawnIdea && !ideas.some(i => i.id === drawnIdea.id)){
+    drawnIdea = null; $('#draw-open').disabled = true;
+    $('#pot-slot').innerHTML = '<p class="pot-empty">Hier landet deine Karte.</p>';
+  }
+  $('#pot-stack').innerHTML = pool.length ? scaledBack(.5).repeat(Math.min(pool.length, 3)) : '';
+  $('#draw').disabled = !pool.length;
+  const rest = pool.length - gezogen.size;
+  $('#pot-left').textContent = !pool.length ? 'Der Stapel ist leer — alles schon gebaut.'
+    : drawnIdea ? `Noch ${rest} von ${pool.length} Karten im Stapel`
+    : `${pool.length} ${pool.length===1?'Karte':'Karten'} im Stapel`;
+}
+function draw(){
+  const pool = potPool();
+  if (!pool.length){ toast('Im Stapel liegt nichts — alle Ideen sind schon gebaut.'); return; }
+  let rest = pool.filter(i => !gezogen.has(i.id));
+  if (!rest.length){ gezogen.clear(); rest = pool; toast('Stapel war durch — <b>neu gemischt.</b>'); }
+  drawnIdea = pickR(rest);
+  gezogen.add(drawnIdea.id);
+  $('#pot-slot').innerHTML = flipCard(drawnIdea, deckNr(drawnIdea), .5);
+  $('#draw-open').disabled = false;
+  $('#draw').innerHTML = 'Nochmal ziehen <kbd>Z</kbd>';
+  renderPot();
+}
+$('#draw').onclick = draw;
+$('#draw-open').onclick = () => { if (drawnIdea) openDetail(drawnIdea.id); };
 $('#spark-take').onclick = () => {
   if (!spark) return;
   openNew({problem:`Aus dem Ideen-Zünder — „${spark.pain.t}“ im Bereich ${spark.dept}: ${spark.pain.q}`,
@@ -1958,8 +2218,17 @@ function cardArt(i, nr){
     </div>
   </article>`;
 }
-const scaledCard = (i, nr, s) =>
-  `<div class="card-scale" style="transform:scale(${s});width:calc(88mm * ${s});height:calc(125mm * ${s})">${cardArt(i,nr)}</div>`;
+const box = (s, inner) =>
+  `<div class="card-scale" style="transform:scale(${s});width:calc(88mm * ${s});height:calc(125mm * ${s})">${inner}</div>`;
+const scaledCard = (i, nr, s) => box(s, cardArt(i, nr));
+const backArt = () => `<article class="ideacard -back"><span class="mark">pilot<i>.</i>Hangar</span></article>`;
+const scaledBack = s => box(s, backArt());
+/* Karte, die sich von der Rückseite auf die Vorderseite dreht. */
+const flipCard = (i, nr, s) => `
+  <div class="flip" style="width:calc(88mm * ${s});height:calc(125mm * ${s})">
+    <div class="-rear">${scaledBack(s)}</div>
+    <div class="-face">${scaledCard(i, nr, s)}</div>
+  </div>`;
 /* Nur im Druck bekommt die Karte Schnittmarken — in der Vorschau stören sie. */
 const cutCard = (i, nr) => `<div class="cut">${cardArt(i, nr)}</div>`;
 

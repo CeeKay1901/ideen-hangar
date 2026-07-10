@@ -26,9 +26,10 @@ Jede Idee wird einem Werkzeug zugeordnet — als Vermutung, die beim Kickoff gem
    Die Idee wechselt dann automatisch auf *Team gesucht*.
 4. **Bauen** — beim Hackathon. Den Status darf nur das Team der jeweiligen Idee ändern.
 
-Wer keine Idee hat, nutzt den **Ideen-Zünder**: drei Würfel für Abteilung,
-Schmerzpunkt und Werkzeug ergeben eine Frage zum Weiterdenken, die sich per Klick
-in eine vorausgefüllte Einreichung verwandelt.
+Wer keine Idee hat, hat zwei Wege. Der **Ideen-Zünder** würfelt Abteilung, Schmerzpunkt und
+Werkzeug zu einer Frage zusammen, die sich per Klick in eine vorausgefüllte Einreichung
+verwandelt. Der **Lostopf** ist der digitale Zwilling des gedruckten Stapels: eine Karte
+ziehen, sie dreht sich um, fertig. Jede Karte kommt einmal dran, dann wird neu gemischt.
 
 Wer eine Idee eingereicht hat, kann sie später **bearbeiten oder löschen**. Der Filter
 *„Von mir"* zeigt alles, woran man beteiligt ist.
@@ -82,13 +83,20 @@ Haarlinien statt Schatten. Die Kategoriefarben am Bildschirm *sind* die Druckfar
 (`PRINT_HEX` = die `--c-*`-Tokens), es gibt also keine Überraschung beim Ausdruck.
 Akzentfarbe ist ausschließlich das pilot-Gelb; es markiert wie ein Textmarker.
 
+Und weil das Ding am Ende ein **Kartendeck** druckt, benimmt sich der Bildschirm auch wie eins:
+
+- **Das Prägewerk.** Beim Einreichen wächst rechts die echte Idea Card mit — keine Attrappe,
+  sondern dieselbe `cardArt()`, die später auf dem Papier landet. Die Kategorie färbt live den
+  Kartenkopf, die Wildcard schlägt einen goldenen Rand. Der letzte Knopf heißt „Karte prägen",
+  und die Karte dreht sich von der Rückseite ins Deck.
+- **Der Kartentisch.** Die Board-Karten werden ausgeteilt, neigen sich zum Zeiger und fangen
+  Licht. Wildcards schillern wie eine Holo-Sammelkarte.
+- **Der Lostopf** mit echtem Stapel und Kartenrückseite.
 - **Command-Palette** mit <kbd>⌘K</kbd> / <kbd>Strg+K</kbd> — alle Aktionen ohne Maus erreichbar.
-- **Kürzel**: <kbd>N</kbd> neue Idee, <kbd>/</kbd> Suche, <kbd>R</kbd> Ideen-Zünder würfeln.
-- **Einreichen in vier Schritten** statt eines langen Formulars: Problem → Kategorie → Werkzeug → Du.
-  Am Ende wird die Idea Card sichtbar „gedruckt".
+- **Kürzel**: <kbd>N</kbd> neue Idee, <kbd>/</kbd> Suche, <kbd>R</kbd> würfeln, <kbd>Z</kbd> Karte ziehen.
 - Im Hero liegen zwei **echte Karten** aus dem Board — das Produkt zeigt sich selbst.
-- Alles respektiert `prefers-reduced-motion`. Der Inhalt hängt nie an einer Animation:
-  Fällt der IntersectionObserver aus, wird alles sofort sichtbar.
+- Alles respektiert `prefers-reduced-motion`: kein Kippen, kein Drehen, kein Glanz. Der Inhalt
+  hängt nie an einer Animation — fällt der IntersectionObserver aus, wird alles sofort sichtbar.
 
 ## Beispiel-Ideen
 
