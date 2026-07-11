@@ -531,7 +531,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ov.-mini .panel{max-width:46rem}
 @keyframes panelIn{from{opacity:0;transform:translateY(1.6rem)}to{opacity:1;transform:none}}
 .p-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;padding:3rem 3rem 0}
-.p-hd h2{font-size:2.4rem;font-weight:700;letter-spacing:-.02em;margin-top:1rem}
+.p-hd h2{font-size:2.4rem;font-weight:700;letter-spacing:-.02em;margin-top:1rem;overflow-wrap:anywhere}
 .p-bd{padding:3rem}
 .p-ft{padding:2rem 3rem;border-top:1px solid var(--line);display:flex;gap:.8rem;justify-content:flex-end;flex-wrap:wrap}
 @media(max-width:640px){.p-hd,.p-bd,.p-ft{padding-left:2rem;padding-right:2rem}}
@@ -547,7 +547,11 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .pbar{height:2px;background:var(--line);margin:0 3rem;position:relative;overflow:hidden}
 .pbar .fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--fg);transition:width .45s var(--ease)}
 .psteps{display:flex;justify-content:space-between;padding:1.4rem 3rem .6rem;font-family:var(--mono);font-size:1rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3)}
-.psteps span[data-on="true"]{color:var(--fg);font-weight:600}
+.psteps button{background:none;border:none;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;padding:.4rem 0;cursor:default}
+.psteps [data-on="true"]{color:var(--fg);font-weight:600}
+/* Erledigte Schritte sind begehbar — zurückspringen ohne x-mal „Zurück". */
+.psteps [data-done="true"]{color:var(--fg-2);cursor:pointer}
+.psteps [data-done="true"]:hover{color:var(--fg);text-decoration:underline;text-underline-offset:.5rem}
 @media(max-width:640px){.pbar,.psteps{margin-left:2rem;margin-right:2rem;padding-left:0;padding-right:0}.psteps{font-size:.88rem;letter-spacing:.08em}}
 /* ═══ PRÄGEWERK ═══
    Rechts wächst die echte Idea Card mit, während links getippt wird.
@@ -721,8 +725,8 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ideacard .catline .sym{font-family:var(--mono);font-size:2.95cqw;font-weight:600;letter-spacing:.1em;border:.34cqw solid rgba(255,255,255,.75);padding:.57cqw 1.25cqw;border-radius:.68cqw;line-height:1.2}
 .ideacard .catline .nm{font-size:3.3cqw;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
 .ideacard .body{padding:5.68cqw;flex:1;min-height:0;display:flex;flex-direction:column;gap:3.41cqw}
-.ideacard .body h3{font-size:5.91cqw;line-height:1.16;font-weight:700;letter-spacing:-.02em}
-.ideacard .body p{font-size:3.64cqw;line-height:1.45;color:#4a4a4a}
+.ideacard .body h3{font-size:5.91cqw;line-height:1.16;font-weight:700;letter-spacing:-.02em;overflow-wrap:anywhere}
+.ideacard .body p{font-size:3.64cqw;line-height:1.45;color:#4a4a4a;overflow-wrap:anywhere}
 .ideacard .stats{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:2.84cqw;padding-top:3.41cqw;border-top:1px solid #eee}
 .ideacard .stat .k{font-size:2.39cqw;text-transform:uppercase;letter-spacing:.16em;color:#6f6a5c;font-weight:600}
 .ideacard .stat .v{font-size:3.52cqw;font-weight:600;margin-top:.8cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -834,6 +838,8 @@ footer .cols{display:grid;gap:3.6rem;grid-template-columns:1fr;margin-bottom:4.4
 footer h2{color:var(--bg);font-size:1.7rem;font-weight:700;margin-bottom:1.4rem;letter-spacing:-.01em}
 footer p{line-height:1.7;max-width:58ch;color:#b8b2a4}
 footer .tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:2rem}
+/* Destruktives gehört nicht neben Export/Import — der Reset rückt ab. */
+footer .tools #reset{margin-left:auto}
 footer .btn{background:transparent;border-color:#57534a;color:var(--bg)}
 footer .btn:hover{background:var(--bg);border-color:var(--bg);color:var(--fg)}
 footer code{font-family:var(--mono);background:#2a2720;border:1px solid #3d392f;padding:.3rem .7rem;color:var(--acid);font-size:1.25rem}
@@ -846,6 +852,7 @@ footer .bot{border-top:1px solid #3d392f;padding-top:2.4rem;display:flex;justify
   .btn,.btn.-sm,.chip,.chk,.crew-item .rm,.tb-meta button,.x,#chg{min-height:4.4rem}
   .cmdk li{min-height:4.4rem}
   .search .clr{width:4.2rem;height:4.2rem;right:.1rem}
+  .nav a{min-height:4.4rem;display:inline-flex;align-items:center}
 }
 
 /* ═══ DRUCKEREI-FINISH ═══
@@ -1176,7 +1183,7 @@ a,button,input,select,textarea,[tabindex]{
           <button class="btn -ghost -sm" id="export-md">Markdown exportieren</button>
           <label class="btn -ghost -sm" for="import-file" style="cursor:pointer">Importieren</label>
           <input type="file" id="import-file" accept="application/json,.json" hidden>
-          <button class="btn -ghost -sm" id="reset">Zurücksetzen</button>
+          <button class="btn -ghost -sm" id="reset">Board zurücksetzen</button>
         </div>
       </div>
       <div>
@@ -1201,7 +1208,8 @@ a,button,input,select,textarea,[tabindex]{
 <!-- COMMAND PALETTE -->
 <div class="cmdk" id="cmdk" role="dialog" aria-modal="true" aria-label="Befehle">
   <div class="box">
-    <input type="text" id="cmd-input" placeholder="Was willst du tun?" aria-label="Befehl suchen" autocomplete="off">
+    <input type="text" id="cmd-input" placeholder="Was willst du tun?" aria-label="Befehl suchen" autocomplete="off"
+      role="combobox" aria-expanded="true" aria-controls="cmd-list" aria-autocomplete="list">
     <ul id="cmd-list" role="listbox" aria-label="Befehle"></ul>
   </div>
 </div>
@@ -1214,7 +1222,7 @@ a,button,input,select,textarea,[tabindex]{
       <button class="x" data-close-new aria-label="Schließen">×</button>
     </div>
     <div class="psteps" id="psteps">
-      <span data-step="0">Problem</span><span data-step="1">Kategorie</span><span data-step="2">Werkzeug</span><span data-step="3">Du</span>
+      <button type="button" data-step="0" disabled>Problem</button><button type="button" data-step="1" disabled>Kategorie</button><button type="button" data-step="2" disabled>Werkzeug</button><button type="button" data-step="3" disabled>Du</button>
     </div>
     <div class="pbar"><div class="fill" id="pfill"></div></div>
 
@@ -1251,13 +1259,15 @@ a,button,input,select,textarea,[tabindex]{
           <p class="q-sub">Nur eine Vermutung. Unsicher? Nimm Langdock — da wird kein Code geschrieben.</p>
           <div class="picks" id="track-picks" role="radiogroup" aria-label="Werkzeug"></div>
           <div class="field">
-            <label for="i-effort">Wie groß ist das?</label>
-            <select id="i-effort">
-              <option value="?" selected>Keine Ahnung — das schätzt das Team</option>
-              <option value="S">S — ein halber Tag</option>
-              <option value="M">M — ein bis zwei Tage</option>
-              <option value="L">L — ein echtes Hackathon-Projekt</option>
-            </select>
+            <label id="l-effort">Wie groß ist das?</label>
+            <!-- Vier Optionen gehören sichtbar hin, nicht in ein Select —
+                 dasselbe Muster wie Kategorie und Track eine Frage vorher. -->
+            <div class="chk-row" id="effort-picks" role="radiogroup" aria-labelledby="l-effort">
+              <label class="chk"><input type="radio" name="effort" value="?" checked>Keine Ahnung — schätzt das Team</label>
+              <label class="chk"><input type="radio" name="effort" value="S">S — halber Tag</label>
+              <label class="chk"><input type="radio" name="effort" value="M">M — 1–2 Tage</label>
+              <label class="chk"><input type="radio" name="effort" value="L">L — Hackathon-Projekt</label>
+            </div>
           </div>
         </div>
 
@@ -1705,9 +1715,11 @@ function renderCmd(){
   cmdHits = CMDS.filter(c => !q || c.name.toLowerCase().includes(q));
   if (cmdIdx >= cmdHits.length) cmdIdx = 0;
   $('#cmd-list').innerHTML = cmdHits.length
-    ? cmdHits.map((c,n) => `<li role="option" aria-selected="${n===cmdIdx}" data-i="${n}">
+    ? cmdHits.map((c,n) => `<li role="option" id="cmd-o-${n}" aria-selected="${n===cmdIdx}" data-i="${n}">
         <span class="ico">${String(n+1).padStart(2,'0')}</span>${esc(c.name)}${c.sc?`<span class="sc">${c.sc}</span>`:''}</li>`).join('')
     : `<li class="none" role="option" aria-selected="false">Kein Befehl gefunden.</li>`;
+  /* Screenreader folgen der Pfeiltasten-Auswahl über den aktiven Nachfahren. */
+  $('#cmd-input').setAttribute('aria-activedescendant', cmdHits.length ? `cmd-o-${cmdIdx}` : '');
 }
 $('#cmd-input').addEventListener('input', () => { cmdIdx = 0; renderCmd(); });
 $('#cmd-list').addEventListener('click', e => {
@@ -1731,6 +1743,12 @@ document.addEventListener('keydown', e => {
   }
 
   const open = $$('.ov.open'); const o = open[open.length-1];
+  /* Escape schließt auch das Burger-Menü — wie jede andere Fläche hier. */
+  if (e.key === 'Escape' && !o && nav.dataset.open === 'true'){
+    e.preventDefault();
+    nav.dataset.open = 'false'; burger.setAttribute('aria-expanded','false'); burger.focus();
+    return;
+  }
   if (e.key === 'Escape' && o){
     if (o.id === 'ov-mini'){ cancelMini(); closeOv(o); return; }
     if (o.id === 'ov-new'){ tryCloseNew(); return; }
@@ -1774,8 +1792,12 @@ function renderMetrics(){
   const diff = new Date(HACKATHON_DATE) - new Date();
   countTo($('#m-days'), Math.max(0, Math.floor(diff/864e5)));
   countTo($('#m-ideas'), ideas.length);
-  countTo($('#m-votes'), ideas.reduce((a,i)=>a+i.votes,0));
+  const votes = ideas.reduce((a,i)=>a+i.votes,0);
+  countTo($('#m-votes'), votes);
   countTo($('#m-open'), ideas.filter(i=>i.status==='crew-gesucht').length);
+  /* Beide Ticker-Hälften mitziehen — sonst laufen dort veraltete Zahlen. */
+  $$('#ticker [data-tk="ideas"]').forEach(e => e.textContent = ideas.length);
+  $$('#ticker [data-tk="votes"]').forEach(e => e.textContent = votes);
 }
 $('#hero-date').textContent = new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'long',year:'numeric'}).format(new Date(HACKATHON_DATE));
 
@@ -2087,6 +2109,7 @@ if (!reduced()){
 const PANES = 4;
 let step = 0;
 const nForm = $('#n-form');
+const effortVal = () => (nForm.querySelector('input[name=effort]:checked')||{value:'?'}).value;
 
 function buildForm(){
   $('#cat-picks').innerHTML = Object.entries(CATEGORIES).map(([id,c]) => `
@@ -2145,7 +2168,7 @@ function draftIdea(){
     category:(nForm.querySelector('input[name=category]:checked')||{value:CAT_DEFAULT}).value,
     track:(nForm.querySelector('input[name=track]:checked')||{value:Object.keys(TRACKS)[0]}).value,
     dept:$('#i-dept').value || '—',
-    effort:$('#i-effort').value || '?',
+    effort:effortVal(),
     author:$('#i-author').value.trim() || me || 'Du',
     wildcard:$('#i-wild').checked,
     votes:1
@@ -2174,7 +2197,7 @@ function writeDraft(){
     title:$('#i-title').value, problem:$('#i-problem').value,
     category:(nForm.querySelector('input[name=category]:checked')||{}).value,
     track:(nForm.querySelector('input[name=track]:checked')||{}).value,
-    dept:$('#i-dept').value, effort:$('#i-effort').value,
+    dept:$('#i-dept').value, effort:effortVal(),
     author:$('#i-author').value, wild:$('#i-wild').checked,
     needs:$$('#needs-chks input:checked').map(c=>c.value)
   })); }catch(e){}
@@ -2186,9 +2209,8 @@ function restoreDraft(d){
   $('#i-problem').value = d.problem || '';
   $('#i-author').value = d.author || me;
   if (d.dept) $('#i-dept').value = d.dept;
-  if (d.effort) $('#i-effort').value = d.effort;
   $('#i-wild').checked = !!d.wild;
-  [['category',d.category],['track',d.track]].forEach(([n,v]) => {
+  [['category',d.category],['track',d.track],['effort',d.effort]].forEach(([n,v]) => {
     const r = nForm.querySelector(`input[name=${n}][value="${v}"]`); if (r) r.checked = true;
   });
   $$('#needs-chks input').forEach(c => c.checked = (d.needs||[]).includes(c.value));
@@ -2202,7 +2224,12 @@ function goStep(n, back){
     p.classList.toggle('back', !!back);
     p.dataset.on = String(+p.dataset.pane === n);
   });
-  $$('#psteps span').forEach(s => s.dataset.on = String(+s.dataset.step === n));
+  $$('#psteps [data-step]').forEach(s => {
+    s.dataset.on = String(+s.dataset.step === n);
+    const done = +s.dataset.step < n && n < PANES;
+    s.dataset.done = String(done);
+    s.disabled = !done;
+  });
   $('#pfill').style.width = (n >= PANES ? 100 : (n/PANES)*100) + '%';
   $('#p-nav').style.display = n >= PANES ? 'none' : '';
   const done = n >= PANES;
@@ -2237,6 +2264,10 @@ function validStep(n){
   return true;
 }
 $('#n-back').onclick = () => { if (step > 0) goStep(step-1, true); };
+$('#psteps').addEventListener('click', e => {
+  const b = e.target.closest('[data-step]');
+  if (b && b.dataset.done === 'true') goStep(+b.dataset.step, true);
+});
 nForm.addEventListener('submit', e => {
   e.preventDefault();
   if (!validStep(step)) return;
@@ -2299,7 +2330,7 @@ function submitIdea(){
     id:uid(), title:$('#i-title').value.trim(), problem:$('#i-problem').value.trim(), solution:'',
     category:(nForm.querySelector('input[name=category]:checked')||{value:CAT_DEFAULT}).value,
     track:nForm.querySelector('input[name=track]:checked').value,
-    dept:$('#i-dept').value, effort:$('#i-effort').value, author,
+    dept:$('#i-dept').value, effort:effortVal(), author,
     status:'idee', wildcard:$('#i-wild').checked,
     needs:$$('#needs-chks input:checked').map(c=>c.value),
     votes:1, voters:[author], crew:[{name:author, role:'Idee & Fachwissen'}],
@@ -2369,7 +2400,7 @@ function openDetail(id, keep){
       <p style="color:var(--fg-3);font-size:1.4rem;margin-bottom:1rem">${inTeam||owner
         ? 'Du gehörst zu dieser Idee — du darfst den Status setzen.'
         : 'Nur das Team ändert den Status. Tritt bei, wenn du mitarbeiten willst.'}</p>
-      <div class="chk-row">${Object.entries(STATUSES).map(([sid,s])=>`
+      <div class="chk-row" role="group" aria-label="Status setzen">${Object.entries(STATUSES).map(([sid,s])=>`
         <button class="chip" data-setstatus="${sid}" aria-pressed="${i.status===sid}" title="${esc(s.desc)}"
         ${inTeam||owner?'':'disabled style="opacity:.4;cursor:not-allowed"'}>${esc(s.label)}</button>`).join('')}</div></div>
     <div class="d-sec"><h3>Idea Card</h3>
@@ -2424,14 +2455,17 @@ function openDetail(id, keep){
   const ed = $('#edit-idea');
   if (ed) ed.onclick = async () => {
     const v = await mini({tag:'Bearbeiten', title:'Idee anpassen',
-      bodyHTML:`<div class="field" style="margin-top:0"><label for="e-title">Titel</label><input type="text" id="e-title" maxlength="90" value="${esc(i.title)}"></div>
-        <div class="field"><label for="e-problem">Problem</label><textarea id="e-problem" maxlength="400">${esc(i.problem)}</textarea></div>
+      bodyHTML:`<div class="field" style="margin-top:0" id="ef-title"><label for="e-title">Titel</label><input type="text" id="e-title" maxlength="90" value="${esc(i.title)}"><p class="err">Ohne Titel finden andere die Idee nicht.</p></div>
+        <div class="field" id="ef-problem"><label for="e-problem">Problem</label><textarea id="e-problem" maxlength="400">${esc(i.problem)}</textarea><p class="err">Das Problem darf nicht leer bleiben.</p></div>
         <div class="field"><label for="e-solution">Lösungsidee</label><textarea id="e-solution" maxlength="400" style="min-height:6rem">${esc(i.solution)}</textarea></div>
         <div class="field"><label for="e-cat">Kategorie</label><select id="e-cat">${Object.entries(CATEGORIES).map(([cid,c2])=>
           `<option value="${cid}" ${cid===i.category?'selected':''}>${esc(c2.label)}</option>`).join('')}</select></div>`,
       ok:'Speichern', focus:'#e-title',
+      /* Fehler stehen am Feld — wie in jedem anderen Formular hier. */
       read: b => { const t2 = $('#e-title',b).value.trim(), p = $('#e-problem',b).value.trim();
-        if (!t2 || !p){ toast('Titel und Problem dürfen nicht leer sein.'); return undefined; }
+        $('#ef-title',b).classList.toggle('bad', !t2);
+        $('#ef-problem',b).classList.toggle('bad', !p);
+        if (!t2 || !p){ (!t2 ? $('#e-title',b) : $('#e-problem',b)).focus(); return undefined; }
         return {title:t2, problem:p, solution:$('#e-solution',b).value.trim(), category:$('#e-cat',b).value}; }});
     if (!v) return;
     Object.assign(i, v); save(); render(); openDetail(id,true); toast('Idee aktualisiert.');
@@ -2778,10 +2812,12 @@ if (!reduced()){
    -50%-Schleife nahtlos ist. */
 {
   const days = Math.max(0, Math.floor((new Date(HACKATHON_DATE) - new Date())/864e5));
+  /* data-tk: die Zahlen werden bei jedem render() in-place aktualisiert —
+     innerHTML neu zu schreiben würde die Laufanimation sichtbar zurückspringen. */
   const items = [
     'Sag uns, was dich nervt',
-    `<b>${ideas.length}</b> Ideen im Deck`,
-    `<b>${ideas.reduce((a,i)=>a+i.votes,0)}</b> Stimmen`,
+    `<b data-tk="ideas">${ideas.length}</b> Ideen im Deck`,
+    `<b data-tk="votes">${ideas.reduce((a,i)=>a+i.votes,0)}</b> Stimmen`,
     `Noch <b>${days}</b> Tage bis zum Kickoff`,
     'Kein Code nötig',
     'Drück <b>N</b> für deine Idee',
