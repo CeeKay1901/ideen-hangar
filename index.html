@@ -1076,6 +1076,7 @@ a,button,input,select,textarea,[tabindex]{
         <div class="chips" id="misc-filters" role="group" aria-label="Status und Track"></div>
       </div>
       <div class="tb-meta">
+        <span id="budget" hidden title="Jede Person hat 5 Stimmen — Zurückziehen gibt sie wieder frei"></span>
         <span id="count" role="status" aria-live="polite"></span>
         <span style="display:flex;gap:1rem;align-items:center">
           <button type="button" id="open-print">Karten drucken</button>
@@ -1406,7 +1407,7 @@ a,button,input,select,textarea,[tabindex]{
 
 /* ═══ CONFIG ═══ */
 const HACKATHON_DATE = '2026-09-24T09:00:00+02:00';
-const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft', EXPORT_KEY='pilot-hangar-last-export';
+const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft', EXPORT_KEY='pilot-hangar-last-export', DEPT_KEY='pilot-hangar-dept';
 const PRO_SEITE = 4;
 
 /* ═══ FEATURE-FLAG: CLAUDE-TRACKS ═══
@@ -1815,7 +1816,16 @@ nav.addEventListener('click', e => {
 /* ═══ METRICS ═══ */
 function renderMetrics(){
   const diff = new Date(HACKATHON_DATE) - new Date();
-  countTo($('#m-days'), Math.max(0, Math.floor(diff/864e5)));
+  const dEl = $('#m-days');   /* nach dem Umschalten unten existiert der Zähler nicht mehr */
+  if (dEl){
+    if (diff > 0){ countTo(dEl, Math.floor(diff/864e5)); }
+    else {
+      /* Ab dem Kickoff zählt hier nichts mehr runter — die Zahl würde lügen. */
+      const metric = dEl.closest('.metric');
+      metric.querySelector('.k').textContent = 'Hackathon';
+      metric.querySelector('.v').innerHTML = diff > -3*864e5 ? 'Läuft!' : 'Vorbei';
+    }
+  }
   countTo($('#m-ideas'), ideas.length);
   const votes = ideas.reduce((a,i)=>a+i.votes,0);
   countTo($('#m-votes'), votes);
@@ -1978,6 +1988,9 @@ function render(){
 
   const n = nFilters();
   $('#count').textContent = n ? `${list.length}/${ideas.length} Ideen · ${n} Filter` : `${ideas.length} Ideen`;
+  const bud = $('#budget');
+  bud.hidden = !me;
+  if (me) bud.textContent = `Deine Stimmen: ${myVoteCount()}/${VOTE_BUDGET}`;
   $('#f-n').textContent = (n - (filters.q?1:0)) || '';
   $('#clear-f').hidden = !n;
 
@@ -2080,7 +2093,12 @@ function renderWho(){
   };
 }
 
-/* ═══ VOTING ═══ */
+/* ═══ VOTING ═══
+   Dot-Voting: 5 Stimmen pro Person. Unbegrenztes Voting wäre Beifall für
+   alles und kein Prioritätensignal — knappe Stimmen erzwingen Entscheidungen.
+   Zurückziehen gibt die Stimme wieder frei. */
+const VOTE_BUDGET = 5;
+const myVoteCount = () => me ? ideas.filter(i => i.voters.includes(me)).length : 0;
 async function vote(id, btn){
   if (!await ensureMe('Damit jede Person nur einmal pro Idee abstimmt.')) return;
   const i = ideas.find(x => x.id === id); if (!i) return;
@@ -2089,10 +2107,15 @@ async function vote(id, btn){
   if (at > -1){
     i.voters.splice(at,1); i.votes = Math.max(0,i.votes-1);
     /* Zurückziehen ist ein Zug wie das Setzen — also auch mit Rückmeldung. */
-    toast(`Stimme zurückgezogen von <b>${esc(kurz)}</b>`);
+    toast(`Stimme zurückgezogen von <b>${esc(kurz)}</b> — wieder ${VOTE_BUDGET - myVoteCount()} frei`);
   } else {
+    if (myVoteCount() >= VOTE_BUDGET){
+      toast(`Alle <b>${VOTE_BUDGET} Stimmen</b> vergeben — zieh erst eine zurück.`);
+      return;
+    }
     i.voters.push(me); i.votes++;
-    toast(`Stimme für <b>${esc(kurz)}</b>`);
+    const rest = VOTE_BUDGET - myVoteCount();
+    toast(`Stimme für <b>${esc(kurz)}</b>${rest ? ` — noch ${rest} übrig` : ' — <b>das war deine letzte.</b>'}`);
   }
   save();
   /* Der Kernzug des Spiels: die Karte steigt sichtbar im Deck auf. Früher lief
@@ -2347,6 +2370,9 @@ function openNew(prefill){
   $$('.field.bad').forEach(f => f.classList.remove('bad'));
   $('#dup-warn').innerHTML = '';
   $('#i-author').value = me;
+  /* Die Abteilung ändert sich zwischen zwei Ideen nicht — letzte Wahl vorbelegen. */
+  const lastDept = localStorage.getItem(DEPT_KEY);
+  if (lastDept && DEPTS.includes(lastDept)) $('#i-dept').value = lastDept;
   let restored = false;
   if (prefill){
     if (prefill.problem) $('#i-problem').value = prefill.problem;
@@ -2364,7 +2390,7 @@ function openNew(prefill){
   if (restored) toast('Dein Entwurf von vorhin ist wieder da.');
 }
 $('#n-again').onclick = () => openNew();
-$('#n-export').onclick = () => { closeOv($('#ov-new')); exportJSON(); };
+$('#n-export').onclick = () => { closeOv($('#ov-new')); shareBoard(); };
 $('#n-done').onclick = () => {
   closeOv($('#ov-new'));
   const el = $('.pcard');
@@ -2395,11 +2421,34 @@ function submitIdea(){
     createdAt:new Date().toISOString()
   };
   ideas.unshift(idea); save(); clearDraft();
+  localStorage.setItem(DEPT_KEY, idea.dept);
   clearFiltersSilent(); filters.sort = 'new'; $('#sort').value = 'new';
   render();
   $('#mint-card').innerHTML = flipCard(idea, deckNr(idea), .74);
   goStep(PANES);
   setTimeout(burst, reduced() ? 0 : 520);
+}
+
+/* ═══ IDEE IM LINK ═══
+   Ohne Backend zeigt ein #i/<id>-Link beim Empfänger ins Leere, solange er
+   das Board nicht importiert hat. Deshalb reist die Idee selbst im Link:
+   kompakt als URL-sicheres Base64 im Hash. Stimmen und Team reisen bewusst
+   NICHT mit — die kämen sonst doppelt, wenn später die Orga-JSON gemergt wird. */
+function packIdea(i){
+  const slim = {id:i.id, title:i.title, problem:i.problem, solution:i.solution,
+    category:i.category, track:i.track, dept:i.dept, effort:i.effort,
+    author:i.author, wildcard:i.wildcard, needs:i.needs};
+  return btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(slim))))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function unpackIdea(s){
+  try{
+    const b64 = s.replace(/-/g,'+').replace(/_/g,'/');
+    const json = new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+    const o = JSON.parse(json);
+    if (!o || typeof o.title !== 'string' || !o.title) return null;
+    return normIdea({...o, votes:0, voters:[], crew:[], status:'idee'});
+  }catch(e){ return null; }
 }
 
 /* Kopiert in die Zwischenablage; wo das der Browser verbietet, zum Markieren anzeigen. */
@@ -2556,8 +2605,8 @@ function openDetail(id, keep){
   };
   const sh = $('#share-idea');
   if (sh) sh.onclick = () => copyLink(
-    location.origin + location.pathname + '#i/' + encodeURIComponent(i.id),
-    'Link kopiert — <b>führt direkt zu dieser Idee.</b>', 'Link zur Idee');
+    location.origin + location.pathname + '#x/' + packIdea(i),
+    'Link kopiert — <b>trägt die ganze Idee in sich.</b> Funktioniert für alle.', 'Link zur Idee');
   if (!keep){
     openOv('#ov-detail', '#join, [data-vote]');
     /* Der Query-String trägt die Filter — beim Öffnen darf er nicht verloren gehen. */
@@ -2724,6 +2773,8 @@ function printScopes(){
   return [
     {id:'lostopf', label:'Gute Ziehkarten', desc:'Noch nicht gebaut, noch kein Team. Genau das, was jemand ohne eigene Idee übernehmen kann.',
      list: ideas.filter(i => i.status !== 'gebaut' && i.crew.length === 0)},
+    {id:'top', label:'Die Top 12', desc:'Die Ideen mit den meisten Stimmen — das Beste-Deck für den Tag, maximal drei Blatt A4.',
+     list: [...ideas].sort((a,b) => b.votes - a.votes).slice(0,12)},
     {id:'gefiltert', label:'Was gerade im Board steht',
      desc: n ? `Die aktuell gefilterte Auswahl (${n} Filter aktiv).`
              : 'Du hast keine Filter gesetzt — das ist gerade dasselbe wie „Alle Ideen“. Filtere im Board z. B. nach einer Kategorie.',
@@ -2792,6 +2843,24 @@ function exportJSON(){
   renderExportInfo();
   hideReminder(); toast('Board exportiert. <b>Schick es der Orga.</b>');
 }
+/* Am Handy öffnet sich das native Teilen-Menü (Teams, Mail, …) mit der JSON
+   als Anhang — kein Umweg über den Download-Ordner. Wo die Share-API fehlt
+   oder abgelehnt wird, fällt alles auf den normalen Download zurück. */
+async function shareBoard(){
+  try{
+    const file = new File([JSON.stringify(ideas,null,2)], `ideen-hangar-${stamp()}.json`, {type:'application/json'});
+    if (navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Ideen-Hangar Board'});
+      localStorage.setItem(CLEAN_KEY, String(Date.now()));
+      localStorage.setItem(EXPORT_KEY, String(Date.now()));
+      renderExportInfo(); hideReminder();
+      toast('Board geteilt. <b>Die Orga freut sich.</b>');
+      return;
+    }
+  }catch(e){ if (e.name === 'AbortError') return; }
+  exportJSON();
+}
+
 /* Sichtbar machen, ob das Board gesichert ist — ohne dass man sich erinnern muss. */
 function renderExportInfo(){
   const el = $('#export-info'); if (!el) return;
@@ -2800,8 +2869,10 @@ function renderExportInfo(){
     ? `Zuletzt exportiert: ${ago(new Date(t).toISOString())}`
     : 'Noch nie exportiert — alles liegt nur in diesem Browser.';
 }
+/* Footer bleibt bewusst purer Download (Orga am Desktop will die Datei),
+   Mint-Abschluss und Erinnerung teilen nativ, wo es geht. */
 $('#export-json').onclick = exportJSON;
-$('#rem-export').onclick = exportJSON;
+$('#rem-export').onclick = shareBoard;
 $('#rem-close').onclick = () => hideReminder(true);
 
 let remDismissed = false, remArmed = false;
@@ -2923,14 +2994,16 @@ if (!reduced()){
    sichtbar zurückspringen lassen. Zwei identische Hälften, damit die
    -50%-Schleife nahtlos ist. */
 {
-  const days = Math.max(0, Math.floor((new Date(HACKATHON_DATE) - new Date())/864e5));
+  const diffT = new Date(HACKATHON_DATE) - new Date();
+  const days = Math.floor(diffT/864e5);
   /* data-tk: die Zahlen werden bei jedem render() in-place aktualisiert —
      innerHTML neu zu schreiben würde die Laufanimation sichtbar zurückspringen. */
   const items = [
     'Sag uns, was dich nervt',
     `<b data-tk="ideas">${ideas.length}</b> Ideen im Deck`,
     `<b data-tk="votes">${ideas.reduce((a,i)=>a+i.votes,0)}</b> Stimmen`,
-    `Noch <b>${days}</b> Tage bis zum Kickoff`,
+    diffT > 0 ? `Noch <b>${days}</b> Tage bis zum Kickoff`
+      : diffT > -3*864e5 ? '<b>Der Hackathon läuft!</b>' : 'Hackathon 01 ist Geschichte',
     'Kein Code nötig',
     'Drück <b>N</b> für deine Idee',
     'Hamburg &amp; remote'
@@ -2963,6 +3036,34 @@ if ('IntersectionObserver' in window){
     else {
       history.replaceState(null, '', location.pathname + location.search);
       toast('Diese Idee gibt es in deinem Board-Stand nicht — vielleicht erst die JSON der Orga importieren?');
+    }
+  }
+}
+
+/* Geteilte Idee: #x/<payload> zeigt die Vorschau und übernimmt sie per Klick. */
+{
+  const mx = location.hash.match(/^#x\/(.+)$/);
+  if (mx){
+    const g = unpackIdea(mx[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!g){
+      toast('Der Link war beschädigt — die Idee ließ sich nicht lesen.');
+    } else if (ideas.some(x => x.id === g.id)){
+      setTimeout(() => openDetail(g.id), 350);
+      toast('Diese Idee ist schon in deinem Board.');
+    } else {
+      (async () => {
+        const ok = await mini({tag:`Geteilte Idee · von ${g.author}`, title:g.title,
+          bodyHTML:`<p style="color:var(--fg-2);line-height:1.65;font-size:1.55rem">${esc(g.problem)}</p>
+            ${g.solution ? `<p style="color:var(--fg-2);line-height:1.65;font-size:1.45rem;margin-top:1.2rem"><b style="color:var(--fg)">Lösungsidee:</b> ${esc(g.solution)}</p>` : ''}
+            <p class="mono" style="font-size:1.05rem;color:var(--fg-3);letter-spacing:.1em;text-transform:uppercase;margin-top:2rem">
+              ${esc(cat(g).label)} · ${esc((TRACKS[g.track]||{label:'—'}).label)} · ${esc(g.dept)}</p>`,
+          ok:'Ins Board übernehmen'});
+        if (!ok) return;
+        ideas.unshift(g); save(); render();
+        openDetail(g.id);
+        toast('Idee übernommen — <b>stimm ab, wenn sie dich packt.</b>');
+      })();
     }
   }
 }
