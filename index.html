@@ -258,7 +258,10 @@ section{padding:9rem 0;position:relative;border-bottom:1px solid var(--line)}
 
 /* ═══ TRACKS ═══ */
 .trk-grid{display:grid;gap:1.6rem;grid-template-columns:1fr}
-@media(min-width:900px){.trk-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){
+  .trk-grid{grid-template-columns:repeat(3,1fr)}
+  .trk-grid[data-n="2"]{grid-template-columns:repeat(2,1fr)}
+}
 .trk{
   position:relative;border:1px solid var(--line);padding:3rem 2.6rem;
   background:var(--bg-1);transition:border-color .15s;
@@ -438,6 +441,8 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .empty{grid-column:1/-1;border:1px dashed var(--line-2);padding:8rem 2rem;text-align:center;background:var(--bg-1)}
 .empty h3{font-size:2.4rem;font-weight:700;letter-spacing:-.02em}
 .empty p{color:var(--fg-2);margin:1rem 0 2.8rem}
+.empty .hints{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center;margin:-1.4rem 0 2.8rem}
+.empty .hints .chip{max-width:100%}
 .empty .btn + .btn{margin-left:.8rem}
 
 /* ═══ ZÜNDER ═══ */
@@ -840,6 +845,7 @@ footer p{line-height:1.7;max-width:58ch;color:#b8b2a4}
 footer .tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:2rem}
 /* Destruktives gehört nicht neben Export/Import — der Reset rückt ab. */
 footer .tools #reset{margin-left:auto}
+footer .export-info{margin-top:1.4rem;font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase;color:#8b8577}
 footer .btn{background:transparent;border-color:#57534a;color:var(--bg)}
 footer .btn:hover{background:var(--bg);border-color:var(--bg);color:var(--fg)}
 footer code{font-family:var(--mono);background:#2a2720;border:1px solid #3d392f;padding:.3rem .7rem;color:var(--acid);font-size:1.25rem}
@@ -1182,9 +1188,10 @@ a,button,input,select,textarea,[tabindex]{
           <button class="btn -ghost -sm" id="export-json">JSON exportieren</button>
           <button class="btn -ghost -sm" id="export-md">Markdown exportieren</button>
           <label class="btn -ghost -sm" for="import-file" style="cursor:pointer">Importieren</label>
-          <input type="file" id="import-file" accept="application/json,.json" hidden>
+          <input type="file" id="import-file" accept="application/json,.json" multiple hidden>
           <button class="btn -ghost -sm" id="reset">Board zurücksetzen</button>
         </div>
+        <p class="export-info mono" id="export-info" role="status"></p>
       </div>
       <div>
         <h2>Neue Ideen</h2>
@@ -1399,8 +1406,15 @@ a,button,input,select,textarea,[tabindex]{
 
 /* ═══ CONFIG ═══ */
 const HACKATHON_DATE = '2026-09-24T09:00:00+02:00';
-const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft';
+const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft', EXPORT_KEY='pilot-hangar-last-export';
 const PRO_SEITE = 4;
+
+/* ═══ FEATURE-FLAG: CLAUDE-TRACKS ═══
+   Phase 1 läuft nur auf Langdock. Die Claude-Tracks (Code, Skill, Design)
+   bleiben im Code voll funktionsfähig und werden weiterentwickelt — dieser
+   Schalter blendet sie nur aus. Vorschau der Vollversion: ?claude=1 an die
+   URL hängen. Zum Reaktivieren: die Zeile auf `true` stellen. */
+const SHOW_CLAUDE = new URLSearchParams(location.search).has('claude');
 
 /* sym = Kürzel wie ein Aktenzeichen — druckt auch schwarzweiß sauber.
    Der Klartext-Name steht überall direkt daneben. */
@@ -1421,18 +1435,26 @@ const PRINT_HEX = {zeit:'#c2571a',wissen:'#2f5fa8',qualitaet:'#1f7a4d',formate:'
 
 const TRACKS = {
   'langdock-agent':    {label:'Langdock Agent',    short:'Agent',   hex:'#2f5fa8', noCode:true,  hint:'Ein Assistent mit festem Auftrag und eigenem Wissen.'},
-  'langdock-workflow': {label:'Langdock Workflow', short:'Workflow',hex:'#2f5fa8', noCode:true,  hint:'Eine Kette aus Schritten, die im Hintergrund läuft.'},
-  'claude-code-app':   {label:'Claude Code — Webapp',short:'Webapp',hex:'#ffd400', noCode:false, hint:'Ein echtes Tool im Browser, mit Link zum Teilen.'},
-  'claude-code-skill': {label:'Claude Code — Skill',short:'Skill', hex:'#ffd400', noCode:false, hint:'Ein Handgriff, den danach die ganze Agentur nutzt.'},
-  'claude-design':     {label:'Claude Design',     short:'Design',  hex:'#a8436f', noCode:true,  hint:'Prototyp, Deck oder One-Pager im pilot-Design.'}
+  'langdock-workflow': {label:'Langdock Workflow', short:'Workflow',hex:'#12706f', noCode:true,  hint:'Eine Kette aus Schritten, die im Hintergrund läuft.'},
+  'claude-code-app':   {label:'Claude Code — Webapp',short:'Webapp',hex:'#ffd400', noCode:false, claude:true, hint:'Ein echtes Tool im Browser, mit Link zum Teilen.'},
+  'claude-code-skill': {label:'Claude Code — Skill',short:'Skill', hex:'#ffd400', noCode:false, claude:true, hint:'Ein Handgriff, den danach die ganze Agentur nutzt.'},
+  'claude-design':     {label:'Claude Design',     short:'Design',  hex:'#a8436f', noCode:true,  claude:true, hint:'Prototyp, Deck oder One-Pager im pilot-Design.'}
 };
-const TRACK_CARDS = [
+/* Alles, was Tracks zur Auswahl anbietet, geht über diese Liste — Validierung
+   und Anzeige gespeicherter Ideen kennen weiterhin alle Tracks. */
+const visTracks = () => Object.entries(TRACKS).filter(([,t]) => SHOW_CLAUDE || !t.claude);
+const TRACK_CARDS = SHOW_CLAUDE ? [
   {no:'01', name:'Langdock', hex:'#2f5fa8', nocode:true, tags:['Ohne Programmieren','Agent','Workflow'],
    desc:'Unsere DSGVO-konforme KI-Plattform, EU-gehostet und an unsere Dokumente angebunden. Hier fängst du an, wenn du noch nie etwas gebaut hast: Es wird kein Code geschrieben, nur beschrieben.'},
   {no:'02', name:'Claude Code', hex:'#ffd400', nocode:false, tags:['Webapp','Skill','Sofort online'],
    desc:'Du beschreibst das Ziel, der Agent in unserer Sandbox schreibt den Code. Am Ende steht eine echte Webapp mit einem Link, den du rumschicken kannst.'},
   {no:'03', name:'Claude Design', hex:'#a8436f', nocode:true, tags:['Ohne Programmieren','Prototyp','Deck'],
    desc:'Kennt unser Design-System. Aus einer Beschreibung entsteht ein Prototyp, ein Deck oder ein One-Pager, der schon nach pilot aussieht.'}
+] : [
+  {no:'01', name:'Langdock Agent', hex:'#2f5fa8', nocode:true, tags:['Ohne Programmieren','Eigenes Wissen','Chat'],
+   desc:'Ein Assistent mit festem Auftrag: kennt eure Dokumente, antwortet im Chat und bleibt bei seinem Thema. DSGVO-konform und EU-gehostet — es wird kein Code geschrieben, nur beschrieben.'},
+  {no:'02', name:'Langdock Workflow', hex:'#12706f', nocode:true, tags:['Ohne Programmieren','Automatisierung','Läuft von selbst'],
+   desc:'Eine Kette aus Schritten, die im Hintergrund läuft: etwas kommt rein, wird verarbeitet, ein Ergebnis geht raus. Perfekt für alles, was regelmäßig von allein passieren soll.'}
 ];
 
 const DEPTS = ['Mediaplanung','Strategie','Kreation','Werbewirkungsforschung','Technologie','Account Management','New Business','HR & People','Controlling','Agenturweit'];
@@ -1453,9 +1475,9 @@ const SPARK_PAINS = [
   {t:'Zahlen erklären',            cat:'formate',   q:'welche Auswertung müsst ihr immer wieder für andere übersetzen?'},
   {t:'Pitch-Vorbereitung',         cat:'pitch',     q:'was frisst vor jedem Pitch Zeit, ohne den Pitch besser zu machen?'}
 ];
-const SPARK_TOOLS = Object.entries(TRACKS).map(([id,t]) => ({id, t:t.label}));
+const SPARK_TOOLS = visTracks().map(([id,t]) => ({id, t:t.label}));
 
-const SEED = [
+const SEED_ALL = [
   {id:'s-mediaplan-diff', title:'Mediaplan-Diff — was hat sich zwischen zwei Versionen geändert?',
    problem:'Kunden schicken überarbeitete Mediapläne als neue Excel. Wir vergleichen Zeile für Zeile von Hand und übersehen trotzdem Änderungen bei Budgets und Laufzeiten.',
    solution:'Zwei Dateien reinziehen, das Tool markiert farbig jede Abweichung — plus eine Zusammenfassung für die Mail an den Kunden.',
@@ -1509,9 +1531,12 @@ const SEED = [
    status:'gebaut',wildcard:false,needs:[],votes:34,crew:[{name:'Mia Hoffmann',role:'Bauen'},{name:'Christopher Kipp',role:'Testen'}],days:30}
 ];
 
+/* Ohne Claude-Tracks kommen nur die Langdock-Beispiele ins Board. */
+const SEED = SHOW_CLAUDE ? SEED_ALL : SEED_ALL.filter(s => !TRACKS[s.track]?.claude);
 /* Die Beispiel-Ideen tragen erfundene Namen. Sie werden im Board sichtbar als
-   Beispiele markiert, damit niemand sie für echte Einreichungen hält. */
-const DEMO_IDS = new Set(SEED.map(s => s.id));
+   Beispiele markiert, damit niemand sie für echte Einreichungen hält.
+   DEMO_IDS kennt bewusst alle Beispiele — auch alte Stände räumen sauber auf. */
+const DEMO_IDS = new Set(SEED_ALL.map(s => s.id));
 const isDemo = i => DEMO_IDS.has(i.id);
 
 /* ═══ STATE ═══ */
@@ -1803,6 +1828,7 @@ $('#hero-date').textContent = new Intl.DateTimeFormat('de-DE',{day:'2-digit',mon
 
 /* ═══ TRACKS ═══ */
 function renderTracks(){
+  $('#trk-grid').dataset.n = TRACK_CARDS.length;
   $('#trk-grid').innerHTML = TRACK_CARDS.map(t => `
     <article class="trk rv" style="--tc:${t.hex}">
       <div class="top"><span class="no">${t.no}</span><span class="dot"></span></div>
@@ -1822,7 +1848,7 @@ function renderFilters(){
     `<button class="chip -mine" data-mine aria-pressed="false">Von mir</button>` +
     `<button class="chip -wild" data-wild aria-pressed="false" title="Mutig, ungewöhnlich — zählt auf den Mut-Preis ein">Wildcards<span class="n" data-n="wild"></span></button>` +
     Object.entries(STATUSES).map(([id,s]) => `<button class="chip" data-status="${id}" aria-pressed="false" title="${esc(s.desc)}">${esc(s.label)}<span class="n" data-n="s-${id}"></span></button>`).join('') +
-    Object.entries(TRACKS).map(([id,t]) => `<button class="chip" data-track="${id}" aria-pressed="false">${esc(t.short)}<span class="n" data-n="t-${id}"></span></button>`).join('');
+    visTracks().map(([id,t]) => `<button class="chip" data-track="${id}" aria-pressed="false">${esc(t.short)}<span class="n" data-n="t-${id}"></span></button>`).join('');
 
   /* flipRender statt render: die Karten gleiten an ihre neue Position,
      wie umsortierte Karten auf dem Tisch. */
@@ -1859,6 +1885,7 @@ function writeUrl(){
   if (filters.statuses.size) p.set('status', [...filters.statuses].join(','));
   if (filters.mine) p.set('meine', '1');
   if (filters.wild) p.set('wild', '1');
+  if (SHOW_CLAUDE) p.set('claude', '1');   /* die Vorschau-Ansicht überlebt jeden Filterklick */
   const s = p.toString();
   history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
 }
@@ -1906,13 +1933,44 @@ function visible(){
   return out;
 }
 
+/* Tippfehler-tolerante Nachsuche für den leeren Zustand: ein Wort trifft,
+   wenn es ein Textwort ist, dessen Anfang — oder sich nur um einen Buchstaben
+   unterscheidet. „Brifing" findet so den Briefing-Wächter. */
+function fuzzyHits(q){
+  const norm = s => s.toLowerCase().replace(/[^a-zäöüß0-9 ]/g,' ').split(/\s+/).filter(w => w.length > 2);
+  const qt = norm(q); if (!qt.length) return [];
+  const lev1 = (a,b) => {
+    if (Math.abs(a.length-b.length) > 1) return false;
+    let i=0, j=0, diff=0;
+    while (i < a.length && j < b.length){
+      if (a[i] === b[j]){ i++; j++; continue; }
+      if (++diff > 1) return false;
+      if (a.length > b.length) i++;
+      else if (b.length > a.length) j++;
+      else { i++; j++; }
+    }
+    return diff + (a.length-i) + (b.length-j) <= 1;
+  };
+  return ideas.map(i => {
+    const ht = norm([i.title, i.problem, i.dept, cat(i).label].join(' '));
+    const score = qt.reduce((s,w) => s + (ht.some(h => h.startsWith(w) || lev1(h,w)) ? 1 : 0), 0);
+    return {i, score};
+  }).filter(x => x.score >= Math.max(1, qt.length*.5))
+    .sort((a,b) => b.score - a.score || b.i.votes - a.i.votes)
+    .slice(0,3).map(x => x.i);
+}
+
 /* ═══ RENDER ═══ */
 function render(){
   const list = visible();
+  const hints = list.length ? [] : (filters.q ? fuzzyHits(filters.q) : []);
   $('#grid').innerHTML = list.length ? list.map(cardHTML).join('') : `
     <div class="empty">
       <h3>Nichts gefunden.</h3>
-      <p>Setz die Filter zurück — oder reich die Idee ein, die dir gerade fehlt.</p>
+      ${hints.length ? `
+        <p>Meintest du vielleicht eine von diesen?</p>
+        <div class="hints">${hints.map(h => `<button class="chip" data-open="${h.id}">${esc(kurz(h.title,52))}</button>`).join('')}</div>`
+      : `<p>Setz die Filter zurück — oder reich die Idee ein, die dir gerade fehlt.</p>`}
       <button class="btn -ghost" id="empty-clear">Filter löschen</button>
       <button class="btn -primary" data-new>Idee einreichen</button>
     </div>`;
@@ -1934,7 +1992,7 @@ function render(){
   renderPot();
   writeUrl();
 
-  renderMetrics(); showReminder();
+  renderMetrics(); renderExportInfo(); showReminder();
 }
 
 /* Deine Hand: eigene Karten, Stimmen darauf, beigetretene Teams. Klick filtert
@@ -2118,7 +2176,7 @@ function buildForm(){
       <span class="sym" aria-hidden="true">${c.sym}</span>
       <span class="nm">${esc(c.label)}</span>
       <span class="ds">${esc(c.desc)}</span></label>`).join('');
-  $('#track-picks').innerHTML = Object.entries(TRACKS).map(([id,t],n) => `
+  $('#track-picks').innerHTML = visTracks().map(([id,t],n) => `
     <label class="pick" style="--cc:${t.hex}">
       <input type="radio" name="track" value="${id}" ${n===0?'checked':''}>
       <span class="nm">${esc(t.label)}</span>
@@ -2454,19 +2512,40 @@ function openDetail(id, keep){
   };
   const ed = $('#edit-idea');
   if (ed) ed.onclick = async () => {
+    /* Bearbeiten kann alles, was Einreichen kann — sonst müsste man für einen
+       vertippten Track neu einreichen und die Stimmen opfern. Ein versteckter
+       (Claude-)Track bleibt wählbar, wenn die Idee ihn schon trägt. */
+    const trackOpts = visTracks().map(([tid,t]) => [tid, t.label]);
+    if (!trackOpts.some(([tid]) => tid === i.track)) trackOpts.push([i.track, TRACKS[i.track].label]);
+    const depts = DEPTS.includes(i.dept) ? DEPTS : [i.dept, ...DEPTS];
     const v = await mini({tag:'Bearbeiten', title:'Idee anpassen',
       bodyHTML:`<div class="field" style="margin-top:0" id="ef-title"><label for="e-title">Titel</label><input type="text" id="e-title" maxlength="90" value="${esc(i.title)}"><p class="err">Ohne Titel finden andere die Idee nicht.</p></div>
         <div class="field" id="ef-problem"><label for="e-problem">Problem</label><textarea id="e-problem" maxlength="400">${esc(i.problem)}</textarea><p class="err">Das Problem darf nicht leer bleiben.</p></div>
         <div class="field"><label for="e-solution">Lösungsidee</label><textarea id="e-solution" maxlength="400" style="min-height:6rem">${esc(i.solution)}</textarea></div>
         <div class="field"><label for="e-cat">Kategorie</label><select id="e-cat">${Object.entries(CATEGORIES).map(([cid,c2])=>
-          `<option value="${cid}" ${cid===i.category?'selected':''}>${esc(c2.label)}</option>`).join('')}</select></div>`,
+          `<option value="${cid}" ${cid===i.category?'selected':''}>${esc(c2.label)}</option>`).join('')}</select></div>
+        <div class="field"><label for="e-track">Werkzeug</label><select id="e-track">${trackOpts.map(([tid,l])=>
+          `<option value="${tid}" ${tid===i.track?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+        <div class="field"><label id="le-effort">Aufwand</label>
+          <div class="chk-row" role="radiogroup" aria-labelledby="le-effort">${['?','S','M','L'].map(ev=>
+            `<label class="chk"><input type="radio" name="e-effort" value="${ev}" ${i.effort===ev?'checked':''}>${ev==='?'?'offen':ev+' — '+esc(EFFORTS[ev])}</label>`).join('')}</div></div>
+        <div class="field"><label for="e-dept">Abteilung</label><select id="e-dept">${depts.map(d=>
+          `<option ${d===i.dept?'selected':''}>${esc(d)}</option>`).join('')}</select></div>
+        <div class="field"><label id="le-needs">Wen braucht das Team?</label>
+          <div class="chk-row" role="group" aria-labelledby="le-needs">${NEEDS.map(n=>
+            `<label class="chk"><input type="checkbox" name="e-needs" value="${esc(n)}" ${i.needs?.includes(n)?'checked':''}>${esc(n)}</label>`).join('')}</div></div>
+        <label class="toggle"><input type="checkbox" id="e-wild" ${i.wildcard?'checked':''}><span class="sw" aria-hidden="true"></span>
+          <span><b>Wildcard</b><small>Mutig, ungewöhnlich — zählt auf den Mut-Preis ein.</small></span></label>`,
       ok:'Speichern', focus:'#e-title',
       /* Fehler stehen am Feld — wie in jedem anderen Formular hier. */
       read: b => { const t2 = $('#e-title',b).value.trim(), p = $('#e-problem',b).value.trim();
         $('#ef-title',b).classList.toggle('bad', !t2);
         $('#ef-problem',b).classList.toggle('bad', !p);
         if (!t2 || !p){ (!t2 ? $('#e-title',b) : $('#e-problem',b)).focus(); return undefined; }
-        return {title:t2, problem:p, solution:$('#e-solution',b).value.trim(), category:$('#e-cat',b).value}; }});
+        return {title:t2, problem:p, solution:$('#e-solution',b).value.trim(), category:$('#e-cat',b).value,
+          track:$('#e-track',b).value, effort:$('input[name=e-effort]:checked',b).value,
+          dept:$('#e-dept',b).value, wildcard:$('#e-wild',b).checked,
+          needs:$$('input[name=e-needs]:checked',b).map(c=>c.value)}; }});
     if (!v) return;
     Object.assign(i, v); save(); render(); openDetail(id,true); toast('Idee aktualisiert.');
   };
@@ -2709,7 +2788,17 @@ const stamp = () => new Date().toISOString().slice(0,10);
 function exportJSON(){
   download(`ideen-hangar-${stamp()}.json`, JSON.stringify(ideas,null,2), 'application/json');
   localStorage.setItem(CLEAN_KEY, String(Date.now()));
+  localStorage.setItem(EXPORT_KEY, String(Date.now()));
+  renderExportInfo();
   hideReminder(); toast('Board exportiert. <b>Schick es der Orga.</b>');
+}
+/* Sichtbar machen, ob das Board gesichert ist — ohne dass man sich erinnern muss. */
+function renderExportInfo(){
+  const el = $('#export-info'); if (!el) return;
+  const t = +localStorage.getItem(EXPORT_KEY);
+  el.textContent = t
+    ? `Zuletzt exportiert: ${ago(new Date(t).toISOString())}`
+    : 'Noch nie exportiert — alles liegt nur in diesem Browser.';
 }
 $('#export-json').onclick = exportJSON;
 $('#rem-export').onclick = exportJSON;
@@ -2740,15 +2829,16 @@ $('#export-md').onclick = () => {
   toast('Markdown exportiert.');
 };
 
-$('#import-file').onchange = e => {
-  const f = e.target.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = () => {
+/* Die Orga sammelt Boards von vielen Leuten ein — deshalb gehen beliebig
+   viele Dateien auf einmal. Eine kaputte Datei bricht nicht den Rest ab. */
+$('#import-file').onchange = async e => {
+  const files = [...e.target.files]; if (!files.length) return;
+  const byId = new Map(ideas.map(i => [i.id,i]));
+  let added=0, merged=0, kaputt=0;
+  for (const f of files){
     try{
-      const inc = JSON.parse(r.result);
+      const inc = JSON.parse(await f.text());
       if (!Array.isArray(inc)) throw new Error('Kein Array');
-      const byId = new Map(ideas.map(i => [i.id,i]));
-      let added=0, merged=0;
       migrate(inc).forEach(n => {
         if (!n?.id || !n.title) return;
         const cur = byId.get(n.id);
@@ -2761,11 +2851,13 @@ $('#import-file').onchange = e => {
         if (n.status !== 'idee') cur.status = n.status;
         merged++;
       });
-      save(); render(); toast(`Import: <b>${added} neu</b>, ${merged} zusammengeführt.`);
-    }catch(err){ toast('Import fehlgeschlagen — ist das eine Hangar-JSON?'); }
-    e.target.value = '';
-  };
-  r.readAsText(f);
+    }catch(err){ kaputt++; }
+  }
+  if (added || merged){ save(); render(); }
+  toast(kaputt
+    ? `Import: <b>${added} neu</b>, ${merged} zusammengeführt — <b>${kaputt} ${kaputt===1?'Datei':'Dateien'} unlesbar</b>.`
+    : `Import: <b>${added} neu</b>, ${merged} zusammengeführt${files.length>1?` aus ${files.length} Dateien`:''}.`);
+  e.target.value = '';
 };
 $('#reset').onclick = async () => {
   const ok = await confirmDialog({title:'Board zurücksetzen?',
@@ -2777,6 +2869,26 @@ $('#reset').onclick = async () => {
 
 /* ═══ INIT ═══ */
 load();
+if (!SHOW_CLAUDE){
+  /* Alte Beispiel-Ideen mit Claude-Tracks aus früheren Ständen ausblenden —
+     echte Einreichungen bleiben unangetastet. */
+  const vorher = ideas.length;
+  ideas = ideas.filter(i => !(DEMO_IDS.has(i.id) && TRACKS[i.track]?.claude));
+  if (ideas.length !== vorher) save();
+
+  /* Texte der Langdock-Phase — das HTML trägt die Vollversion,
+     hier wird nur überschrieben, damit das Reaktivieren trivial bleibt. */
+  $('.lead').textContent = 'Zwei Felder, neunzig Sekunden — und du hältst deine eigene Karte im Deck. ' +
+    'Ob daraus ein Assistent oder ein Workflow im Hintergrund wird, findet dein Team beim Hackathon heraus.';
+  $('.nav a[href="#tracks"]').textContent = 'Werkzeug';
+  $('#tracks .head .eyebrow').textContent = '01 · Das Werkzeug';
+  $('#tracks .head p:not(.eyebrow)').textContent = 'Alles läuft auf Langdock, unserer DSGVO-konformen KI-Plattform — ' +
+    'ohne eine Zeile Code. Ob Agent oder Workflow, entscheidet ihr beim Kickoff.';
+  $('.pane[data-pane="2"] .q-sub').textContent = 'Nur eine Vermutung — dein Team entscheidet später. Beides läuft ohne Programmieren.';
+  $('#ablauf .head h2').textContent = 'Von der Idee zum laufenden Helfer';
+  $$('.fstep')[2].querySelector('p').textContent = 'Zugänge, kurze Einführung in Langdock. Danach wird gebaut.';
+  $$('footer .cols > div')[1].hidden = true;   /* „Neue Ideen“-Spalte nennt Claude Code */
+}
 {
   const sv = localStorage.getItem('pilot-hangar-sort');
   if (sv && ['votes','new','cat','effort','crew'].includes(sv)){ filters.sort = sv; $('#sort').value = sv; }
