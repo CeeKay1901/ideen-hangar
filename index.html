@@ -874,6 +874,12 @@ footer{background:var(--fg);color:#8b8577;padding:5.5rem 0 3.2rem;font-size:1.4r
 footer .cols{display:grid;gap:3.6rem;grid-template-columns:1fr;margin-bottom:4.4rem}
 @media(min-width:900px){footer .cols{grid-template-columns:1.6fr 1fr}}
 footer h2{color:var(--bg);font-size:1.7rem;font-weight:700;margin-bottom:1.4rem;letter-spacing:-.01em}
+/* „Und dann?"-Dreischritt im Footer — kompakter Ersatz für die entfernte
+   Ablauf-Sektion, damit klar bleibt, was mit einer Idee passiert. */
+.foot-steps{list-style:none;counter-reset:fs;display:flex;flex-direction:column;gap:1.2rem;margin-top:.2rem;max-width:38ch}
+.foot-steps li{counter-increment:fs;display:flex;gap:1.3rem;align-items:baseline;color:#b8b2a4;font-size:1.45rem;line-height:1.55}
+.foot-steps li::before{content:counter(fs,decimal-leading-zero);font-family:var(--mono);font-size:1.15rem;color:var(--acid);font-weight:600;flex-shrink:0}
+.foot-steps b{color:var(--bg);font-weight:600}
 footer p{line-height:1.7;max-width:58ch;color:#b8b2a4}
 footer .tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:2rem}
 /* Destruktives gehört nicht neben Export/Import — der Reset rückt ab. */
@@ -1252,7 +1258,7 @@ a,button,input,select,textarea,[tabindex]{
         </div>
         <p class="export-info mono" id="export-info" role="status"></p>
       </div>
-      <div>
+      <div id="foot-more">
         <h2>Neue Ideen</h2>
         <p>Der Skill <code>/ideen-radar</code> in Claude Code würfelt jederzeit frische Vorschläge — und merkt sich, was schon dran war.</p>
       </div>
@@ -4040,7 +4046,15 @@ if (!SHOW_CLAUDE){
      hier wird nur überschrieben, damit das Reaktivieren trivial bleibt. */
   $('.nav a[href="#tracks"]').textContent = 'Werkzeug';
   $('#tracks .head .eyebrow').textContent = '01 · Das Werkzeug';
-  $$('footer .cols > div')[1].hidden = true;   /* „Neue Ideen“-Spalte nennt Claude Code */
+  /* Die „Neue Ideen"-Spalte nennt Claude Code — in der Langdock-Phase ersetzen
+     wir sie durch den Ablauf in Kurzform (die Ablauf-Sektion selbst ist raus). */
+  $('#foot-more').innerHTML =
+    '<h2>Und dann?</h2>' +
+    '<ol class="foot-steps">' +
+    '<li><b>Sammeln.</b> Jede:r reicht ein, was nervt — auch halbgare Gedanken.</li>' +
+    '<li><b>Abstimmen.</b> Die Ideen mit den meisten Stimmen bekommen ein Team.</li>' +
+    '<li><b>Bauen.</b> Am Hackathon-Tag entsteht daraus ein echter Langdock-Agent.</li>' +
+    '</ol>';
 
   if (SHOW_WORKFLOWS){
     $('.lead').textContent = 'Zwei Felder, neunzig Sekunden — und du hältst deine eigene Karte im Deck. ' +
