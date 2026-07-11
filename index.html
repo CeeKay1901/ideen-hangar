@@ -286,6 +286,7 @@ section{padding:7rem 0;position:relative;border-bottom:1px solid var(--line)}
 .trk .top{display:flex;justify-content:space-between;align-items:center}
 .trk .no{font-family:var(--mono);font-size:1.15rem;color:var(--fg-3);letter-spacing:.1em}
 .trk .dot{width:1rem;height:1rem;background:var(--tc)}
+.trk .brand-ic{width:2rem;height:2rem;color:var(--tc)}
 .trk h3{font-size:2.3rem;font-weight:700;letter-spacing:-.02em}
 .trk p{color:var(--fg-2);font-size:1.55rem;line-height:1.62;flex:1}
 .trk .tags{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem}
@@ -531,7 +532,12 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .flow{display:grid;gap:1px;background:var(--line);border:1px solid var(--fg);grid-template-columns:1fr}
 @media(min-width:900px){.flow{grid-template-columns:repeat(5,1fr)}}
 .fstep{background:var(--bg-1);padding:2.8rem 2.2rem}
+.fstep .top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
 .fstep .n{font-family:var(--mono);font-size:1.05rem;letter-spacing:.14em;color:var(--fg);background:var(--acid);display:inline-block;padding:.2rem .7rem;font-weight:600}
+/* Zweifarbdruck-Illustration: Schmuckfarbe als Fläche, Tinte als Zeichnung
+   (Phosphor-Duotone aus design-assets — Duotone IST die Druckbogen-Sprache). */
+.duo{width:3.4rem;height:3.4rem;color:var(--fg);flex-shrink:0;margin-top:-.4rem}
+.duo path:first-child{fill:var(--acid);opacity:1}
 .fstep h3{font-size:1.7rem;font-weight:700;margin:1.2rem 0 .7rem;letter-spacing:-.01em}
 .fstep p{font-size:1.35rem;color:var(--fg-2);line-height:1.55}
 .crits{display:grid;gap:1px;background:var(--line);border:1px solid var(--fg);margin-top:5rem;grid-template-columns:1fr}
@@ -549,7 +555,11 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .panel{
   background:var(--bg-2);border:1px solid var(--fg);width:100%;max-width:76rem;margin:auto;
   position:relative;overflow:hidden;animation:panelIn .35s var(--ease);
-  box-shadow:0 3rem 8rem rgba(27,25,18,.35);
+  /* Mehrstufig statt ein harter Wurf — Papier über Papier (ui-details.css). */
+  box-shadow:
+    0 .2rem .5rem rgba(27,25,18,.08),
+    0 1.2rem 2.6rem rgba(27,25,18,.16),
+    0 3rem 8rem rgba(27,25,18,.26);
 }
 .ov.-mini .panel{max-width:46rem}
 @keyframes panelIn{from{opacity:0;transform:translateY(1.6rem)}to{opacity:1;transform:none}}
@@ -692,7 +702,8 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 /* ═══ COMMAND PALETTE ═══ */
 .cmdk{position:fixed;inset:0;z-index:400;display:none;padding:12vh 2rem 2rem;background:rgba(27,25,18,.4);justify-content:center;align-items:flex-start}
 .cmdk.open{display:flex;animation:fadeIn .15s var(--ease)}
-.cmdk .box{width:100%;max-width:60rem;background:var(--bg-2);border:1px solid var(--fg);overflow:hidden;box-shadow:0 3rem 8rem rgba(27,25,18,.4);animation:panelIn .25s var(--ease)}
+.cmdk .box{width:100%;max-width:60rem;background:var(--bg-2);border:1px solid var(--fg);overflow:hidden;animation:panelIn .25s var(--ease);
+  box-shadow:0 .2rem .5rem rgba(27,25,18,.1),0 1.2rem 2.6rem rgba(27,25,18,.2),0 3rem 8rem rgba(27,25,18,.3)}
 .cmdk input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);padding:2rem 2.2rem;font-size:1.7rem}
 .cmdk input:focus{outline:none}
 .cmdk input::placeholder{color:var(--fg-3)}
@@ -772,10 +783,12 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 /* Rückseite — dieselbe Geometrie, damit sich die Karte sauber umdrehen lässt. */
 .ideacard.-back{
   background:#1b1912;border-color:#1b1912;align-items:center;justify-content:center;
+  /* Mini-Passerkreuze statt Punkte (design-assets/patterns/plus) — die
+     Rückseite spricht dieselbe Druckerei-Sprache wie der Bogenrand. */
   background-image:
-    radial-gradient(circle,rgba(255,212,0,.5) .57cqw,transparent .63cqw),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M14 16h4M16 14v4' stroke='%23ffd400' stroke-opacity='.45' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"),
     repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 1.14cqw,transparent 1.14cqw 3.41cqw);
-  background-size:7.95cqw 7.95cqw,auto;
+  background-size:9.1cqw 9.1cqw,auto;
 }
 .ideacard.-back .mark{
   color:#fff;font-size:3.86cqw;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
@@ -1002,6 +1015,9 @@ html{scrollbar-color:var(--line-2) var(--bg)}
    (Drucken, Teilen, Export, Würfeln), der Rest der Seite bleibt Typografie. */
 .bi{width:1.5rem;height:1.5rem;flex-shrink:0}
 .tb-meta button{display:inline-flex;align-items:center;gap:.5rem}
+/* [hidden] muss die display-Regel schlagen — sonst bleiben „Auswahl teilen“
+   und „Filter löschen“ dauerhaft sichtbar, obwohl kein Filter aktiv ist. */
+.tb-meta button[hidden],.tb-meta [hidden]{display:none}
 .tb-meta .bi{width:1.3rem;height:1.3rem}
 
 /* Der Variable Font erlaubt Zwischengewichte: Fließtext einen Hauch
@@ -1240,11 +1256,11 @@ a,button,input,select,textarea,[tabindex]{
       <p>Das Board ist Phase 1. Danach wird gebaut.</p>
     </div>
     <div class="flow rv">
-      <div class="fstep"><p class="n">01</p><h3>Sammeln</h3><p>Jede:r reicht ein, was nervt. Auch halbgare Gedanken.</p></div>
-      <div class="fstep"><p class="n">02</p><h3>Abstimmen</h3><p>Die Top-Ideen bekommen Teams aus 2–4 Leuten. Gemischt.</p></div>
-      <div class="fstep"><p class="n">03</p><h3>Kickoff</h3><p>Sandbox, Coolify, kurze Einführung. Danach wird gebaut.</p></div>
-      <div class="fstep"><p class="n">04</p><h3>Bauen</h3><p>Mentor:innen laufen rum. Zwischenstände in den Showroom.</p></div>
-      <div class="fstep"><p class="n">05</p><h3>Demo Day</h3><p>5 Minuten live pro Team. Kein Deck ohne laufendes Ding.</p></div>
+      <div class="fstep"><div class="top"><p class="n">01</p><svg class="duo" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,104a79.86,79.86,0,0,1-30.59,62.92A24.29,24.29,0,0,0,168,186v6a8,8,0,0,1-8,8H96a8,8,0,0,1-8-8v-6a24.11,24.11,0,0,0-9.3-19A79.87,79.87,0,0,1,48,104.45C47.76,61.09,82.72,25,126.07,24A80,80,0,0,1,208,104Z" opacity="0.2"/><path d="M176,232a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h80A8,8,0,0,1,176,232Zm40-128a87.55,87.55,0,0,1-33.64,69.21A16.24,16.24,0,0,0,176,186v6a16,16,0,0,1-16,16H96a16,16,0,0,1-16-16v-6a16,16,0,0,0-6.23-12.66A87.59,87.59,0,0,1,40,104.49C39.74,56.83,78.26,17.14,125.88,16A88,88,0,0,1,216,104Zm-16,0a72,72,0,0,0-73.74-72c-39,.92-70.47,33.39-70.26,72.39a71.65,71.65,0,0,0,27.64,56.3A32,32,0,0,1,96,186v6h64v-6a32.15,32.15,0,0,1,12.47-25.35A71.65,71.65,0,0,0,200,104Zm-16.11-9.34a57.6,57.6,0,0,0-46.56-46.55,8,8,0,0,0-2.66,15.78c16.57,2.79,30.63,16.85,33.44,33.45A8,8,0,0,0,176,104a9,9,0,0,0,1.35-.11A8,8,0,0,0,183.89,94.66Z"/></svg></div><h3>Sammeln</h3><p>Jede:r reicht ein, was nervt. Auch halbgare Gedanken.</p></div>
+      <div class="fstep"><div class="top"><p class="n">02</p><svg class="duo" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M80,104V208H32a8,8,0,0,1-8-8V112a8,8,0,0,1,8-8Z" opacity="0.2"/><path d="M234,80.12A24,24,0,0,0,216,72H160V56a40,40,0,0,0-40-40,8,8,0,0,0-7.16,4.42L75.06,96H32a16,16,0,0,0-16,16v88a16,16,0,0,0,16,16H204a24,24,0,0,0,23.82-21l12-96A24,24,0,0,0,234,80.12ZM32,112H72v88H32ZM223.94,97l-12,96a8,8,0,0,1-7.94,7H88V105.89l36.71-73.43A24,24,0,0,1,144,56V80a8,8,0,0,0,8,8h64a8,8,0,0,1,7.94,9Z"/></svg></div><h3>Abstimmen</h3><p>Die Top-Ideen bekommen Teams aus 2–4 Leuten. Gemischt.</p></div>
+      <div class="fstep"><div class="top"><p class="n">03</p><svg class="duo" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M184,120v61.65a8,8,0,0,1-2.34,5.65l-34.35,34.35a8,8,0,0,1-13.57-4.53L128,176ZM136,72H74.35a8,8,0,0,0-5.65,2.34L34.35,108.69a8,8,0,0,0,4.53,13.57L80,128ZM40,216c37.65,0,50.69-19.69,54.56-28.18L68.18,161.44C59.69,165.31,40,178.35,40,216Z" opacity="0.2"/><path d="M223.85,47.12a16,16,0,0,0-15-15c-12.58-.75-44.73.4-71.41,27.07L132.69,64H74.36A15.91,15.91,0,0,0,63,68.68L28.7,103a16,16,0,0,0,9.07,27.16l38.47,5.37,44.21,44.21,5.37,38.49a15.94,15.94,0,0,0,10.78,12.92,16.11,16.11,0,0,0,5.1.83A15.91,15.91,0,0,0,153,227.3L187.32,193A15.91,15.91,0,0,0,192,181.64V123.31l4.77-4.77C223.45,91.86,224.6,59.71,223.85,47.12ZM74.36,80h42.33L77.16,119.52,40,114.34Zm74.41-9.45a76.65,76.65,0,0,1,59.11-22.47,76.46,76.46,0,0,1-22.42,59.16L128,164.68,91.32,128ZM176,181.64,141.67,216l-5.19-37.17L176,139.31Zm-74.16,9.5C97.34,201,82.29,224,40,224a8,8,0,0,1-8-8c0-42.29,23-57.34,32.86-61.85a8,8,0,0,1,6.64,14.56c-6.43,2.93-20.62,12.36-23.12,38.91,26.55-2.5,36-16.69,38.91-23.12a8,8,0,1,1,14.56,6.64Z"/></svg></div><h3>Kickoff</h3><p>Sandbox, Coolify, kurze Einführung. Danach wird gebaut.</p></div>
+      <div class="fstep"><div class="top"><p class="n">04</p><svg class="duo" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M245.66,129,217,157.66a8,8,0,0,1-11.3,0L168.1,120l-28,28-32-32,28-28L80,31.78a87.81,87.81,0,0,1,98.31,18l67.35,67.89A8,8,0,0,1,245.66,129Z" opacity="0.2"/><path d="M251.34,112,183.88,44.08a96.1,96.1,0,0,0-135.77,0l-.09.09L34.25,58.4A8,8,0,0,0,45.74,69.53L59.47,55.35a79.92,79.92,0,0,1,18.71-13.9L124.68,88l-96,96a16,16,0,0,0,0,22.63l20.69,20.69a16,16,0,0,0,22.63,0l96-96,14.34,14.34h0L200,163.3a16,16,0,0,0,22.63,0l28.69-28.69A16,16,0,0,0,251.34,112ZM60.68,216,40,195.31l68-68L128.68,148ZM162.34,114.32,140,136.67,119.31,116l22.35-22.35a8,8,0,0,0,0-11.32L94.32,35a80,80,0,0,1,78.23,20.41l44.22,44.51L188,128.66l-14.34-14.34A8,8,0,0,0,162.34,114.32Zm49,37.66-12-12L228,111.25l12,12Z"/></svg></div><h3>Bauen</h3><p>Mentor:innen laufen rum. Zwischenstände in den Showroom.</p></div>
+      <div class="fstep"><div class="top"><p class="n">05</p><svg class="duo" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M208,72V184H48V72Z" opacity="0.2"/><path d="M232,64V48a16,16,0,0,0-16-16H40A16,16,0,0,0,24,48V64A16,16,0,0,0,40,80v96H32a8,8,0,0,0,0,16h88v17.38a24,24,0,1,0,16,0V192h88a8,8,0,0,0,0-16h-8V80A16,16,0,0,0,232,64ZM128,240a8,8,0,1,1,8-8A8,8,0,0,1,128,240ZM40,48H216V64H40ZM200,176H56V80H200Z"/></svg></div><h3>Demo Day</h3><p>5 Minuten live pro Team. Kein Deck ohne laufendes Ding.</p></div>
     </div>
 
     <div class="head rv" style="margin-top:7rem;margin-bottom:0">
@@ -2424,12 +2440,15 @@ const TRACKS = {
    und Anzeige gespeicherter Ideen kennen weiterhin alle Tracks. */
 const visTracks = () => Object.entries(TRACKS).filter(([,t]) =>
   (SHOW_CLAUDE || !t.claude) && (SHOW_WORKFLOWS || !t.wf));
+/* Claude-Wortbildmarke (simple-icons, CC0) — schmückt die Claude-Karten
+   der Vollversion; sichtbar erst mit ?claude=1 bzw. nach Reaktivierung. */
+const CLAUDE_ICON = '<svg class="brand-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>';
 const TRACK_CARDS = SHOW_CLAUDE ? [
   {no:'01', name:'Langdock', hex:'#2f5fa8', nocode:true, tags:['Ohne Programmieren','Agent','Workflow'],
    desc:'Unsere DSGVO-konforme KI-Plattform, EU-gehostet und an unsere Dokumente angebunden. Hier fängst du an, wenn du noch nie etwas gebaut hast: Es wird kein Code geschrieben, nur beschrieben.'},
-  {no:'02', name:'Claude Code', hex:'#ffd400', nocode:false, tags:['Webapp','Skill','Sofort online'],
+  {no:'02', name:'Claude Code', hex:'#ffd400', nocode:false, brand:CLAUDE_ICON, tags:['Webapp','Skill','Sofort online'],
    desc:'Du beschreibst das Ziel, der Agent in unserer Sandbox schreibt den Code. Am Ende steht eine echte Webapp mit einem Link, den du rumschicken kannst.'},
-  {no:'03', name:'Claude Design', hex:'#a8436f', nocode:true, tags:['Ohne Programmieren','Prototyp','Deck'],
+  {no:'03', name:'Claude Design', hex:'#a8436f', nocode:true, brand:CLAUDE_ICON, tags:['Ohne Programmieren','Prototyp','Deck'],
    desc:'Kennt unser Design-System. Aus einer Beschreibung entsteht ein Prototyp, ein Deck oder ein One-Pager, der schon nach pilot aussieht.'}
 ] : [
   {no:'01', name:'Langdock Agent', hex:'#2f5fa8', nocode:true, tags:['Ohne Programmieren','Eigenes Wissen','Chat'],
@@ -2825,7 +2844,7 @@ function renderTracks(){
   $('#tracks .wrap').dataset.solo = String(TRACK_CARDS.length === 1);
   $('#trk-grid').innerHTML = TRACK_CARDS.map(t => `
     <article class="trk rv" style="--tc:${t.hex}">
-      <div class="top"><span class="no">${t.no}</span><span class="dot"></span></div>
+      <div class="top"><span class="no">${t.no}</span>${t.brand || '<span class="dot"></span>'}</div>
       <h3>${esc(t.name)}</h3>
       <p>${esc(t.desc)}</p>
       <div class="tags">${t.tags.map(x => `<span class="tg ${x==='Ohne Programmieren'?'-nocode':''}">${esc(x)}</span>`).join('')}</div>
@@ -4000,7 +4019,8 @@ if (!SHOW_CLAUDE){
   $('.nav a[href="#tracks"]').textContent = 'Werkzeug';
   $('#tracks .head .eyebrow').textContent = '01 · Das Werkzeug';
   $('#ablauf .head h2').textContent = 'Von der Idee zum laufenden Helfer';
-  $$('.fstep')[2].querySelector('p').textContent = 'Zugänge, kurze Einführung in Langdock. Danach wird gebaut.';
+  /* p:not(.n): das erste <p> im Schritt ist der Nummern-Chip, nicht der Text. */
+  $$('.fstep')[2].querySelector('p:not(.n)').textContent = 'Zugänge, kurze Einführung in Langdock. Danach wird gebaut.';
   $$('footer .cols > div')[1].hidden = true;   /* „Neue Ideen“-Spalte nennt Claude Code */
 
   if (SHOW_WORKFLOWS){
