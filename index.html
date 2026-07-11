@@ -2354,7 +2354,7 @@ a,button,input,select,textarea,[tabindex]{
 
 /* ═══ CONFIG ═══ */
 const HACKATHON_DATE = '2026-09-24T09:00:00+02:00';
-const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft', EXPORT_KEY='pilot-hangar-last-export', DEPT_KEY='pilot-hangar-dept';
+const STORE_KEY='pilot-hangar-v1', ME_KEY='pilot-hangar-me', CLEAN_KEY='pilot-hangar-exported-at', DRAFT_KEY='pilot-hangar-draft', EXPORT_KEY='pilot-hangar-last-export', DEPT_KEY='pilot-hangar-dept', DEMOS_HIDDEN_KEY='pilot-hangar-demos-hidden';
 const PRO_SEITE = 4;
 
 /* ═══ FEATURE-FLAGS: TRACKS ═══
@@ -2524,7 +2524,10 @@ const SEED = SEED_ALL.filter(s => VIS_TRACK_IDS.has(s.track));
    Beispiele markiert, damit niemand sie für echte Einreichungen hält.
    DEMO_IDS kennt bewusst alle Beispiele — auch alte Stände räumen sauber auf. */
 const DEMO_IDS = new Set(SEED_ALL.map(s => s.id));
-const isDemo = i => DEMO_IDS.has(i.id);
+/* Beispiele erkennt man am Präfix — so gelten auch früher gezeigte,
+   inzwischen entfernte Beispiele als Beispiel und nicht als echte Idee. */
+const isDemoId = id => typeof id === 'string' && id.startsWith('s-');
+const isDemo = i => isDemoId(i.id);
 
 /* ═══ STATE ═══ */
 let ideas=[], me=localStorage.getItem(ME_KEY)||'';
@@ -2566,17 +2569,50 @@ function normIdea(i){
   return o;
 }
 const migrate=l=>l.map(normIdea);
+/* Ein SEED-Eintrag wird zur vollständigen Idee. */
+const seedToIdea = s => normIdea({id:s.id, title:s.title, problem:s.problem, solution:s.solution||'',
+  category:s.category, track:s.track, dept:s.dept, effort:s.effort, author:s.author, status:s.status,
+  wildcard:s.wildcard, needs:s.needs||[], votes:s.votes, voters:[], crew:s.crew||[], createdAt:daysAgo(s.days)});
+
+/* ═══ LADEN ═══
+   Beispiele werden NICHT im Browser eingefroren: Sie kommen bei jedem Laden
+   frisch aus dem aktuellen SEED — nur so sehen alle immer den neuesten Stand
+   und veraltete Beispiele (falscher Track, alte Texte) verschwinden von selbst.
+   Aus dem Speicher kommen nur echte Einreichungen plus die Interaktionen
+   (Stimmen, Team, Status), die jemand auf ein Beispiel gelegt hat. */
 function load(){
-  try{const raw=localStorage.getItem(STORE_KEY);
-    if(raw){const p=JSON.parse(raw); if(Array.isArray(p)){ideas=migrate(p);return}}
-  }catch(e){console.warn('Board nicht lesbar:',e)}
-  ideas=SEED.map(s=>({id:s.id||uid(),title:s.title,problem:s.problem,solution:s.solution||'',category:s.category||CAT_DEFAULT,
-    track:s.track,dept:s.dept,effort:s.effort,author:s.author,status:s.status,wildcard:s.wildcard,
-    needs:s.needs||[],votes:s.votes,voters:[],crew:s.crew||[],createdAt:daysAgo(s.days)}));
-  save({clean:true});
+  let stored = [];
+  try{ const raw = localStorage.getItem(STORE_KEY);
+    if (raw){ const p = JSON.parse(raw); if (Array.isArray(p)) stored = migrate(p); }
+  }catch(e){ console.warn('Board nicht lesbar:', e); }
+
+  const wasFresh = !localStorage.getItem(STORE_KEY);
+  const byId = new Map(stored.map(i => [i.id, i]));
+  const demosHidden = localStorage.getItem(DEMOS_HIDDEN_KEY) === '1';
+
+  const demos = demosHidden ? [] : SEED.map(s => {
+    const fresh = seedToIdea(s);
+    const prev = byId.get(s.id);
+    if (prev){                       /* echte Interaktionen erhalten, Inhalt frisch */
+      fresh.voters = Array.isArray(prev.voters) ? prev.voters : [];
+      fresh.votes  = Math.max(s.votes, fresh.voters.length);
+      if (Array.isArray(prev.crew) && prev.crew.length) fresh.crew = prev.crew;
+      if (prev.status && STATUSES[prev.status]) fresh.status = prev.status;
+    }
+    return fresh;
+  });
+  const real = stored.filter(i => !isDemoId(i.id));   /* nur echte Einreichungen */
+  ideas = [...demos, ...real];
+  /* Immer den bereinigten Stand zurückschreiben, damit Speicher und Anzeige
+     übereinstimmen. Erstbesuch = sauber; bestehendes Board = soft (Export-
+     Status unberührt). */
+  save(wasFresh ? {clean:true} : {soft:true});
 }
 function save(o={}){
   try{localStorage.setItem(STORE_KEY,JSON.stringify(ideas));
+    /* soft: nur den Board-Stand schreiben, den Export-Status in Ruhe lassen —
+       fürs Synchronisieren der frischen Beispiele beim Laden. */
+    if(o.soft) return;
     if(o.clean)localStorage.setItem(CLEAN_KEY,String(Date.now())); else localStorage.removeItem(CLEAN_KEY);
   }catch(e){toast('Speichern fehlgeschlagen — Speicher voll?')}
 }
@@ -3021,15 +3057,17 @@ $('#hand').onclick = () => {
   flipRender(); $('#board').scrollIntoView({behavior:reduced()?'auto':'smooth'});
 };
 
-/* Kein Warndialog: sofort entfernen, bequem zurückholen. */
+/* Kein Warndialog: sofort entfernen, bequem zurückholen. Das Flag sorgt dafür,
+   dass die Beispiele auch beim nächsten Laden wegbleiben — sonst kämen sie
+   frisch aus SEED zurück. */
 function removeDemos(){
   const n = ideas.filter(isDemo).length;
   if (!n){ toast('Es sind keine Beispiel-Ideen mehr im Board.'); return; }
-  const before = [...ideas];
   ideas = ideas.filter(i => !isDemo(i));
+  localStorage.setItem(DEMOS_HIDDEN_KEY, '1');
   save(); render();
   toast(`${n} Beispiele entfernt.`, {label:'Rückgängig',
-    fn: () => { ideas = before; save(); render(); toast('Die Beispiele sind zurück.'); }});
+    fn: () => { localStorage.removeItem(DEMOS_HIDDEN_KEY); load(); render(); toast('Die Beispiele sind zurück.'); }});
 }
 $('#rm-demo').onclick = removeDemos;
 
@@ -3987,17 +4025,16 @@ $('#reset').onclick = async () => {
     text:`Alle ${ideas.length} Ideen in diesem Browser werden gelöscht und die Beispiele wiederhergestellt. Exportiere vorher, wenn du sie behalten willst.`,
     ok:'Ja, zurücksetzen'});
   if (!ok) return;
-  localStorage.removeItem(STORE_KEY); load(); render(); toast('Board zurückgesetzt.');
+  localStorage.removeItem(STORE_KEY); localStorage.removeItem(DEMOS_HIDDEN_KEY);
+  load(); render(); toast('Board zurückgesetzt.');
 };
 
 /* ═══ INIT ═══ */
 load();
 if (!SHOW_CLAUDE){
-  /* Alte Beispiel-Ideen mit versteckten Tracks aus früheren Ständen
-     ausblenden — echte Einreichungen bleiben unangetastet. */
-  const vorher = ideas.length;
-  ideas = ideas.filter(i => !(DEMO_IDS.has(i.id) && !VIS_TRACK_IDS.has(i.track)));
-  if (ideas.length !== vorher) save();
+  /* Beispiele mit versteckten Tracks kommen gar nicht mehr ins Board — load()
+     zieht sie nur aus dem gefilterten SEED, und echte Einreichungen mit
+     verstecktem Track bleiben unangetastet. Keine Migration mehr nötig. */
 
   /* Texte der Langdock-Phase — das HTML trägt die Vollversion,
      hier wird nur überschrieben, damit das Reaktivieren trivial bleibt. */
