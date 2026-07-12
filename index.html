@@ -810,13 +810,22 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ideacard .cat-mark{position:absolute;right:-3.5cqw;top:-4cqw;width:34cqw;height:34cqw;z-index:0;pointer-events:none}
 .ideacard .cat-mark svg{width:100%;height:100%;display:block;color:#fff;opacity:.26}
 /* Die Laufnummer ist ein dezenter Eck-Rang, kein Blickfang — der Titel führt. */
-.ideacard .idx{position:relative;z-index:1;font-family:var(--mono);font-size:6.4cqw;font-weight:600;line-height:.9;letter-spacing:-.03em;opacity:.82}
-.ideacard .idx small{display:block;font-size:2.5cqw;letter-spacing:.24em;font-weight:600;opacity:.8;margin-bottom:.91cqw}
-.ideacard .catline{display:flex;align-items:center;gap:2.27cqw;margin-top:3.98cqw;position:relative;z-index:1}
-.ideacard .catline .sym{font-family:var(--mono);font-size:2.95cqw;font-weight:600;letter-spacing:.1em;border:.34cqw solid rgba(255,255,255,.75);padding:.57cqw 1.25cqw;border-radius:.68cqw;line-height:1.2}
-.ideacard .catline .nm{font-size:3.3cqw;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
-.ideacard .catline .ser{margin-left:auto;font-family:var(--mono);font-size:2.72cqw;font-weight:600;letter-spacing:.12em;opacity:.72;white-space:nowrap}
+.ideacard .idx{position:relative;z-index:1;font-family:var(--mono);font-size:8.6cqw;font-weight:700;line-height:.84;letter-spacing:-.045em;opacity:.92;font-variant-numeric:tabular-nums lining-nums;text-shadow:.1cqw .1cqw 0 rgba(0,0,0,.13),-.05cqw -.05cqw 0 rgba(255,255,255,.32)}
+.ideacard .idx::after{content:"";display:block;width:8.6cqw;height:.32cqw;margin-top:1.15cqw;background:linear-gradient(90deg,rgba(255,255,255,.7),rgba(255,255,255,0));-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ideacard .idx small{display:block;font-size:2.4cqw;letter-spacing:.3em;font-weight:600;opacity:.8;margin-bottom:1.05cqw;text-shadow:none}
+.ideacard .catline{display:flex;align-items:center;gap:3cqw;margin-top:3.98cqw;position:relative;z-index:1}
+.ideacard .catline .sym{position:relative;font-family:var(--mono);font-size:2.7cqw;font-weight:700;letter-spacing:0;border:.34cqw solid rgba(255,255,255,.85);width:6.6cqw;height:6.6cqw;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1;background:rgba(255,255,255,.06);flex-shrink:0}
+.ideacard .catline .sym::before{content:'';position:absolute;inset:-1.7cqw;border-radius:50%;background:repeating-conic-gradient(#fff 0 4deg,transparent 4deg 8deg);-webkit-mask:radial-gradient(circle,transparent 57%,#000 60%,#000 74%,transparent 77%);mask:radial-gradient(circle,transparent 57%,#000 60%,#000 74%,transparent 77%);opacity:.45;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ideacard .catline .nm{font-size:3.3cqw;font-weight:700;text-transform:uppercase;letter-spacing:.14em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ideacard .catline .ser{margin-left:auto;display:inline-flex;align-items:center;font-family:var(--mono);font-size:2.72cqw;font-weight:600;letter-spacing:.12em;opacity:.72;white-space:nowrap}
+.ideacard .catline .ser .star{width:2.8cqw;height:2.8cqw;margin-right:.7cqw;opacity:.95;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ideacard .hero-band::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.5) 49%,rgba(255,255,255,.16) 53%,transparent 61%);background-size:260% 100%;background-position:var(--mx,50%) 0;mix-blend-mode:screen;opacity:0;transition:opacity .3s var(--ease)}
+.pcard:hover .hero-band::after{opacity:.85}
+@keyframes foilLand{0%{opacity:0;background-position:-30% 0}22%{opacity:.9}100%{opacity:0;background-position:150% 0}}
+html.js .deal .hero-band::after{animation:foilLand 1.15s var(--ease) .15s backwards}
+@media(prefers-reduced-motion:reduce){.ideacard .hero-band::after{display:none}html.js .deal .hero-band::after{animation:none}}
 .ideacard .body{padding:5.68cqw;flex:1;min-height:0;display:flex;flex-direction:column;gap:3.41cqw;position:relative}
+.ideacard .body .typeline{font-family:var(--mono);font-size:2.5cqw;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--cc) 78%,#111);opacity:.9;margin:0 0 -1.2cqw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .ideacard .body > *{position:relative;z-index:1}
 .ideacard .body::before{content:'';position:absolute;left:2.3cqw;right:2.3cqw;top:2.3cqw;bottom:2.3cqw;
   border:.3cqw solid color-mix(in srgb,var(--cc) 32%,transparent);border-radius:2.4cqw;
@@ -859,7 +868,10 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ideacard .stat .k{font-size:2.39cqw;text-transform:uppercase;letter-spacing:.16em;color:#6f6a5c;font-weight:600}
 .ideacard .stat .v{font-size:3.52cqw;font-weight:600;margin-top:.8cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ideacard .foot{
-  padding:3.41cqw 5.68cqw;background:#111;color:#fff;display:flex;align-items:center;gap:3.41cqw;flex-shrink:0;
+  padding:3.41cqw 5.68cqw;background-color:#111;color:#fff;display:flex;align-items:center;gap:3.41cqw;flex-shrink:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='8'%3E%3Ctext x='0' y='6.5' font-family='monospace' font-size='6.6' letter-spacing='.6' fill='%23ffd400' fill-opacity='.22'%3EPILOT%C2%B7HANGAR%C2%B7ORIGINAL%C2%B7%3C/text%3E%3C/svg%3E");
+  background-repeat:repeat-x;background-position:center;background-size:auto 2.8cqw;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
 .ideacard .foot .mark{font-size:2.95cqw;font-weight:700;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
 .ideacard .foot .mark i{font-style:normal;color:var(--acid)}
@@ -3964,6 +3976,7 @@ const kurz = (t,max) => {
 function cardArt(i, nr){
   const c = cat(i), t = TRACKS[i.track] || {label:'—'};
   const ink = PRINT_HEX[i.category] || PRINT_HEX.offen;
+  const early = i.createdAt && (Date.now()-new Date(i.createdAt).getTime()) >= 14*864e5;
   /* Pro Karte ein eigener, aber stabiler Barcode: Strichbreite + gelegentliche
      Lücke aus Idee-Nummer/ID geseedet — wie eine gedruckte Objekt-Kennung. */
   const bseed = (String(i.id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0) + nr*97) >>> 0;
@@ -3980,9 +3993,10 @@ function cardArt(i, nr){
     <div class="hero-band">
       <span class="cat-mark" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor">${CAT_ICONS[i.category]||CAT_ICONS.offen}</svg></span>
       <div class="idx"><small>Idee</small>${String(nr).padStart(2,'0')}</div>
-      <div class="catline"><span class="sym" aria-hidden="true">${c.sym}</span><span class="nm">${esc(c.label)}</span><span class="ser" aria-hidden="true">№ ${String(nr).padStart(4,'0')}</span></div>
+      <div class="catline"><span class="sym" aria-hidden="true">${c.sym}</span><span class="nm">${esc(c.label)}</span><span class="ser" aria-hidden="true">${early?'<svg class="star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 18.7 6 21l1.3-6.6L2.4 9l6.6-.8z"/></svg>':''}№ ${String(nr).padStart(4,'0')}</span></div>
     </div>
     <div class="body">
+      <p class="typeline">${esc(c.desc)}</p>
       <h3>${esc(kurz(i.title,74))}</h3>
       <p>${esc(kurz(i.problem,215))}</p>
       <div class="stats">
