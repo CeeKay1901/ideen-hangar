@@ -798,8 +798,7 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
   display:flex;flex-direction:column;
 }
 /* Editorial-Substrat: feines Baseline-Raster, druckt als Haarlinien */
-.ideacard::before{content:"";position:absolute;inset:21cqw 6.5cqw 18cqw;z-index:0;pointer-events:none;
-  background:repeating-linear-gradient(to bottom,rgba(27,25,18,.06) 0 .16cqw,transparent .16cqw 6cqw);}
+.ideacard::before{content:none}
 /* Passer-/Schnittmarken in den Ecken — die Sammelkarten-Signatur */
 .ideacard .tick{position:absolute;width:4.6cqw;height:4.6cqw;z-index:3;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ideacard .tick::before,.ideacard .tick::after{content:"";position:absolute;background:var(--fg)}
@@ -809,28 +808,28 @@ select.sort{background:var(--bg-2);border:1px solid var(--line-2);border-radius:
 .ideacard .tick.tr{top:2.4cqw;right:2.4cqw}.ideacard .tick.tr::before{right:0}.ideacard .tick.tr::after{right:0}
 .ideacard .tick.bl{bottom:2.4cqw;left:2.4cqw}.ideacard .tick.bl::before{bottom:0}.ideacard .tick.bl::after{bottom:0}
 .ideacard .tick.br{bottom:2.4cqw;right:2.4cqw}.ideacard .tick.br::before{bottom:0;right:0}.ideacard .tick.br::after{bottom:0;right:0}
-.ideacard > .idx-row,.ideacard > .rule,.ideacard > .hero,.ideacard > .problem,.ideacard > .art,.ideacard > .foot{position:relative;z-index:1}
+.ideacard > .idx-row,.ideacard > .rule,.ideacard > .ic-hero,.ideacard > .problem,.ideacard > .art,.ideacard > .foot{position:relative;z-index:1}
 /* Kopfzeile */
 .ideacard .idx-row{display:flex;justify-content:space-between;align-items:flex-start;gap:2cqw}
-.ideacard .eyebrow{display:flex;flex-direction:column;gap:1.4cqw;padding-top:1.2cqw;min-width:0}
+.ideacard .ic-eb{display:flex;flex-direction:column;gap:1.4cqw;padding-top:1.2cqw;min-width:0}
 .ideacard .cat{display:flex;align-items:center;gap:2cqw;font-family:var(--mono);font-size:3.3cqw;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--cat);min-width:0}
 .ideacard .cat svg{width:5.2cqw;height:5.2cqw;display:block;flex:0 0 auto}
 .ideacard .cat span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ideacard .track{font-family:var(--mono);font-size:2.8cqw;letter-spacing:.14em;text-transform:uppercase;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ideacard .wild-tag{align-self:flex-start;margin-top:1.2cqw;background:var(--acid);color:var(--fg);font-family:var(--mono);font-size:2.4cqw;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:.7cqw 1.6cqw;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 /* Index-Nummer an den oberen Beschnitt gecropped */
-.ideacard .nr{font-family:var(--mono);text-align:right;line-height:.74;margin:-2.8cqw -1.2cqw 0 0;flex:0 0 auto}
-.ideacard .nr b{display:block;font-size:21cqw;font-weight:700;color:var(--cat);letter-spacing:-.04em;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ideacard .nr{position:absolute;top:-1.4cqw;right:5.6cqw;z-index:2;font-family:var(--mono);text-align:right;line-height:.72}
+.ideacard .nr b{display:block;font-size:19.5cqw;font-weight:700;color:var(--cat);letter-spacing:-.04em;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ideacard .nr span{display:block;font-size:3cqw;letter-spacing:.34em;opacity:.5;margin-top:.5cqw}
 .ideacard .rule{height:1.2cqw;background:var(--cat);margin:2.2cqw 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 /* Hero: Titel führt */
-.ideacard .hero{margin-top:2cqw}
-.ideacard .headline{font-weight:800;font-size:10.6cqw;line-height:.92;letter-spacing:-.02em;hyphens:auto;-webkit-hyphens:auto;word-break:break-word}
+.ideacard .ic-hero{margin-top:2cqw}
+.ideacard .headline{font-weight:800;font-size:11cqw;line-height:.92;letter-spacing:-.02em;hyphens:auto;-webkit-hyphens:auto;word-break:break-word}
 .ideacard .deck{margin-top:1.3cqw;font-size:3.95cqw;line-height:1.08;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ideacard .problem{margin-top:1.6cqw;padding-left:3.2cqw;position:relative;font-size:3.15cqw;line-height:1.24;font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ideacard .problem::before{content:"";position:absolute;left:0;top:.5cqw;bottom:.5cqw;width:.85cqw;background:var(--cat);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 /* DAS ARTWORK: Bold Duotone-Emblem — vollflächige Siebdruck-Platte */
-.ideacard .art{margin:auto -6.5cqw;height:20cqw;flex:0 0 auto;position:relative;overflow:hidden;background:var(--cat);border-top:.55cqw solid var(--fg);border-bottom:.55cqw solid var(--fg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ideacard .art{margin:auto -6.5cqw;height:26cqw;flex:0 0 auto;position:relative;overflow:hidden;background:var(--cat);border-top:.55cqw solid var(--fg);border-bottom:.55cqw solid var(--fg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ideacard .art .emblem{position:absolute;inset:0;width:100%;height:100%;display:block}
 .ideacard .art .astamp{position:absolute;z-index:2;bottom:1.4cqw;font-family:var(--mono);text-transform:uppercase;color:var(--bg);font-weight:700;white-space:nowrap;text-shadow:0 0 .9cqw rgba(27,25,18,.55),0 .15cqw .2cqw rgba(27,25,18,.5)}
 .ideacard .art .astamp.l{left:3.2cqw;font-size:2.5cqw;letter-spacing:.26em}
@@ -4016,7 +4015,7 @@ function cardArt(i, nr){
   <article class="ideacard ${i.wildcard?'-wild':''}" style="--cat:${hex}">
     <i class="tick tl"></i><i class="tick tr"></i><i class="tick bl"></i><i class="tick br"></i>
     <div class="idx-row">
-      <div class="eyebrow">
+      <div class="ic-eb">
         <div class="cat">${eye}<span>${esc(c.label)}</span></div>
         <div class="track">${esc(kurz(t.label,22))}</div>
         ${i.wildcard?'<span class="wild-tag">Wildcard</span>':''}
@@ -4024,7 +4023,7 @@ function cardArt(i, nr){
       <div class="nr"><b>${String(nr).padStart(2,'0')}</b><span>${esc(c.sym)}</span></div>
     </div>
     <div class="rule"></div>
-    <div class="hero">
+    <div class="ic-hero">
       <div class="headline">${esc(kurz(head,40))}</div>
       ${deck?`<div class="deck">${esc(kurz(deck,58))}</div>`:''}
     </div>
